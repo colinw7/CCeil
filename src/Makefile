@@ -49,13 +49,19 @@ CCeilPType.cpp \
 CCeilPUserfn.cpp \
 CCeilPValue.cpp \
 CCeilPVar.cpp \
-CStrParse.cpp
 
 OBJS = $(patsubst %.cpp,$(OBJ_DIR)/%.o,$(SRC))
 
 LIBS = -lCCeil -lCArgs -lCOS -lCStrUtil -lCGlob
 
-CPPFLAGS = -I$(INC_DIR) -I.
+CPPFLAGS = \
+-I$(INC_DIR) \
+-I../../CArgs/include \
+-I../../COS/include \
+-I../../CStrUtil/include \
+-I../../CGlob/include \
+-I../../CUtil/include \
+-I.
 
 LFLAGS = -L$(LIB_DIR)
 
