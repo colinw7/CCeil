@@ -60,6 +60,7 @@ CPPFLAGS = \
 -I../../COS/include \
 -I../../CStrUtil/include \
 -I../../CGlob/include \
+-I../../CMath/include \
 -I../../CUtil/include \
 -I.
 

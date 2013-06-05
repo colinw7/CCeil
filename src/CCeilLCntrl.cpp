@@ -1776,7 +1776,7 @@ processExpression(ClLanguageCommand *, ClLanguageArgs *args)
  *
  * RETURNS:
  *   flag         : The control flow state :-
- *    int         :  LANGUAGE_EXIT
+ *                :  LANGUAGE_EXIT
  *                :   'exit' command has been entered.
  *                :  LANGUAGE_GOTO_INSIDE
  *                :   'goto' command has been entered and points to a command inside

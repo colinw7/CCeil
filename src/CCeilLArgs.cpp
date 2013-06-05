@@ -176,9 +176,9 @@ termArgs()
  *   int error = checkNumberOfArgs(int min, int max);
  *
  * INPUT:
- *   min : The minimum number of arguments allowed
+ *   min   : The minimum number of arguments allowed
  *
- *   max : The maximum number of arguments allowed
+ *   max   : The maximum number of arguments allowed
  *
  * RETURNS:
  *   error : Error Return Code :-
