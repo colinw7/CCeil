@@ -125,7 +125,7 @@ class CMultiArrayT {
         num_data *= dims[i];
     }
 
-    void getDims(const std::vector<uint> &dims1) const {
+    void getDims(std::vector<uint> &dims1) const {
       for (uint i = 0; i < num_dims; ++i)
         dims1.push_back(dims[i]);
     }
