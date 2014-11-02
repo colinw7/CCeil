@@ -16,7 +16,7 @@ class ClLanguageDebug {
 #ifdef CL_LANGUAGE_DEBUG
     Trace(const char *id) : trace_(*ClLanguageDebugInst->getTrace(), id) { }
 #else
-    Trace(const char *id) { }
+    Trace(const char *) { }
 #endif
 
 #ifdef CL_LANGUAGE_DEBUG

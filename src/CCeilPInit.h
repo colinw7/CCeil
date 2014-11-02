@@ -221,17 +221,17 @@ class ClParser {
   }
 #endif
 
-  void setDebug(bool flag) {
 #ifdef CL_PARSER_DEBUG
-    trace_mgr_.setActive(flag);
+  void setDebug(bool flag) { trace_mgr_.setActive(flag); }
+#else
+  void setDebug(bool) { }
 #endif
-  }
 
-  FILE *setDebugFile(FILE *fp) {
 #ifdef CL_PARSER_DEBUG
-    return trace_mgr_.setOutput(fp);
+  FILE *setDebugFile(FILE *fp) { return trace_mgr_.setOutput(fp); }
+#else
+  FILE *setDebugFile(FILE *) { return 0; }
 #endif
-  }
 
   bool isDebug() const {
 #ifdef CL_PARSER_DEBUG

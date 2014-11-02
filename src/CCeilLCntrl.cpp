@@ -5,8 +5,6 @@
 #include <CArgs.h>
 #include <CFile.h>
 
-#include <cstdlib>
-
 using std::string;
 
 struct ClLanguageRunFileData {

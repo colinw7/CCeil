@@ -886,7 +886,7 @@ unstackSelectExpression(int *error_code)
     if (*error_code != 0)
       return;
 
-    toPrev();
+    //toPrev();
   }
   else {
     skipExpression(error_code);

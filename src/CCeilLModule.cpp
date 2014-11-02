@@ -1,31 +1,15 @@
 #include <CCeilL.h>
 
 using std::string;
-using std::cerr;
-using std::endl;
 
 /*------------------------------------------------------------------*
  *
  * defineModule
  *   Define a module which can subsequently be imported.
  *
- * CALL:
- *   defineModule(const string &name, ClModuleDef *module_def);
- *
  * INPUT:
  *   name       : Module Name.
- *
- *   module_def : Structure containing the method names and their
- *              : associated routine.
- *
- * OUTPUT:
- *   None
- *
- * RETURNS:
- *   None
- *
- * NOTES:
- *   None
+ *   module_def : Structure containing the method names and their associated routine.
  *
  *------------------------------------------------------------------*/
 
@@ -45,7 +29,7 @@ defineModule(const string &name, ClModuleDef *module_def)
     else if (CStrUtil::casecmp(module_def[i].name, "help") == 0)
       module->setHelpProc((ClModuleHelpProc) module_def[i].proc);
     else
-      cerr << "Invalid Module Procedure Name '" << module_def[i].name << "'" << endl;
+      std::cerr << "Invalid Module Procedure Name '" << module_def[i].name << "'" << std::endl;
   }
 
   module_list_[name] = module;
@@ -244,9 +228,6 @@ isModuleLoaded(const string &name) const
  *
  *   args   : String containing additional arguments
  *          : to use to set the option.
- *
- * OUTPUT:
- *     None
  *
  * RETURNS:
  *   flag   : Whether the set was successful or not.
@@ -564,8 +545,8 @@ string
 ClModuleMgr::
 moduleSearchLib(const string &envname, const string &name)
 {
-  if (COS::checkenv(envname))
-    envval = COS::getenv(envname);
+  if (CEnvInst.exists(envname))
+    envval = CEnvInst.get(envname);
   else
     envval = "/usr/lib /lib";
 

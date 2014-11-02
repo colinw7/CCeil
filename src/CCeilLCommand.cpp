@@ -1,5 +1,4 @@
 #include <CCeilL.h>
-
 #include <cstdlib>
 
 using std::string;

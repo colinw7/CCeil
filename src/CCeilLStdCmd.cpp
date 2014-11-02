@@ -1,10 +1,10 @@
 #include <CCeilLI.h>
 #include <COSProcess.h>
 #include <COSRand.h>
-#include <COSEnv.h>
 #include <CFile.h>
+#include <CEnv.h>
 
-#include <signal.h>
+#include <csignal>
 #include <algorithm>
 
 using std::string;
@@ -4085,8 +4085,8 @@ ClStdGetEnvCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
 
   env_value = "";
 
-  if (env_name != "" && COSEnv::checkenv(env_name))
-    env_value = COSEnv::getenv(env_name);
+  if (env_name != "" && CEnvInst.exists(env_name))
+    CEnvInst.get(env_name, env_value);
 
   args->setStringArg(1, env_value, &error_code);
 }
@@ -4148,7 +4148,7 @@ ClStdSetEnvCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
 
   /* Set Environment Variable */
 
-  COSEnv::setenv(env_name, env_value);
+  CEnvInst.set(env_name, env_value);
 }
 
 /*------------------------------------------------------------------*
@@ -4200,8 +4200,8 @@ ClStdUnSetEnvCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
 
   /* Unset Environment Variable */
 
-  if (COSEnv::checkenv(env_name))
-    COSEnv::unsetenv(env_name);
+  if (CEnvInst.exists(env_name))
+    CEnvInst.unset(env_name);
 }
 
 /*------------------------------------------------------------------*

@@ -34,6 +34,8 @@ setDebug(bool flag)
 {
 #ifdef CL_LANGUAGE_DEBUG
   trace_mgr_.setActive(flag);
+#else
+  assert(&flag);
 #endif
 }
 
@@ -67,7 +69,7 @@ setDebugFile(FILE *fp)
 #ifdef CL_LANGUAGE_DEBUG
   return trace_mgr_.setOutput(fp);
 #else
-  return 0;
+  return fp;
 #endif
 }
 

@@ -250,7 +250,8 @@ parse()
 
       ClParserParser parser2(this);
 
-      if (! parser2.parse()) {
+      if (! parser2.parse() &&
+          parser2.getErrorCode() != CLERR_INVALID_CHARACTER) {
         error_code_ = parser2.getErrorCode();
         goto fail;
       }

@@ -1,8 +1,6 @@
 #include <CCeilL.h>
 #include <COSSignal.h>
 
-#include <signal.h>
-
 using std::string;
 
 static void

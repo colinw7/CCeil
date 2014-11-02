@@ -1,7 +1,7 @@
 #include <CCeil.h>
+#include <CCeilP.h>
+#include <CEnv.h>
 #include <cstdlib>
-
-#include <CCeilPI.h>
 
 /*------------------------------------------------------------------*
  *
@@ -27,10 +27,10 @@ main(int argc, char **argv)
 
   /* Turn Real Parsing on if Environment Variable set */
 
-  if (getenv("CL_PARSE_REAL"))
+  if (CEnvInst.exists("CL_PARSE_REAL"))
     ClParserInst->setParseAsReals(true);
 
-  if (getenv("CL_DOLLAR_PREFIX"))
+  if (CEnvInst.exists("CL_DOLLAR_PREFIX"))
     ClParserInst->setDollarPrefix(true);
 
   /* Start Command Line Interface
