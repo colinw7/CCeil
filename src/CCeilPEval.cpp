@@ -4,7 +4,7 @@ using std::string;
 
 ClParserExpr::
 ClParserExpr(const string &expression) :
- expression_(expression)
+ expression_(expression), compiled_(false)
 {
 }
 
@@ -39,7 +39,8 @@ compile()
     return false;
   }
 
-  stack_ = stack;
+  stack_    = stack;
+  compiled_ = true;
 
   return true;
 }

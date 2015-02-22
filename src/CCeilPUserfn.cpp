@@ -24,13 +24,15 @@ createUserFn(const ClUserFnData &data)
   int        type;
   IntVectorT arg_types;
 
-  if (data.types != NULL)
+  if (data.types != 0)
     stringToTypes(data.types, &type, arg_types);
+  else
+    type = 0;
 
   ClParserUserFnPtr userfn =
     createUserFn(data.name, type, arg_types, data.proc, data.data);
 
-  if (data.num != NULL)
+  if (data.num != 0)
     *data.num = userfn->getInd();
 
   return userfn;
@@ -732,8 +734,8 @@ term()
   free_array_strings_.clear();
   free_array_string_dims_.clear();
 
-  execUserFn_ = NULL;
+  execUserFn_ = 0;
 
-  values_     = NULL;
+  values_     = 0;
   num_values_ = 0;
 }

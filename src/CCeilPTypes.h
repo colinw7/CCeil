@@ -160,10 +160,10 @@ class  ClParserScope;
 
 struct ClParserArg;
 class  ClParserArgValue;
-struct ClParserKey;
+class  ClParserKey;
 struct ClParserKeyValue;
-struct ClParserStackNode;
-struct ClParserSubType;
+class  ClParserStackNode;
+class  ClParserSubType;
 
 union  ClParserArrayData;
 union  ClParserStackNodeData;

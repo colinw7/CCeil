@@ -111,7 +111,7 @@ cl_builtin_module_def[] = {
   { "init", (ClModuleProc) ClStdCommandsInit, },
   { "set" , (ClModuleProc) ClStdCommandsSet , },
   { "help", (ClModuleProc) ClStdCommandsHelp, },
-  { ""    , NULL                            , },
+  { ""    , 0                               , },
 };
 
 static int language_import_ident = -1;
@@ -276,7 +276,7 @@ ClStdCommandsInit(ClModuleInitType flag, void *)
                    CL_PARSER_VALUE_TYPE_STRING;
 
     ClParserInst->createUserFn("format", CL_PARSER_USERFN_TYPE_VARARGS,
-                               arg_types, num_arg_types, ClStdFormatCommand, NULL);
+                               arg_types, num_arg_types, ClStdFormatCommand, 0);
 
     if (ClParserUserFn::getErrorCode() != 0) {
       ClLanguageMgrInst->expressionError
@@ -291,7 +291,7 @@ ClStdCommandsInit(ClModuleInitType flag, void *)
                    CL_PARSER_VALUE_TYPE_STRING  | CL_PARSER_VALUE_TYPE_OUTPUT;
 
     ClParserInst->createUserFn("scan", CL_PARSER_USERFN_TYPE_VARARGS,
-                               arg_types, num_arg_types, ClStdScanCommand, NULL);
+                               arg_types, num_arg_types, ClStdScanCommand, 0);
 
     if (ClParserUserFn::getErrorCode() != 0) {
       ClLanguageMgrInst->expressionError
@@ -307,7 +307,7 @@ ClStdCommandsInit(ClModuleInitType flag, void *)
     arg_types[0] = CL_PARSER_VALUE_TYPE_STRING;
 
     ClParserInst->createUserFn("exec", CL_PARSER_USERFN_TYPE_STD,
-                               arg_types, num_arg_types, ClStdExecCommand, NULL);
+                               arg_types, num_arg_types, ClStdExecCommand, 0);
 
     if (ClParserUserFn::getErrorCode() != 0) {
       ClLanguageMgrInst->expressionError
@@ -323,7 +323,7 @@ ClStdCommandsInit(ClModuleInitType flag, void *)
     arg_types[0] = CL_PARSER_VALUE_TYPE_STRING;
 
     ClParserInst->createUserFn("parse", CL_PARSER_USERFN_TYPE_STD,
-                               arg_types, num_arg_types, ClStdParseCommand, NULL);
+                               arg_types, num_arg_types, ClStdParseCommand, 0);
 
     if (ClParserUserFn::getErrorCode() != 0) {
       ClLanguageMgrInst->expressionError
@@ -346,7 +346,7 @@ ClStdCommandsInit(ClModuleInitType flag, void *)
     num_arg_types = 0;
 
     ClParserInst->createUserFn("rand", CL_PARSER_USERFN_TYPE_VARARGS,
-                               arg_types, num_arg_types, ClStdRandCommand, NULL);
+                               arg_types, num_arg_types, ClStdRandCommand, 0);
 
     if (ClParserUserFn::getErrorCode() != 0) {
       ClLanguageMgrInst->expressionError
@@ -357,7 +357,7 @@ ClStdCommandsInit(ClModuleInitType flag, void *)
     num_arg_types = 0;
 
     ClParserInst->createUserFn("rrand", CL_PARSER_USERFN_TYPE_VARARGS,
-                               arg_types, num_arg_types, ClStdRRandCommand, NULL);
+                               arg_types, num_arg_types, ClStdRRandCommand, 0);
 
     if (ClParserUserFn::getErrorCode() != 0) {
       ClLanguageMgrInst->expressionError
@@ -379,7 +379,7 @@ ClStdCommandsInit(ClModuleInitType flag, void *)
     arg_types[0] = CL_PARSER_VALUE_TYPE_STRING;
 
     ClParserInst->createUserFn("isvar", CL_PARSER_USERFN_TYPE_STD,
-                               arg_types, num_arg_types, ClStdIsVarCommand, NULL);
+                               arg_types, num_arg_types, ClStdIsVarCommand, 0);
 
     if (ClParserUserFn::getErrorCode() != 0) {
       ClLanguageMgrInst->expressionError
@@ -400,7 +400,7 @@ ClStdCommandsInit(ClModuleInitType flag, void *)
     /******/
 
     language_retall_ident =
-       ClLanguageMgrInst->defineCommand("retall", (ClLanguageCmdProc) NULL);
+       ClLanguageMgrInst->defineCommand("retall", (ClLanguageCmdProc) 0);
 
     /******/
 
@@ -492,7 +492,7 @@ ClStdCommandsSet(const char *option, const char *args, void *)
 
     ClLanguageArgs *args1 = new ClLanguageArgs;
 
-    args1->startArgs(NULL);
+    args1->startArgs(0);
 
     if (args1->getStringArgList(args,
                                 CL_ARG_TYPE_STRING, &prompt,
@@ -515,7 +515,7 @@ ClStdCommandsSet(const char *option, const char *args, void *)
 
     ClLanguageArgs *args1 = new ClLanguageArgs;
 
-    args1->startArgs(NULL);
+    args1->startArgs(0);
 
     if (args1->getStringArgList(args,
                                 CL_ARG_TYPE_STRING, &format,
@@ -548,7 +548,7 @@ ClStdCommandsSet(const char *option, const char *args, void *)
 
     ClLanguageArgs *args1 = new ClLanguageArgs;
 
-    args1->startArgs(NULL);
+    args1->startArgs(0);
 
     if (args1->getStringArgList(args,
                                 CL_ARG_TYPE_STRING, &format,
@@ -581,7 +581,7 @@ ClStdCommandsSet(const char *option, const char *args, void *)
 
     ClLanguageArgs *args1 = new ClLanguageArgs;
 
-    args1->startArgs(NULL);
+    args1->startArgs(0);
 
     if (args1->getStringArgList(args,
                                 CL_ARG_TYPE_STRING, &format,
@@ -1025,7 +1025,7 @@ ClStdProcCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 
   /* Ensure Procedure Can be Deleted */
 
-  if (old_procedure != NULL && ! old_procedure->canDelete()) {
+  if (old_procedure != 0 && ! old_procedure->canDelete()) {
     ClLanguageMgrInst->syntaxError
      ("'proc' Existing procedure '%s' cannot be deleted", name_string.c_str());
     goto fail;
@@ -1094,10 +1094,10 @@ ClStdProcCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
   /* Remove existing language procedure, language function and
      parser function with the same name */
 
-  if (old_procedure != NULL)
+  if (old_procedure != 0)
     ClLanguageProcMgrInst->deleteProc(old_procedure->getName());
 
-  if (old_lfunction != NULL) {
+  if (old_lfunction != 0) {
     ClParserInst->removeUserFn(old_lfunction->getName());
 
     ClLanguageFuncMgrInst->deleteFunc(old_lfunction->getName());
@@ -1188,7 +1188,7 @@ ClStdFuncCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 
   /* Ensure Procedure Can be Deleted */
 
-  if (old_procedure != NULL && ! old_procedure->canDelete()) {
+  if (old_procedure != 0 && ! old_procedure->canDelete()) {
     ClLanguageMgrInst->syntaxError
      ("'func' Existing procedure '%s' cannot be deleted", name_string.c_str());
     goto fail;
@@ -1298,10 +1298,10 @@ ClStdFuncCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
   /* Remove existing language procedure, language function and
      parser function with the same name */
 
-  if (old_procedure != NULL)
+  if (old_procedure != 0)
     ClLanguageProcMgrInst->deleteProc(old_procedure->getName());
 
-  if (old_lfunction != NULL) {
+  if (old_lfunction != 0) {
     ClParserInst->removeUserFn(old_lfunction->getName());
 
     ClLanguageFuncMgrInst->deleteFunc(old_lfunction->getName());
@@ -2154,7 +2154,7 @@ ClStdIfCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 
   ClLanguageCommandList command_list1;
 
-  ClLanguageCommand **commands = NULL;
+  ClLanguageCommand **commands = 0;
 
   /* Extract If Expression */
 
@@ -2483,7 +2483,7 @@ ClStdGotoCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
 
   label_data = ClLanguageLabelDataMgrInst->getCurrentLabelData(arg);
 
-  if (label_data == NULL) {
+  if (! label_data) {
     ClLanguageMgrInst->syntaxError
      ("'goto' label '%s' not known in current scope", arg.c_str());
     return;
@@ -2848,7 +2848,7 @@ ClStdDefineCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
 
   /* Ensure Procedure Can be Deleted */
 
-  if (old_procedure != NULL && ! old_procedure->canDelete()) {
+  if (old_procedure != 0 && ! old_procedure->canDelete()) {
     ClLanguageMgrInst->syntaxError
      ("'define' Existing procedure '%s' cannot be deleted",
       name_string.c_str());
@@ -2867,7 +2867,7 @@ ClStdDefineCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
   /* Remove existing Language Function's Parser User Function
      to prevent namespace error when creating Parser Function */
 
-  if (old_lfunction != NULL)
+  if (old_lfunction != 0)
     ClParserInst->removeUserFn(old_lfunction->getName());
 
   lhs = cargs.substr(0, p - 1);
@@ -2882,13 +2882,13 @@ ClStdDefineCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
     /* Restore Language Function's Parser User Function if failed
        to define Parser Function */
 
-    if (old_lfunction != NULL) {
+    if (old_lfunction != 0) {
       int *arg_types;
 
       if (old_lfunction->getNumArgs() > 0)
         arg_types = new int [old_lfunction->getNumArgs()];
       else
-        arg_types = NULL;
+        arg_types = 0;
 
       for (uint i = 0; i < old_lfunction->getNumArgs(); i++)
         arg_types[i] = old_lfunction->getArg(i).getType();
@@ -2898,7 +2898,7 @@ ClStdDefineCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
                                  old_lfunction->getNumArgs(),
                                  ClLanguageRunFunction, (void *) old_lfunction);
 
-      if (arg_types != NULL)
+      if (arg_types != 0)
         delete [] arg_types;
     }
 
@@ -3259,7 +3259,7 @@ ClStdPrintCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 
   /*-------------*/
 
-  FILE *fp      = ClLanguageMgrInst->setOutputFp(NULL);
+  FILE *fp      = ClLanguageMgrInst->setOutputFp(0);
   FILE *save_fp = fp;
 
   /* Get Print's Arguments */
@@ -3441,7 +3441,7 @@ ClStdFormatCommand(ClParserValuePtr *values, uint num_values, void *, int *error
           break;
         }
 
-        if (strchr("diouxXfeEgGcs%", format_code) == NULL) {
+        if (strchr("diouxXfeEgGcs%", format_code) == 0) {
           temp_string1 += value_format_string;
           break;
         }
@@ -3635,7 +3635,7 @@ ClStdScanCommand(ClParserValuePtr *values, uint num_values, void *, int *error_c
   uint    i, len1, len2;
   char   *addrs[20];
   int     codes[20];
-  uint    num_addrs;
+  uint    num_addrs = 0;
   uint    num_scanned;
   string  source_string;
   string  format_string;
@@ -3724,10 +3724,10 @@ ClStdScanCommand(ClParserValuePtr *values, uint num_values, void *, int *error_c
           continue;
         }
         else {
-          if (strchr("diouxcsefgpn", format_code) == NULL)
+          if (strchr("diouxcsefgpn", format_code) == 0)
             continue;
 
-          if (strchr("diouxefg", format_code) != NULL)
+          if (strchr("diouxefg", format_code) != 0)
             format_string3 += 'l';
 
           format_string3 += format_code;
@@ -3798,7 +3798,7 @@ ClStdScanCommand(ClParserValuePtr *values, uint num_values, void *, int *error_c
 
   for (i = num_addrs; i < 20; i++) {
     codes[i] = '\0';
-    addrs[i] = NULL;
+    addrs[i] = 0;
   }
 
   num_scanned = sscanf(source_string.c_str(), format_string1.c_str(),
@@ -4488,14 +4488,14 @@ ClStdUndefCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
     else if (ClParserInst->isType(arg)) {
       ClParserInst->deleteType(arg);
     }
-    else if ((procedure = ClLanguageProcMgrInst->lookupProc(arg)) != NULL) {
+    else if ((procedure = ClLanguageProcMgrInst->lookupProc(arg)) != 0) {
       if (procedure->canDelete())
         ClLanguageProcMgrInst->deleteProc(arg);
       else
         ClLanguageMgrInst->syntaxError
          ("'undef' procedure '%s' cannot be undefined", arg.c_str());
     }
-    else if ((function = ClLanguageFuncMgrInst->lookupFunc(arg)) != NULL) {
+    else if ((function = ClLanguageFuncMgrInst->lookupFunc(arg)) != 0) {
       ClParserInst->removeUserFn(arg);
 
       ClLanguageFuncMgrInst->deleteFunc(arg);
@@ -4561,7 +4561,7 @@ ClStdWhatisCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
 
     //bool found_proc = false;
 
-    if ((procedure = ClLanguageProcMgrInst->lookupProc(arg)) != NULL) {
+    if ((procedure = ClLanguageProcMgrInst->lookupProc(arg)) != 0) {
       ClLanguageMgrInst->output("Procedure ");
 
       procedure->print();
@@ -4573,7 +4573,7 @@ ClStdWhatisCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
 
     command_def = ClLanguageMgrInst->getCommandDef(scope, arg, &end_name);
 
-    if      (command_def != NULL) {
+    if      (command_def != 0) {
       if (command_def->getEndName() != "") {
         if (! end_name)
           ClLanguageMgrInst->output("Start Block Command %s\n", arg.c_str());
@@ -4847,15 +4847,15 @@ ClStdHelpCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
 
   /*-------*/
 
-  FILE *fp     = NULL;
-  FILE *old_fp = NULL;
+  FILE *fp     = 0;
+  FILE *old_fp = 0;
 
   /*-------*/
 
   if (file != "") {
     fp = fopen(file.c_str(), "w");
 
-    if (fp != NULL)
+    if (fp != 0)
       old_fp = ClLanguageMgrInst->setOutputFp(fp);
     else
       ClLanguageMgrInst->error("invalid file '%s'", file.c_str());
@@ -4875,7 +4875,7 @@ ClStdHelpCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
   {
     ClLanguageHelpProc help_proc = ClLanguageMgrInst->getHelpProc();
 
-    if (help_proc != NULL) {
+    if (help_proc != 0) {
       (*help_proc)(subject.c_str(), args1.c_str());
 
       goto done;
@@ -4889,7 +4889,7 @@ ClStdHelpCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
   /*-------*/
 
  done:
-  if (file != "" && fp != NULL)
+  if (file != "" && fp != 0)
     ClLanguageMgrInst->setOutputFp(old_fp);
 }
 

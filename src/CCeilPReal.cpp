@@ -293,6 +293,8 @@ abs() const
     COSNaN::set_nan(&result);
   else if (real_ < 0.0)
     result = -real_;
+  else
+    result = real_;
 
   return ClParserValueMgrInst->createValue(result);
 }
