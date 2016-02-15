@@ -3038,20 +3038,13 @@ ClStdStructCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
 static void
 ClStdInputCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
 {
-  int             i;
-  FILE           *fp;
-  long            fp1;
-  string          arg;
-  string          name;
-  string          line;
-  string          line1;
   ClParserValuePtr value;
-  int             evaluate;
-  string          variable;
-  string          variable1;
-  int             error_code;
-  int             arg_offset;
-  string          prompt_string;
+  int              evaluate;
+  string           variable;
+  string           variable1;
+  int              error_code;
+  int              arg_offset;
+  string           prompt_string;
 
   CL_LANGUAGE_TRACE("ClStdInputCommand");
 
@@ -3062,15 +3055,17 @@ ClStdInputCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
 
   /* Check for specified Input File */
 
-  arg = args->getArg(1, &error_code);
+  std::string arg = args->getArg(1, &error_code);
 
   if (error_code != 0)
     return;
 
-  if (arg[0] == '@') {
-    i = 1;
+  FILE *fp = 0;
 
-    name = arg.substr(i);
+  if (arg[0] == '@') {
+    int i = 1;
+
+    std::string name = arg.substr(i);
 
     CStrUtil::stripSpaces(name);
 
@@ -3081,6 +3076,8 @@ ClStdInputCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
     }
 
     value = ClParserInst->getVariableValue(name);
+
+    long fp1;
 
     if (! value->integerValue(&fp1)) {
       ClLanguageMgrInst->expressionError
@@ -3135,6 +3132,8 @@ ClStdInputCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
 
   ClLanguageMgrInst->output("%s", prompt_string.c_str());
 
+  std::string line;
+
 #ifdef CEIL_READLINE
   if (fp == stdin) {
     ClLanguageMgrInst->getReadLine().setPrompt("");
@@ -3146,7 +3145,7 @@ ClStdInputCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
       line = "";
   }
 #else
-  if (! CFile::readLine(fp, line1))
+  if (! CFile::readLine(fp, line))
     line = "";
 #endif
 
