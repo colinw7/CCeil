@@ -52,7 +52,7 @@ CCeilPVar.cpp \
 
 OBJS = $(patsubst %.cpp,$(OBJ_DIR)/%.o,$(SRC))
 
-LIBS = -lCCeil -lCArgs -lCOS -lCStrUtil -lCGlob
+LIBS = -lCCeil -lCArgs -lCOS -lCUtil -lCStrUtil -lCGlob
 
 CPPFLAGS = \
 -I$(INC_DIR) \
@@ -68,6 +68,7 @@ LFLAGS = \
 -L$(LIB_DIR) \
 -L../../CArgs/lib \
 -L../../COS/lib \
+-L../../CUtil/lib \
 -L../../CStrUtil/lib \
 -L../../CGlob/lib \
 
