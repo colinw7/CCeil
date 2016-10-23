@@ -55,6 +55,7 @@ OBJS = $(patsubst %.cpp,$(OBJ_DIR)/%.o,$(SRC))
 LIBS = -lCCeil -lCArgs -lCOS -lCUtil -lCStrUtil -lCGlob
 
 CPPFLAGS = \
+-std=c++11 \
 -I$(INC_DIR) \
 -I../../CArgs/include \
 -I../../COS/include \
