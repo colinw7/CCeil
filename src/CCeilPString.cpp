@@ -29,7 +29,7 @@ ClParserString(const ClParserStringPtr &str) :
 {
 }
 
-const ClParserString &
+ClParserString &
 ClParserString::
 operator=(const ClParserString &str)
 {

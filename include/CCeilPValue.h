@@ -16,7 +16,7 @@ class ClParserValueCmp {
   ClParserSortDirection direction_;
 
  public:
-  ClParserValueCmp(ClParserSortDirection direction) :
+  explicit ClParserValueCmp(ClParserSortDirection direction) :
    direction_(direction) {
   }
 
@@ -96,29 +96,29 @@ class ClParserValue {
   friend class CRefPtr<ClParserValue>;
 
   ClParserValue();
-  ClParserValue(double real);
-  ClParserValue(ClParserRealPtr real);
-  ClParserValue(long integer);
-  ClParserValue(ClParserIntegerPtr integer);
-  ClParserValue(const std::string &str);
+  explicit ClParserValue(double real);
+  explicit ClParserValue(ClParserRealPtr real);
+  explicit ClParserValue(long integer);
+  explicit ClParserValue(ClParserIntegerPtr integer);
+  explicit ClParserValue(const std::string &str);
   ClParserValue(const char *text, int len);
-  ClParserValue(ClParserStringPtr str);
-  ClParserValue(ClParserArrayPtr array);
-  ClParserValue(ClParserListPtr list);
-  ClParserValue(ClParserDictPtr dict);
-  ClParserValue(ClParserStructPtr structure);
-  ClParserValue(const ClParserValue &value);
-  ClParserValue(const ClParserObj &obj);
+  explicit ClParserValue(ClParserStringPtr str);
+  explicit ClParserValue(ClParserArrayPtr array);
+  explicit ClParserValue(ClParserListPtr list);
+  explicit ClParserValue(ClParserDictPtr dict);
+  explicit ClParserValue(ClParserStructPtr structure);
+  explicit ClParserValue(const ClParserObj &obj);
+  explicit ClParserValue(ClParserValueType type);
 
-  ClParserValue(ClParserValueType type);
+  ClParserValue(const ClParserValue &value);
 
   ClParserValue(ClParserValueType type, ClParserValuePtr *values, int num_values);
   ClParserValue(ClParserValueType type, const ClParserValueArray &values);
 
   ClParserValue(ClParserValuePtr *values, int num_values);
-  ClParserValue(const ClParserValueArray &values);
+  explicit ClParserValue(const ClParserValueArray &values);
 
-  ClParserValue(ClParserTypePtr type);
+  explicit ClParserValue(ClParserTypePtr type);
   ClParserValue(ClParserTypePtr type, ClParserValuePtr *values, int num_values);
   ClParserValue(ClParserTypePtr type, const ClParserValueArray &values);
 

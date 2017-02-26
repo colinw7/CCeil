@@ -29,25 +29,8 @@ struct ClModuleDef {
 /*---- Routines ----*/
 
 class ClModule {
- private:
-  enum State {
-    MODULE_UNLOADED = 0,
-    MODULE_LOADED   = 1
-  };
-
-  std::string       name_;
-  ClModuleInitProc  init_proc_;
-  void             *init_data_;
-  ClModuleSetProc   set_proc_;
-  void             *set_data_;
-  ClModuleTermProc  term_proc_;
-  void             *term_data_;
-  ClModuleHelpProc  help_proc_;
-  void             *help_data_;
-  State             state_;
-
  public:
-  ClModule(const std::string &name);
+  explicit ClModule(const std::string &name);
 
   const std::string &getName() const { return name_; }
 
@@ -78,16 +61,30 @@ class ClModule {
   bool execSetProc (const std::string &option, const std::string &args);
   bool execTermProc();
   bool execHelpProc(const std::string &args);
+
+ private:
+  enum State {
+    MODULE_UNLOADED = 0,
+    MODULE_LOADED   = 1
+  };
+
+  std::string       name_;
+  ClModuleInitProc  init_proc_;
+  void             *init_data_;
+  ClModuleSetProc   set_proc_;
+  void             *set_data_;
+  ClModuleTermProc  term_proc_;
+  void             *term_data_;
+  ClModuleHelpProc  help_proc_;
+  void             *help_data_;
+  State             state_;
 };
+
+//------
 
 #define ClModuleMgrInst ClModuleMgr::getInstance()
 
 class ClModuleMgr {
- private:
-  typedef std::map<std::string,ClModule *> ModuleMap;
-
-  ModuleMap module_list_;
-
  public:
   static ClModuleMgr *getInstance() {
     static ClModuleMgr *instance;
@@ -135,6 +132,11 @@ class ClModuleMgr {
  ~ClModuleMgr() { }
 
   ClModule *createModule(const std::string &name);
+
+ private:
+  typedef std::map<std::string,ClModule *> ModuleMap;
+
+  ModuleMap module_list_;
 };
 
 #endif

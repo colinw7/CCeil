@@ -29,7 +29,7 @@ class ClParserInteger : public ClParserObj {
     return ClParserIntegerPtr(pinteger);
   }
 
-  ClParserInteger(long integer = 0) :
+  explicit ClParserInteger(long integer = 0) :
    ClParserObj(CL_PARSER_VALUE_TYPE_INTEGER), integer_(integer) {
   }
 
@@ -37,13 +37,13 @@ class ClParserInteger : public ClParserObj {
    ClParserObj(CL_PARSER_VALUE_TYPE_INTEGER), integer_(integer.integer_) {
   }
 
-  ClParserInteger(ClParserIntegerPtr integer) :
+  explicit ClParserInteger(ClParserIntegerPtr integer) :
    ClParserObj(CL_PARSER_VALUE_TYPE_INTEGER), integer_(integer->integer_) {
   }
 
  ~ClParserInteger() { }
 
-  const ClParserInteger &operator=(const ClParserInteger &integer) {
+  ClParserInteger &operator=(const ClParserInteger &integer) {
     integer_ = integer.integer_;
 
     return *this;

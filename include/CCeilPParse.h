@@ -12,11 +12,11 @@ class ClParserParser {
   int             error_code_;
 
  public:
-  ClParserParser(const std::string &str) :
+  explicit ClParserParser(const std::string &str) :
    parent_(NULL), parse_(str), assign_(false), error_code_(0) {
   }
 
-  ClParserParser(ClParserParser *parent) :
+  explicit ClParserParser(ClParserParser *parent) :
    parent_(parent), parse_(parent->parse_.getAt()), assign_(false), error_code_(0) {
   }
 

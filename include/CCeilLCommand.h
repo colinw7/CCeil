@@ -79,7 +79,7 @@ class ClLanguageCommand {
 
 class ClLanguageSystemCommand : public ClLanguageCommand {
  public:
-  ClLanguageSystemCommand(const std::string &args);
+  explicit ClLanguageSystemCommand(const std::string &args);
 
  ~ClLanguageSystemCommand();
 
@@ -121,7 +121,7 @@ class ClLanguagePosProcCommand : public ClLanguageCommand {
 
 class ClLanguageLabelCommand : public ClLanguageCommand {
  public:
-  ClLanguageLabelCommand(ClLanguageLabelData *label_data);
+  explicit ClLanguageLabelCommand(ClLanguageLabelData *label_data);
 
  ~ClLanguageLabelCommand();
 
@@ -149,7 +149,7 @@ class ClLanguageExpressionCommand : public ClLanguageCommand {
 
 class ClLanguageLanguageCommand : public ClLanguageCommand {
  public:
-  ClLanguageLanguageCommand(const std::string &args);
+  explicit ClLanguageLanguageCommand(const std::string &args);
 
  ~ClLanguageLanguageCommand();
 

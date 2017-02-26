@@ -55,7 +55,7 @@ class ClParserArray : public ClParserObj {
   friend class ClParserValue;
 
   ClParserArray();
-  ClParserArray(ClParserValueType type);
+  explicit ClParserArray(ClParserValueType type);
   ClParserArray(ClParserValueType type, const uint *dims, uint num_dims);
   ClParserArray(ClParserValueType type, const UIntVectorT &dims);
   ClParserArray(ClParserValueType type, const ValueArray &values);
@@ -88,7 +88,7 @@ class ClParserArray : public ClParserObj {
   ClParserArray(const uint *dims, uint num_dims, const ClParserValuePtr *values);
 
   ClParserArray(const ClParserValuePtr *values, uint num_values);
-  ClParserArray(const ClParserValueArray &values);
+  explicit ClParserArray(const ClParserValueArray &values);
 
   // TODO: remove
   ClParserArray(const ClParserValuePtr *values, const uint *dims, uint num_dims);
@@ -98,7 +98,7 @@ class ClParserArray : public ClParserObj {
 
  ~ClParserArray();
 
-  const ClParserArray &operator=(const ClParserArray &array);
+  ClParserArray &operator=(const ClParserArray &array);
 
   ClParserArray *dup() const;
 

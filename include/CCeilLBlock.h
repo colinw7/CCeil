@@ -38,7 +38,7 @@ class ClLanguageBlockData {
 
   ClLanguageBlockData(const ClLanguageBlockData &block_data);
 
-  const ClLanguageBlockData &operator=(const ClLanguageBlockData &block_data);
+  ClLanguageBlockData &operator=(const ClLanguageBlockData &block_data);
 
   ClBlockType         getType       () const { return type_        ; }
   const std::string  &getName       () const { return name_        ; }

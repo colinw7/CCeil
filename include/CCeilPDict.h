@@ -15,7 +15,7 @@ struct ClParserKeyValueBase {
 struct ClParserIntegerKeyValue : public ClParserKeyValueBase {
   long integer;
 
-  ClParserIntegerKeyValue(long integer1) : integer(integer1) { }
+  explicit ClParserIntegerKeyValue(long integer1) : integer(integer1) { }
 
   ClParserIntegerKeyValue(const ClParserIntegerKeyValue &value) :
    ClParserKeyValueBase(value), integer(value.integer) {
@@ -23,8 +23,7 @@ struct ClParserIntegerKeyValue : public ClParserKeyValueBase {
 
  ~ClParserIntegerKeyValue() { }
 
-  const ClParserIntegerKeyValue &
-  operator=(const ClParserIntegerKeyValue &value) {
+  ClParserIntegerKeyValue &operator=(const ClParserIntegerKeyValue &value) {
     integer = value.integer;
 
     return *this;
@@ -46,14 +45,13 @@ struct ClParserIntegerKeyValue : public ClParserKeyValueBase {
 struct ClParserStringKeyValue : public ClParserKeyValueBase {
   std::string str;
 
-  ClParserStringKeyValue(const std::string &str1) : str(str1) { }
+  explicit ClParserStringKeyValue(const std::string &str1) : str(str1) { }
 
   ClParserStringKeyValue(const ClParserStringKeyValue &value) :
    ClParserKeyValueBase(value), str(value.str) {
   }
 
-  const ClParserStringKeyValue &
-  operator=(const ClParserStringKeyValue &value) {
+  ClParserStringKeyValue &operator=(const ClParserStringKeyValue &value) {
     str = value.str;
 
     return *this;
@@ -80,12 +78,13 @@ class ClParserKey {
   ClParserKeyValueBase *value_;
 
  public:
-  ClParserKey(long integer=0);
-  ClParserKey(const std::string &str);
+  explicit ClParserKey(long integer=0);
+  explicit ClParserKey(const std::string &str);
+
   ClParserKey(const ClParserKey &key);
  ~ClParserKey();
 
-  const ClParserKey &operator=(const ClParserKey &key);
+  ClParserKey &operator=(const ClParserKey &key);
 
   bool operator==(const ClParserKey &key) const;
 
@@ -152,7 +151,7 @@ class ClParserDict : public ClParserObj {
 
   ClParserDict();
   ClParserDict(const ClParserValuePtr *values, uint num_values);
-  ClParserDict(const ClParserValueArray &values);
+  explicit ClParserDict(const ClParserValueArray &values);
   ClParserDict(const ClParserDict &dict);
 
  ~ClParserDict();

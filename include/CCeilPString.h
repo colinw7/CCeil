@@ -35,14 +35,15 @@ class ClParserString : public ClParserObj {
     return ClParserStringPtr(pstr);
   }
 
-  ClParserString(const std::string &text = "");
+  explicit ClParserString(const std::string &text = "");
   ClParserString(const char *text, uint len);
+  explicit ClParserString(const ClParserStringPtr &str);
+
   ClParserString(const ClParserString &str);
-  ClParserString(const ClParserStringPtr &str);
 
  ~ClParserString() { }
 
-  const ClParserString &operator=(const ClParserString &str);
+  ClParserString &operator=(const ClParserString &str);
 
   ClParserString *dup() const;
 

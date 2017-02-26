@@ -144,7 +144,8 @@ init(int *argc, char **argv)
 
   CArgs cargs(opts);
 
-  cargs.parse(argc, argv);
+  if (argc && argv)
+    cargs.parse(argc, argv);
 
   if (cargs.getBooleanArg("-nocase"))
     ClParserInst->setCaseSensitive(false);

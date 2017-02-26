@@ -28,7 +28,7 @@ int
 ClParserObjCmp::
 operator()(const ClParserIntegerPtr &obj1, const ClParserIntegerPtr &obj2)
 {
-  int cmp = obj1->cmp(obj2);
+  int cmp = obj1->cmp(*obj2.get());
 
   if (direction_ == CL_SORT_DESCENDING)
     cmp = -cmp;

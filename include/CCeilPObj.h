@@ -12,7 +12,7 @@ class ClParserObjCmp {
   ClParserSortDirection direction_;
 
  public:
-  ClParserObjCmp(ClParserSortDirection direction) :
+  explicit ClParserObjCmp(ClParserSortDirection direction) :
    direction_(direction) {
   }
 
@@ -28,7 +28,7 @@ class ClParserObj {
   ClParserValueType base_type_;
 
  public:
-  ClParserObj(ClParserValueType base_type) :
+  explicit ClParserObj(ClParserValueType base_type) :
    base_type_(base_type) {
   }
 

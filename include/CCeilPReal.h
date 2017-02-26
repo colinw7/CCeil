@@ -29,7 +29,7 @@ class ClParserReal : public ClParserObj {
     return ClParserRealPtr(preal);
   }
 
-  ClParserReal(double real = 0.0) :
+  explicit ClParserReal(double real = 0.0) :
    ClParserObj(CL_PARSER_VALUE_TYPE_REAL), real_(real) {
   }
 
@@ -37,7 +37,7 @@ class ClParserReal : public ClParserObj {
    ClParserObj(CL_PARSER_VALUE_TYPE_REAL), real_(real.real_) {
   }
 
-  ClParserReal(ClParserRealPtr real) :
+  explicit ClParserReal(ClParserRealPtr real) :
    ClParserObj(CL_PARSER_VALUE_TYPE_REAL), real_(real->real_) {
   }
 

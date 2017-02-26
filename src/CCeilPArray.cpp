@@ -624,7 +624,7 @@ ClParserArray::
 {
 }
 
-const ClParserArray &
+ClParserArray &
 ClParserArray::
 operator=(const ClParserArray &array)
 {

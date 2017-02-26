@@ -127,7 +127,7 @@ ClParserArgValue::
 {
 }
 
-const ClParserArgValue &
+ClParserArgValue &
 ClParserArgValue::
 operator=(const ClParserArgValue &arg_value)
 {

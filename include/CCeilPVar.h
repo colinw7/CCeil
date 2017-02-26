@@ -90,8 +90,9 @@ class ClParserVar {
   friend class ClParserVarMgr;
   friend class CRefPtr<ClParserVar>;
 
-  ClParserVar(const std::string &name);
+  explicit ClParserVar(const std::string &name);
   ClParserVar(const std::string &name, ClParserValuePtr value);
+
   ClParserVar(const ClParserVar &var);
 
  ~ClParserVar();

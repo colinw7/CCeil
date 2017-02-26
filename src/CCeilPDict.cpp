@@ -1121,7 +1121,7 @@ ClParserKey::
   delete value_;
 }
 
-const ClParserKey &
+ClParserKey &
 ClParserKey::
 operator=(const ClParserKey &key)
 {

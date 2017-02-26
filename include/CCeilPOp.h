@@ -90,8 +90,8 @@ class ClParserOperator {
   friend class ClParserOperatorMgr;
   friend class CRefPtr<ClParserOperator>;
 
-  ClParserOperator(const ClParserOperatorData &data);
-  ClParserOperator(const ClParserOpData &data);
+  explicit ClParserOperator(const ClParserOperatorData &data);
+  explicit ClParserOperator(const ClParserOpData &data);
 
   ClParserOperator *dup() const;
 

@@ -532,7 +532,7 @@ ClLanguageBlockData(const ClLanguageBlockData &block_data)
   num_commands_ = block_data.num_commands_;
 }
 
-const ClLanguageBlockData &
+ClLanguageBlockData &
 ClLanguageBlockData::
 operator=(const ClLanguageBlockData &block_data)
 {

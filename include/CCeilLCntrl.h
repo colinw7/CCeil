@@ -17,7 +17,7 @@ class ClLanguageInputFile {
    name_(file.name_), fp_(file.fp_), line_num_(file.line_num_) {
   }
 
-  const ClLanguageInputFile &operator=(const ClLanguageInputFile &file) {
+  ClLanguageInputFile &operator=(const ClLanguageInputFile &file) {
     name_     = file.name_;
     fp_       = file.fp_;
     line_num_ = file.line_num_;

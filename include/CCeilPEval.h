@@ -4,13 +4,9 @@
 #include <CCeilPValue.h>
 
 class ClParserExpr {
- private:
-  std::string      expression_;
-  ClParserStackPtr stack_;
-  bool             compiled_;
-
  public:
-  ClParserExpr(const std::string &expression);
+  explicit ClParserExpr(const std::string &expression);
+
  ~ClParserExpr();
 
   bool compile();
@@ -20,20 +16,23 @@ class ClParserExpr {
   void freeExpressionVariables(char **variables, uint num_variables);
 
   bool exec(ClParserValuePtr &value);
+
+ private:
+  std::string      expression_;
+  ClParserStackPtr stack_;
+  bool             compiled_;
 };
 
-class ClParserArgValue {
- private:
-  ClParserVarRefPtr var_ref_;
-  ClParserValuePtr  value_;
+//---
 
+class ClParserArgValue {
  public:
   ClParserArgValue();
   ClParserArgValue(ClParserVarRefPtr var_ref, ClParserValuePtr value);
   ClParserArgValue(const ClParserArgValue &arg_value);
  ~ClParserArgValue();
 
-  const ClParserArgValue &operator=(const ClParserArgValue &arg_value);
+  ClParserArgValue &operator=(const ClParserArgValue &arg_value);
 
   ClParserVarRefPtr getVarRef() const { return var_ref_; }
   ClParserValuePtr  getValue () const { return value_; }
@@ -45,6 +44,10 @@ class ClParserArgValue {
   void setValue(ClParserValuePtr value) {
     value_ = value;
   }
+
+ private:
+  ClParserVarRefPtr var_ref_;
+  ClParserValuePtr  value_;
 };
 
 #endif

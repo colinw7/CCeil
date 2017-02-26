@@ -230,14 +230,15 @@ class ClParserStackNode {
 
  public:
   ClParserStackNode();
-  ClParserStackNode(ClParserOperatorPtr op);
-  ClParserStackNode(ClParserInternFnPtr internfn);
-  ClParserStackNode(ClParserValuePtr value);
-  ClParserStackNode(ClParserVarRefPtr var_ref);
-  ClParserStackNode(ClParserStructVarRefPtr var_ref);
-  ClParserStackNode(ClParserIdentifierPtr identifier);
-  ClParserStackNode(ClParserUserFnPtr userfn);
-  ClParserStackNode(ClParserTypePtr type);
+
+  explicit ClParserStackNode(ClParserOperatorPtr op);
+  explicit ClParserStackNode(ClParserInternFnPtr internfn);
+  explicit ClParserStackNode(ClParserValuePtr value);
+  explicit ClParserStackNode(ClParserVarRefPtr var_ref);
+  explicit ClParserStackNode(ClParserStructVarRefPtr var_ref);
+  explicit ClParserStackNode(ClParserIdentifierPtr identifier);
+  explicit ClParserStackNode(ClParserUserFnPtr userfn);
+  explicit ClParserStackNode(ClParserTypePtr type);
 
  ~ClParserStackNode();
 
