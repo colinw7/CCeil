@@ -12,6 +12,18 @@ struct ClLanguageRunFileData {
   ClLanguageInputFile   save_input_file;
 };
 
+ClLanguageMgr *
+ClLanguageMgr::
+getInstance()
+{
+  static ClLanguageMgr *instance;
+
+  if (! instance)
+    instance = new ClLanguageMgr;
+
+  return instance;
+}
+
 ClLanguageMgr::
 ClLanguageMgr()
 {
@@ -32,7 +44,7 @@ ClLanguageMgr::
 initVars()
 {
   argc_ = 0;
-  argv_ = NULL;
+  argv_ = nullptr;
 
   exit_flag_     = false;
   exit_code_     = 0;
@@ -41,7 +53,7 @@ initVars()
   continue_flag_ = false;
   return_flag_   = false;
 
-  help_proc_ = NULL;
+  help_proc_ = nullptr;
 
   command_name_     = "";
   command_line_num_ = 0;
@@ -52,7 +64,7 @@ initVars()
   exit_after_run_  = true;
   echo_commands_   = false;
   ident_           = 1;
-  block_command_   = NULL;
+  block_command_   = nullptr;
   first_line_      = true;
   prompt_          = "";
   ignore_pos_proc_ = false;
@@ -66,8 +78,10 @@ initVars()
 
   block_command_stack_.clear();
 
-  command_term_proc_ = NULL;
-  command_term_data_ = NULL;
+  command_term_proc_ = nullptr;
+  command_term_data_ = nullptr;
+
+  errorMgr_ = new CCeilLErrorMgr;
 }
 
 /*------------------------------------------------------------------*
@@ -131,15 +145,16 @@ ClLanguageMgr::
 init(int *argc, char **argv)
 {
   const char *opts = "\
- -run:s\
- -startup:s\
- -echo:f\
- -ldebug:f\
- -pdebug:f\
- -prompt:s\
- -exp:s\
- -var:s\
- -nocase:f\
+ -run:s     (run a file and then exit) \
+ -startup:s (run the file and start prompt loop) \
+ -echo:f    (echo executed commands) \
+ -ldebug:f  (enable language debug) \
+ -pdebug:f  (enable parser debug) \
+ -prompt:s  (set prompt) \
+ -exp:s     (evaluate expression) \
+ -var:s     (set variable) \
+ -nocase:f  (set case insensitive) \
+ -exit:f    (exit after evaluating expression) \
 ";
 
   CArgs cargs(opts);
@@ -191,7 +206,10 @@ init(int *argc, char **argv)
   if (cargs.isStringArgSet("-prompt"))
     prompt = cargs.getStringArg("-prompt");
 
-  if (cargs.isStringArgSet("-exp")) {
+  bool isExp  = cargs.isStringArgSet("-exp");
+  bool isExit = cargs.getBooleanArg("-exit");
+
+  if (isExp) {
     string exp = cargs.getStringArg("-exp");
 
     ClParserExpr expr(exp);
@@ -204,6 +222,11 @@ init(int *argc, char **argv)
     else if (! value.isValid())
       ClLanguageMgrInst->syntaxError
        ("undefined '-exp' expression '%s'", exp.c_str());
+    else if (isExit) {
+      value->print();
+
+      std::cout << std::endl;
+    }
   }
 
 #if 0
@@ -219,10 +242,10 @@ init(int *argc, char **argv)
 
   /* Store remaining arguments in external */
 
-  if (argc != NULL)
+  if (argc != nullptr)
     setArgv(*argc, argv);
   else
-    setArgv(0, NULL);
+    setArgv(0, nullptr);
 
   /***********/
 
@@ -255,6 +278,11 @@ init(int *argc, char **argv)
 #ifdef CEIL_READLINE
   getReadLine().setName("ceil");
 #endif
+
+  /***********/
+
+  if (isExp && isExit)
+    setExitFlag(true);
 }
 
 /*------------------------------------------------------------------*
@@ -364,6 +392,9 @@ void
 ClLanguageMgr::
 promptLoop()
 {
+  if (getExitFlag())
+    return;
+
   /* Startup Command Line Interface */
 
   startup();
@@ -383,7 +414,7 @@ promptLoop()
 
       ClLanguageCommand *command = processLine(getLine());
 
-      if (command != NULL) {
+      if (command != nullptr) {
         processCommand(command);
 
         delete command;
@@ -523,7 +554,7 @@ runFile(const string &file_name)
 
       ClLanguageCommand *command = processLine(getLine());
 
-      if (command != NULL) {
+      if (command != nullptr) {
         if (! command->isSpecial()) {
           ClLanguageCommandDefCommand *ccommand =
             (ClLanguageCommandDefCommand *) command;
@@ -569,7 +600,7 @@ runFile(const string &file_name)
 
   /* Ensure All Block Commands are Terminated */
 
-  if (getBlockCommand() != NULL) {
+  if (getBlockCommand() != nullptr) {
     clearBlockCommandStack(true);
 
     goto runFile_1;
@@ -597,7 +628,7 @@ runFile(const string &file_name)
 
   /* Clean Up */
 
-  if (run_file != NULL) {
+  if (run_file != nullptr) {
     process_vector(run_file->command_list, CDeletePointer());
 
     delete run_file;
@@ -738,7 +769,7 @@ runCommand(const string &command_string)
 
   ClLanguageCommand *command = processLine(command_string1);
 
-  if (command != NULL) {
+  if (command != nullptr) {
     processCommand(command);
 
     delete command;
@@ -761,7 +792,7 @@ runCommand(const string &command_string)
  *   line    : Line entered by the user.
  *
  * RETURNS:
- *   command : Command parsed from the entered line (NULL if none).
+ *   command : Command parsed from the entered line (nullptr if none).
  *
  *------------------------------------------------------------------*/
 
@@ -778,7 +809,7 @@ processLine(const string &line)
   ClLanguageCommandDef *command_def;
   string                command_name;
 
-  ClLanguageCommand *command = NULL;
+  ClLanguageCommand *command = nullptr;
 
   CStrParse parse(line);
 
@@ -790,11 +821,11 @@ processLine(const string &line)
 
   if (parse.isChar(';')) {
     ClLanguageMgrInst->error("Warning: Old Comment Syntax - Change to '#'");
-    return NULL;
+    return nullptr;
   }
 
   if (parse.isChar('#') || parse.isString("//"))
-    return NULL;
+    return nullptr;
 
   /********/
 
@@ -813,7 +844,7 @@ processLine(const string &line)
       if (! ClLanguageArgs::readArgList(line, &i, ')', args)) {
         ClLanguageMgrInst->syntaxError
          ("missing close brackets for '!(' '%s' argument list", line.c_str());
-        return NULL;
+        return nullptr;
       }
 
       parse.setPos(i);
@@ -832,7 +863,7 @@ processLine(const string &line)
       else if (! parse.eof()) {
         ClLanguageMgrInst->syntaxError
          ("spurious characters '%s' after '!' argument list", parse.getAt().c_str());
-        return NULL;
+        return nullptr;
       }
     }
     else
@@ -864,7 +895,7 @@ processLine(const string &line)
       if (! ClLanguageArgs::readArgList(line, &i, ')', args)) {
         ClLanguageMgrInst->syntaxError
          ("missing close brackets for '!(' '%s' argument list", line.c_str());
-        return NULL;
+        return nullptr;
       }
 
       parse.setPos(i);
@@ -883,7 +914,7 @@ processLine(const string &line)
       else if (! parse.eof()) {
         ClLanguageMgrInst->syntaxError
          ("spurious characters '%s' after '$' argument list", parse.getAt().c_str());
-        return NULL;
+        return nullptr;
       }
     }
     else
@@ -936,7 +967,7 @@ processLine(const string &line)
 
   command_def = getCommandDef(scope, command_name, &is_end_name);
 
-  if (command_def != NULL) {
+  if (command_def != nullptr) {
     i = parse.getPos();
 
     if (! ClLanguageArgs::readArgList(line, &i, '\0', args))
@@ -959,7 +990,7 @@ processLine(const string &line)
       ClLanguageMgrInst->syntaxError
        ("spurious characters '%s' after 'command' '%s' argument list",
         parse.getAt().c_str(), command_name.c_str());
-      return NULL;
+      return nullptr;
     }
 
     CStrUtil::stripSpaces(args);
@@ -977,15 +1008,15 @@ processLine(const string &line)
 
   procedure = ClLanguageProcMgrInst->lookupProc(command_name);
 
-  if (procedure != NULL ||
+  if (procedure != nullptr ||
       (! getIgnorePosProc() && parse.isChar('('))) {
     if (! parse.isChar('(')) {
-      if (procedure == NULL)
+      if (procedure == nullptr)
         goto processLine_2;
 
       ClLanguageMgrInst->syntaxError
        ("missing open brackets for 'proc' '%s' argument list", procedure->getName().c_str());
-      return NULL;
+      return nullptr;
     }
 
     parse.skipChar();
@@ -995,12 +1026,12 @@ processLine(const string &line)
     i = parse.getPos();
 
     if (! ClLanguageArgs::readArgList(line, &i, ')', args)) {
-      if (procedure == NULL)
+      if (procedure == nullptr)
         goto processLine_2;
 
       ClLanguageMgrInst->syntaxError
        ("missing close brackets for 'proc' '%s' argument list", procedure->getName().c_str());
-      return NULL;
+      return nullptr;
     }
 
     parse.setPos(i);
@@ -1017,18 +1048,18 @@ processLine(const string &line)
     else if (parse.isString("//"))
       ;
     else if (! parse.eof()) {
-      if (procedure == NULL)
+      if (procedure == nullptr)
         goto processLine_2;
 
       ClLanguageMgrInst->syntaxError
        ("spurious characters '%s' after 'proc' '%s' argument list", parse.getAt().c_str(),
         procedure->getName().c_str());
-      return NULL;
+      return nullptr;
     }
 
     CStrUtil::stripSpaces(args);
 
-    if (procedure != NULL)
+    if (procedure != nullptr)
       command = new ClLanguageProcCommand(procedure, args);
     else
       command = new ClLanguagePosProcCommand(command_name, line);
@@ -1057,13 +1088,13 @@ processLine(const string &line)
     else if (! parse.eof()) {
       ClLanguageMgrInst->syntaxError
        ("spurious characters after label '%s'", command_name.c_str());
-      return NULL;
+      return nullptr;
     }
 
     if (getDepth() == 0) {
       ClLanguageMgrInst->syntaxError
        ("labels only allowed inside a block command or a file");
-      return NULL;
+      return nullptr;
     }
 
     ClLanguageLabelData *label_data =
@@ -1123,9 +1154,9 @@ processLine(const string &line)
 
     delete command;
 
-    command = NULL;
+    command = nullptr;
 
-    return NULL;
+    return nullptr;
   }
 
   /* Add Block Commands to Current Block Command List until
@@ -1140,18 +1171,18 @@ processLine(const string &line)
     if (command_def->getEndName() != "")
       command = startBlockCommand(command);
     else {
-      if (getBlockCommand() != NULL) {
+      if (getBlockCommand() != nullptr) {
         getBlockCommand()->addCommand(command);
 
-        command = NULL;
+        command = nullptr;
       }
     }
   }
   else {
-    if (getBlockCommand() != NULL) {
+    if (getBlockCommand() != nullptr) {
       getBlockCommand()->addCommand(command);
 
-      command = NULL;
+      command = nullptr;
     }
   }
 
@@ -1187,7 +1218,7 @@ processCommand(ClLanguageCommand *command)
 {
   int error_code = 0;
 
-  if (command == NULL)
+  if (command == nullptr)
     goto processCommand_1;
 
   /*----------*/
@@ -1234,7 +1265,7 @@ processCommand(ClLanguageCommand *command)
 
       setIgnorePosProc(false);
 
-      if (command1 == NULL)
+      if (command1 == nullptr)
         goto processCommand_1;
 
       command->assign(*command1);
@@ -1347,7 +1378,7 @@ processCommand(ClLanguageCommand *command)
 
       command = processLine(str);
 
-      if (command != NULL) {
+      if (command != nullptr) {
         processCommand(command);
 
         delete command;
@@ -1363,7 +1394,7 @@ processCommand(ClLanguageCommand *command)
     ClLanguageCommandDef *command_def = ccommand->getCommandDef();
 
     if (! (command->isEndBlock())) {
-      if (command_def != NULL && command_def->getFunction() != NULL) {
+      if (command_def != nullptr && command_def->getFunction() != nullptr) {
         if (command_def->getEndName() != "") {
           const ClLanguageCommandList &command_list =
             ccommand->getCommandList();
@@ -1387,7 +1418,7 @@ processCommand(ClLanguageCommand *command)
  processCommand_1:
   ClParserInst->restartStack();
 
-  if (command_term_proc_ != NULL)
+  if (command_term_proc_ != nullptr)
     (*command_term_proc_)(command_term_data_);
 }
 
@@ -1419,7 +1450,7 @@ runProcedure(ClLanguageProc *procedure, ClLanguageArgs *args)
 {
   int error_code;
 
-  ClParserValuePtr *values = NULL;
+  ClParserValuePtr *values = nullptr;
 
   /* Get Command's Arguments */
 
@@ -2188,7 +2219,7 @@ getOutputProc() const
  *   None
  *
  * RETURNS:
- *   value : Last value evaluated (NULL if none).
+ *   value : Last value evaluated (nullptr if none).
  *
  * NOTES:
  *   None
@@ -2198,7 +2229,7 @@ getOutputProc() const
 /*------------------------------------------------------------------*
  *
  * resetLastValue
- *   Reset the last value (to NULL).
+ *   Reset the last value (to nullptr).
  *
  * CALL:
  *   resetLastValue();
@@ -2241,7 +2272,7 @@ getOutputProc() const
  *              : will start the block.
  *
  *     end_name : The block command's end name which when
- *              : entered will end the block (if NULL then
+ *              : entered will end the block (if nullptr then
  *              : this is assumed to be the block command name
  *              : preceded by 'end' i.e. for a block command
  *              : name of 'block' the end name would default to
@@ -2382,7 +2413,7 @@ addCommandDef(ClParserScopePtr scope, ClLanguageCommandDef *command_def)
   ClLanguageCommandDef *old_command_def =
     getCommandDef(scope, command_def->getName(), &is_end_name);
 
-  if (old_command_def != NULL)
+  if (old_command_def != nullptr)
     removeCommandDef(scope, old_command_def);
 
   string scopeName;
@@ -2398,7 +2429,7 @@ addCommandDef(ClParserScopePtr scope, ClLanguageCommandDef *command_def)
     ClLanguageCommandDef *old_command_def =
       getCommandDef(scope, command_def->getEndName(), &is_end_name);
 
-    if (old_command_def != NULL)
+    if (old_command_def != nullptr)
       removeCommandDef(scope, old_command_def);
 
     string key2 = scopeName + command_def->getEndName();
@@ -2426,7 +2457,7 @@ addCommandDef(ClParserScopePtr scope, ClLanguageCommandDef *command_def)
  *               : end name for a block command.
  *
  * RETURNS:
- *   command_def : The command definition structure (NULL
+ *   command_def : The command definition structure (nullptr
  *               : if none found).
  *
  * NOTES:
@@ -2460,7 +2491,7 @@ getCommandDef(ClParserScopePtr scope, const string &name, bool *is_end_name)
     return (*p).second;
   }
 
-  return NULL;
+  return nullptr;
 }
 
 void
@@ -2481,7 +2512,7 @@ void
 ClLanguageMgr::
 removeCommandDef(ClParserScopePtr scope, ClLanguageCommandDef *command_def)
 {
-  assert(command_def != NULL);
+  assert(command_def != nullptr);
 
   string scopeName;
 
@@ -2508,15 +2539,15 @@ startBlockCommand(ClLanguageCommand *command)
   if (! command->isEndBlock()) {
     incDepth();
 
-    if (block_command_ != NULL)
+    if (block_command_ != nullptr)
       block_command_stack_.push_back(block_command_);
 
     block_command_ = command;
 
-    return NULL;
+    return nullptr;
   }
   else {
-    if      (block_command_ == NULL) {
+    if      (block_command_ == nullptr) {
       ClLanguageCommandDefCommand *ccommand =
         (ClLanguageCommandDefCommand *) command;
 
@@ -2528,7 +2559,7 @@ startBlockCommand(ClLanguageCommand *command)
 
       delete command;
 
-      return NULL;
+      return nullptr;
     }
     else if (! command->isIdentNoEnd(block_command_)) {
       ClLanguageCommandDefCommand *ccommand =
@@ -2546,7 +2577,7 @@ startBlockCommand(ClLanguageCommand *command)
 
       delete command;
 
-      return NULL;
+      return nullptr;
     }
     else {
       delete command;
@@ -2570,12 +2601,12 @@ endBlockCommand()
     block_command_stack_.pop_back();
   }
   else
-    block_command_ = NULL;
+    block_command_ = nullptr;
 
-  if (block_command_ != NULL && command != NULL) {
+  if (block_command_ != nullptr && command != nullptr) {
     block_command_->addCommand(command);
 
-    return NULL;
+    return nullptr;
   }
 
   return command;
@@ -2585,7 +2616,7 @@ void
 ClLanguageMgr::
 clearBlockCommandStack(bool report_error)
 {
-  if (block_command_ != NULL) {
+  if (block_command_ != nullptr) {
     if (report_error) {
       string command_name = block_command_->toName();
 
@@ -2595,7 +2626,7 @@ clearBlockCommandStack(bool report_error)
 
     delete block_command_;
 
-    block_command_ = NULL;
+    block_command_ = nullptr;
   }
 
   int num = block_command_stack_.size();
@@ -2662,7 +2693,7 @@ removeCommandLabels(ClLanguageCommand **commands, int num_commands)
 
     ClLanguageLabelData *label_data = lcommand->getLabelData();
 
-    if (label_data != NULL)
+    if (label_data != nullptr)
       ClLanguageLabelDataMgrInst->removeCurrentLabelData(label_data);
   }
 }
@@ -2709,7 +2740,7 @@ addCommandLabels(ClLanguageCommand **commands, int num_commands)
 
     ClLanguageLabelData *label_data = lcommand->getLabelData();
 
-    if (label_data != NULL)
+    if (label_data != nullptr)
       ClLanguageLabelDataMgrInst->addCurrentLabelData(label_data);
   }
 }
@@ -2754,7 +2785,7 @@ commandListToArray(const ClLanguageCommandList &command_list,
       (*commands)[i] = command_list[i];
   }
   else
-    *commands = NULL;
+    *commands = nullptr;
 }
 
 /*------------------------------------------------------------------*
@@ -2800,7 +2831,7 @@ printCommands(const string &subject)
 
   ClLanguageHelpProc help_proc = getHelpProc();
 
-  if (help_proc != NULL)
+  if (help_proc != nullptr)
     (*help_proc)(subject.c_str(), args.c_str());
   else
     ClLanguageMgrInst->error("No help for '%s'", subject.c_str());
@@ -2892,7 +2923,7 @@ voutput(const char *format, va_list *vargs)
 {
   ClParser::OutputProc output_proc = ClParserInst->getOutputProc();
 
-  if (output_proc != NULL) {
+  if (output_proc != nullptr) {
     string str;
 
     CStrUtil::vsprintf(str, format, vargs);
@@ -2916,7 +2947,7 @@ error(const char *format, ...)
 
   va_start(vargs, format);
 
-  errorMgr_.error(format, &vargs);
+  errorMgr_->error(format, &vargs);
 
   va_end(vargs);
 }
@@ -2929,7 +2960,7 @@ expressionError(int error_code, const char *format, ...)
 
   va_start(vargs, format);
 
-  errorMgr_.expressionError(error_code, format, &vargs);
+  errorMgr_->expressionError(error_code, format, &vargs);
 
   va_end(vargs);
 }
@@ -2942,7 +2973,7 @@ syntaxError(const char *format, ...)
 
   va_start(vargs, format);
 
-  errorMgr_.syntaxError(format, &vargs);
+  errorMgr_->syntaxError(format, &vargs);
 
   va_end(vargs);
 }
@@ -2995,13 +3026,19 @@ runFunction(ClLanguageCommand *command)
 
 //-----------------------
 
+ClLanguageInputFile::
+ClLanguageInputFile()
+{
+  fp_ = stdin;
+}
+
 bool
 ClLanguageInputFile::
 setName(const string &name)
 {
   FILE *fp = fopen(name.c_str(), "r");
 
-  if (fp == NULL) {
+  if (fp == nullptr) {
     ClLanguageMgrInst->error("failed to read file '%s'", name.c_str());
     return false;
   }
@@ -3021,10 +3058,7 @@ setFp(FILE *fp)
     if (fp_ != stdin)
       fclose(fp_);
 
-    if (fp != NULL)
-      fp_ = fp;
-    else
-      fp_ = stdin;
+    fp_ = fp;
   }
 
   name_     = "";
@@ -3035,5 +3069,10 @@ bool
 ClLanguageInputFile::
 readLine(string &line)
 {
-  return CFile::readLine(fp_, line);
+  if (! fp_)
+    fp_ = stdin;
+
+  CFile file(fp_);
+
+  return file.readLine(line);
 }

@@ -1,8 +1,10 @@
+#include <CCeilLStdCmd.h>
 #include <CCeilLI.h>
 #include <COSProcess.h>
 #include <COSRand.h>
 #include <CFile.h>
 #include <CEnv.h>
+#include <CUtil.h>
 
 #include <csignal>
 #include <algorithm>
@@ -463,11 +465,11 @@ static bool
 ClStdCommandsSet(const char *option, const char *args, void *)
 {
   if (option[0] == '\0') {
-    CAngleType::Type angle_type = ClParserInst->getAngleType();
-    string           prompt     = ClLanguageMgrInst->getPrompt();
-    bool             math_fail  = ClParserInst->getMathFail();
+    CAngleType angle_type = ClParserInst->getAngleType();
+    string     prompt     = ClLanguageMgrInst->getPrompt();
+    bool       math_fail  = ClParserInst->getMathFail();
 
-    ClLanguageMgrInst->output("angle_type     %s\n"  , CAngleType::toString(angle_type).c_str());
+    ClLanguageMgrInst->output("angle_type     %s\n"  , CUtil::toString(angle_type).c_str());
     ClLanguageMgrInst->output("prompt         '%s'\n", prompt.c_str());
     ClLanguageMgrInst->output("real_format    '%s'\n", ClParserInst->getRealFormat().c_str());
     ClLanguageMgrInst->output("integer_format '%s'\n", ClParserInst->getIntegerFormat().c_str());
@@ -480,9 +482,9 @@ ClStdCommandsSet(const char *option, const char *args, void *)
   if      (CStrUtil::casecmp(option, "angle_type") == 0) {
     /* Set Angle Type degrees/radians */
 
-    CAngleType::Type angle_type = CAngleType::toAngleType(args);
+    CAngleType angle_type = CUtil::toAngleType(args);
 
-    if (angle_type != CAngleType::NONE)
+    if (angle_type != CANGLE_TYPE_NONE)
       ClParserInst->setAngleType(angle_type);
     else
       ClLanguageMgrInst->error("invalid angle type '%s' for 'set %s'", args, option);
@@ -3141,11 +3143,15 @@ ClStdInputCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
     line = ClLanguageMgrInst->getReadLine().readLine();
   }
   else {
-    if (! CFile::readLine(fp, line))
+    CFile file(fp);
+
+    if (! file.readLine(line))
       line = "";
   }
 #else
-  if (! CFile::readLine(fp, line))
+  CFile file(fp);
+
+  if (! file.readLine(line))
     line = "";
 #endif
 

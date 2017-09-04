@@ -52,26 +52,29 @@ CCeilPVar.cpp \
 
 OBJS = $(patsubst %.cpp,$(OBJ_DIR)/%.o,$(SRC))
 
-LIBS = -lCCeil -lCArgs -lCOS -lCUtil -lCStrUtil -lCGlob
+LIBS = -lCCeil -lCArgs -lCFile -lCMath -lCOS -lCUtil -lCStrUtil -lCGlob
 
 CPPFLAGS = \
 -std=c++11 \
 -I$(INC_DIR) \
 -I../../CArgs/include \
--I../../COS/include \
+-I../../CFile/include \
 -I../../CStrUtil/include \
 -I../../CGlob/include \
 -I../../CMath/include \
 -I../../CUtil/include \
+-I../../COS/include \
 -I.
 
 LFLAGS = \
 -L$(LIB_DIR) \
 -L../../CArgs/lib \
--L../../COS/lib \
+-L../../CFile/lib \
 -L../../CUtil/lib \
+-L../../CMath/lib \
 -L../../CStrUtil/lib \
 -L../../CGlob/lib \
+-L../../COS/lib \
 
 clean:
 	$(RM) -f $(OBJ_DIR)/*.o

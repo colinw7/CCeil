@@ -18,7 +18,7 @@ getInstance()
 ClParser::
 ClParser()
 {
-  angle_type_       = CAngleType::RADIANS;
+  angle_type_       = CANGLE_TYPE_RADIANS;
   angle_to_radians_ = 1.0;
   angle_to_degrees_ = 180.0/M_PI;
   radians_to_angle_ = 1.0;

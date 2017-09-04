@@ -3,7 +3,7 @@
 
 #include <accessor.h>
 #include <cmath>
-#include <cstdio>
+#include <CTrace.h>
 #include <CAngleType.h>
 #include <CCeilPValue.h>
 
@@ -34,38 +34,6 @@ class ClParser {
   typedef int (*StrCmpProc )(char *, char *);
   typedef int (*StrNCmpProc)(char *, char *, int);
 
-  CAngleType::Type angle_type_;
-  double           angle_to_radians_;
-  double           angle_to_degrees_;
-  double           radians_to_angle_;
-  double           degrees_to_angle_;
-  std::string      real_format_;
-  std::string      integer_format_;
-  std::string      string_format_;
-  bool             math_fail_;
-  double           tolerance_;
-  bool             parse_as_reals_;
-  bool             dollar_prefix_;
-
-#ifdef CL_PARSER_DEBUG
-  CRoutineTraceMgr trace_mgr_;
-#endif
-
-  int         init_depth_;
-  FILE       *output_fp_;
-  OutputProc  output_proc_;
-  void       *output_data_;
-
-  StrCmpProc  strcmp_;
-  StrNCmpProc strncmp_;
-
-  ClParserVarMgr      varMgr_;
-  ClParserFuncMgr     funcMgr_;
-  ClParserInternFnMgr internFnMgr_;
-  ClParserUserFnMgr   userFnMgr_;
-  ClParserScopeMgr    scopeMgr_;
-  ClParserTypeMgr     typeMgr_;
-
  public:
   static ClParser *getInstance();
 
@@ -78,16 +46,16 @@ class ClParser {
   void init();
   void term();
 
-  CAngleType::Type setAngleType(CAngleType::Type type) {
+  CAngleType setAngleType(CAngleType type) {
     std::swap(angle_type_, type);
 
-    if     (angle_type_ == CAngleType::RADIANS) {
+    if     (angle_type_ == CANGLE_TYPE_RADIANS) {
       angle_to_radians_ = 1.0;
       angle_to_degrees_ = 180.0/M_PI;
       radians_to_angle_ = 1.0;
       degrees_to_angle_ = M_PI/180.0;
     }
-    else if (angle_type_ == CAngleType::DEGREES) {
+    else if (angle_type_ == CANGLE_TYPE_DEGREES) {
       angle_to_radians_ = M_PI/180.0;
       angle_to_degrees_ = 1.0;
       radians_to_angle_ = 180.0/M_PI;
@@ -97,7 +65,7 @@ class ClParser {
     return type;
   }
 
-  CAngleType::Type getAngleType() const {
+  CAngleType getAngleType() const {
     return angle_type_;
   }
 
@@ -405,6 +373,39 @@ class ClParser {
 
     return text;
   }
+
+ private:
+  CAngleType  angle_type_;
+  double      angle_to_radians_;
+  double      angle_to_degrees_;
+  double      radians_to_angle_;
+  double      degrees_to_angle_;
+  std::string real_format_;
+  std::string integer_format_;
+  std::string string_format_;
+  bool        math_fail_;
+  double      tolerance_;
+  bool        parse_as_reals_;
+  bool        dollar_prefix_;
+
+#ifdef CL_PARSER_DEBUG
+  CRoutineTraceMgr trace_mgr_;
+#endif
+
+  int         init_depth_;
+  FILE       *output_fp_;
+  OutputProc  output_proc_;
+  void       *output_data_;
+
+  StrCmpProc  strcmp_;
+  StrNCmpProc strncmp_;
+
+  ClParserVarMgr      varMgr_;
+  ClParserFuncMgr     funcMgr_;
+  ClParserInternFnMgr internFnMgr_;
+  ClParserUserFnMgr   userFnMgr_;
+  ClParserScopeMgr    scopeMgr_;
+  ClParserTypeMgr     typeMgr_;
 };
 
 #endif

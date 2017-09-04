@@ -20,11 +20,11 @@ class CCeilLErrorMgr {
   bool getErrorFlag() const { return error_flag_; }
 
  private:
-  FILE                *error_fp_;
+  FILE                *error_fp_ { nullptr };
   ClLanguageErrorProc  error_proc_;
-  void                *error_data_;
+  void                *error_data_ { nullptr };
   std::string          error_string_;
-  bool                 error_flag_;
+  bool                 error_flag_ { false };
 };
 
 #endif

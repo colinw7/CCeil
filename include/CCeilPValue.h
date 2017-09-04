@@ -94,6 +94,7 @@ class ClParserValue {
  protected:
   friend class ClParserValueMgr;
   friend class CRefPtr<ClParserValue>;
+  friend class CRefPtrDbg<ClParserValue>;
 
   ClParserValue();
   explicit ClParserValue(double real);

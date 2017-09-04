@@ -5,16 +5,16 @@
 
 /*------------------------------------------------------------------*
  *
- * main (ceil.test)
+ * main (CCeil)
  *   Test Harness for CL which provides a basic command
  *   line interface to the CL third generation commands
  *   and expression evaluator.
  *
  * CALL:
- *   ceil.test <language_args>
+ *   CCeil <language_args>
  *
  * INPUT:
- *   <language_args> : See ClLanguageInit() routine
+ *   <language_args> : See ClLanguageMgr::init() routine
  *
  *------------------------------------------------------------------*/
 
@@ -33,8 +33,7 @@ main(int argc, char **argv)
   if (CEnvInst.exists("CL_DOLLAR_PREFIX"))
     ClParserInst->setDollarPrefix(true);
 
-  /* Start Command Line Interface
-     (returns when user enters 'exit') */
+  /* Start Command Line Interface (returns when user enters 'exit') */
 
   ClLanguageMgrInst->promptLoop();
 

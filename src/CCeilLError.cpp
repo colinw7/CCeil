@@ -5,9 +5,9 @@ using std::string;
 CCeilLErrorMgr::
 CCeilLErrorMgr()
 {
-  error_fp_   = NULL;
-  error_proc_ = NULL;
-  error_data_ = NULL;
+  error_fp_   = nullptr;
+  error_proc_ = nullptr;
+  error_data_ = nullptr;
   error_flag_ = false;
 }
 
@@ -56,7 +56,7 @@ error(const char *format, va_list *vargs)
 {
   CStrUtil::vsprintf(error_string_, format, vargs);
 
-  if (error_proc_ != NULL) {
+  if (error_proc_ != nullptr) {
     string str;
 
     const string &input_file = ClLanguageMgrInst->getInputFile().getName();
@@ -71,7 +71,7 @@ error(const char *format, va_list *vargs)
     (*error_proc_)(str.c_str(), error_data_);
   }
   else {
-    if (error_fp_ == NULL)
+    if (error_fp_ == nullptr)
       error_fp_ = stderr;
 
     fprintf(error_fp_, "Error - %s\n", error_string_.c_str());
@@ -137,7 +137,7 @@ syntaxError(const char *format, va_list *vargs)
   if (! ClSignalMgrInst->checkSignalCommand(SIGSYNTAX)) {
     const string &input_file = ClLanguageMgrInst->getInputFile().getName();
 
-    if (error_proc_ != NULL) {
+    if (error_proc_ != nullptr) {
       string str;
 
       if (input_file != "")
@@ -149,7 +149,7 @@ syntaxError(const char *format, va_list *vargs)
       (*error_proc_)(str.c_str(), error_data_);
     }
     else {
-      if (error_fp_ == NULL)
+      if (error_fp_ == nullptr)
         error_fp_ = stderr;
 
       if (input_file != "")
@@ -229,7 +229,7 @@ expressionError(int error_code, const char *format, va_list *vargs)
   if (! ClSignalMgrInst->checkSignalCommand(SIGEXPR)) {
     const string &input_file = ClLanguageMgrInst->getInputFile().getName();
 
-    if (error_proc_ != NULL) {
+    if (error_proc_ != nullptr) {
       string str;
 
       if (error_code != -1) {
@@ -253,7 +253,7 @@ expressionError(int error_code, const char *format, va_list *vargs)
       (*error_proc_)(str.c_str(), error_data_);
     }
     else {
-      if (error_fp_ == NULL)
+      if (error_fp_ == nullptr)
         error_fp_ = stderr;
 
       if (error_code != -1) {
@@ -311,12 +311,12 @@ FILE *
 CCeilLErrorMgr::
 setErrorFile(FILE *fp)
 {
-  if (error_fp_ == NULL)
+  if (error_fp_ == nullptr)
     error_fp_ = stderr;
 
   FILE *old_fp = error_fp_;
 
-  if (fp != NULL)
+  if (fp != nullptr)
     error_fp_ = fp;
 
   return old_fp;
@@ -353,7 +353,7 @@ setErrorProc(ClLanguageErrorProc proc, void *data)
 {
   ClLanguageErrorProc old_proc = error_proc_;
 
-  if (proc != NULL) {
+  if (proc != nullptr) {
     error_proc_ = proc;
     error_data_ = data;
   }

@@ -4,6 +4,7 @@
 #include <vector>
 #include <list>
 #include <CRefPtr.h>
+#include <CRefPtrDbg.h>
 #include <CAutoPtr.h>
 
 typedef unsigned char uchar;
