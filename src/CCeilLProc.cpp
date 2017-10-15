@@ -83,7 +83,8 @@ ClLanguageProc(const string &name, const ArgList &args,
 ClLanguageProc::
 ~ClLanguageProc()
 {
-  process_vector(command_list_, CDeletePointer());
+  for (auto &command : command_list_)
+    delete command;
 
   command_list_.clear();
 }

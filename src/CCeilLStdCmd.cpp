@@ -1116,7 +1116,8 @@ ClStdProcCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
   command->clearCommands();
 
  fail:
-  std::for_each(proc_args.begin(), proc_args.end(), CDeletePointer());
+  for (auto &proc_arg : proc_args)
+    delete proc_arg;
 }
 
 /*------------------------------------------------------------------*
@@ -1329,7 +1330,8 @@ ClStdFuncCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
                              ClLanguageRunFunction, (void *) function);
 
  fail:
-  std::for_each(func_args.begin(), func_args.end(), CDeletePointer());
+  for (auto &func_arg : func_args)
+    delete func_arg;
 }
 
 /*------------------------------------------------------------------*

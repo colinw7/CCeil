@@ -628,8 +628,9 @@ runFile(const string &file_name)
 
   /* Clean Up */
 
-  if (run_file != nullptr) {
-    process_vector(run_file->command_list, CDeletePointer());
+  if (run_file) {
+    for (auto &command : run_file->command_list)
+      delete command;
 
     delete run_file;
   }
