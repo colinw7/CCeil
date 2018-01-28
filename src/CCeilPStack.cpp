@@ -1,8 +1,5 @@
 #include <CCeilPI.h>
 
-using std::string;
-using std::ostream;
-
 ClParserStackMgr *
 ClParserStackMgr::
 getInstance()
@@ -66,7 +63,7 @@ unstackExpressionValues(int *error_code)
 
     ClParserStackNode *stack_node = getCurrentStackNode();
 
-    if (stack_node == NULL) {
+    if (! stack_node) {
       toPrev();
       break;
     }
@@ -101,7 +98,7 @@ unstackExpressionValue(int *error_code)
   ClParserValuePtr value;
 
   if (! pop(value)) {
-    *error_code = CLERR_UNDEFINED_VALUE;
+    *error_code = int(ClErr::UNDEFINED_VALUE);
     return ClParserValuePtr();
   }
 
@@ -130,8 +127,8 @@ unstackExpression(int *error_code)
 
   ClParserStackNode *stack_node = initial_stack_node;
 
-  if (stack_node == NULL) {
-    *error_code = CLERR_NULL_EXPRESSION;
+  if (! stack_node) {
+    *error_code = int(ClErr::NULL_EXPRESSION);
     return;
   }
 
@@ -195,7 +192,7 @@ unstackExpression(int *error_code)
             value_on_stack = true;
           }
           else {
-            *error_code = CLERR_INVALID_OPERATOR;
+            *error_code = int(ClErr::INVALID_OPERATOR);
             return;
           }
 
@@ -235,7 +232,7 @@ unstackExpression(int *error_code)
           ClParserValuePtr subscript_value;
 
           if (! pop(subscript_value)) {
-            *error_code = CLERR_UNDEFINED_SUBSCRIPT_VALUE;
+            *error_code = int(ClErr::UNDEFINED_SUBSCRIPT_VALUE);
             return;
           }
 
@@ -280,7 +277,7 @@ unstackExpression(int *error_code)
       else if (op->isPunctuation())
         end_expression = true;
       else {
-        *error_code = CLERR_INVALID_OPERATOR;
+        *error_code = int(ClErr::INVALID_OPERATOR);
         return;
       }
     }
@@ -343,18 +340,18 @@ unstackExpression(int *error_code)
         value_on_stack = true;
       }
       else {
-        *error_code = CLERR_INVALID_CHARACTER;
+        *error_code = int(ClErr::INVALID_CHARACTER);
         return;
       }
     }
     else {
-      *error_code = CLERR_INVALID_CHARACTER;
+      *error_code = int(ClErr::INVALID_CHARACTER);
       return;
     }
 
     stack_node = getCurrentStackNode();
 
-    if (stack_node == NULL)
+    if (! stack_node)
       end_expression = true;
 
     if (ClParserInst->isDebug())
@@ -365,7 +362,7 @@ unstackExpression(int *error_code)
     toPrev();
 
   if (initial_stack_node == stack_node) {
-    *error_code = CLERR_NULL_EXPRESSION;
+    *error_code = int(ClErr::NULL_EXPRESSION);
     return;
   }
 
@@ -392,14 +389,14 @@ subscriptStackedValue(ClParserValuePtr subscript_value, int *error_code)
     ClParserValuePtr value;
 
     if (! pop(value)) {
-      *error_code = CLERR_UNDEFINED_SUBSCRIPT_VALUE;
+      *error_code = int(ClErr::UNDEFINED_SUBSCRIPT_VALUE);
       return;
     }
 
     ClParserValuePtr sub_value;
 
     if (! value->subscriptValue(subscript_value, sub_value)) {
-      *error_code = CLERR_UNDEFINED_SUBSCRIPT_VALUE;
+      *error_code = int(ClErr::UNDEFINED_SUBSCRIPT_VALUE);
       return;
     }
 
@@ -437,7 +434,7 @@ unstackTypeFunction(int *error_code)
   while (in_brackets) {
     ClParserValuePtr value = unstackExpressionValue(error_code);
 
-    if (*error_code != 0 && *error_code != CLERR_NULL_EXPRESSION)
+    if (*error_code != 0 && *error_code != int(ClErr::NULL_EXPRESSION))
       return;
 
     if      (*error_code == 0) {
@@ -451,10 +448,10 @@ unstackTypeFunction(int *error_code)
         if      (op->isType(CL_PARSER_OP_CLOSE_R_BRACKET))
           in_brackets = false;
         else if (! op->isType(CL_PARSER_OP_COMMA))
-          *error_code = CLERR_INVALID_FN_ARG_SYNTAX;
+          *error_code = int(ClErr::INVALID_FN_ARG_SYNTAX);
       }
       else
-        *error_code = CLERR_INVALID_FN_ARG_SYNTAX;
+        *error_code = int(ClErr::INVALID_FN_ARG_SYNTAX);
     }
     else if (value_list.empty()) {
       toNext();
@@ -468,13 +465,13 @@ unstackTypeFunction(int *error_code)
           *error_code = 0;
         }
         else
-          *error_code = CLERR_INVALID_FN_ARG_SYNTAX;
+          *error_code = int(ClErr::INVALID_FN_ARG_SYNTAX);
       }
       else
-        *error_code = CLERR_INVALID_FN_ARG_SYNTAX;
+        *error_code = int(ClErr::INVALID_FN_ARG_SYNTAX);
     }
     else
-      *error_code = CLERR_INVALID_FN_ARG_SYNTAX;
+      *error_code = int(ClErr::INVALID_FN_ARG_SYNTAX);
 
     if (*error_code != 0)
       return;
@@ -486,9 +483,9 @@ unstackTypeFunction(int *error_code)
 
   if (num_values > 0 && type->getNumSubTypes() != num_values) {
     if (num_values < type->getNumSubTypes())
-      *error_code = CLERR_TOO_FEW_ARGUMENTS;
+      *error_code = int(ClErr::TOO_FEW_ARGUMENTS);
     else
-      *error_code = CLERR_TOO_MANY_ARGUMENTS;
+      *error_code = int(ClErr::TOO_MANY_ARGUMENTS);
 
     return;
   }
@@ -600,7 +597,7 @@ unstackArrayValue(int *error_code)
 
     if (value.isValid()) {
       if (! ClParserValue::checkBinaryTypes(value, value1)) {
-        *error_code = CLERR_INVALID_TYPE_MIX;
+        *error_code = int(ClErr::INVALID_TYPE_MIX);
         return;
       }
     }
@@ -620,10 +617,10 @@ unstackArrayValue(int *error_code)
       if      (op->isType(CL_PARSER_OP_CLOSE_S_BRACKET))
         in_brackets = false;
       else if (! op->isType(CL_PARSER_OP_COMMA))
-        *error_code = CLERR_INVALID_ARRAY_SYNTAX;
+        *error_code = int(ClErr::INVALID_ARRAY_SYNTAX);
     }
     else
-      *error_code = CLERR_INVALID_ARRAY_SYNTAX;
+      *error_code = int(ClErr::INVALID_ARRAY_SYNTAX);
 
     if (*error_code != 0)
       return;
@@ -712,10 +709,10 @@ unstackListValue(int *error_code)
       if      (op->isType(CL_PARSER_OP_CLOSE_BRACE))
         in_brackets = false;
       else if (! op->isType(CL_PARSER_OP_COMMA))
-        *error_code = CLERR_INVALID_LIST_SYNTAX;
+        *error_code = int(ClErr::INVALID_LIST_SYNTAX);
     }
     else
-      *error_code = CLERR_INVALID_LIST_SYNTAX;
+      *error_code = int(ClErr::INVALID_LIST_SYNTAX);
 
     if (*error_code != 0)
       return;
@@ -803,10 +800,10 @@ unstackDictionaryValue(int *error_code)
       if      (op->isType(CL_PARSER_OP_CLOSE_DICT))
         in_brackets = false;
       else if (! op->isType(CL_PARSER_OP_COMMA))
-        *error_code = CLERR_INVALID_DICT_SYNTAX;
+        *error_code = int(ClErr::INVALID_DICT_SYNTAX);
     }
     else
-      *error_code = CLERR_INVALID_DICT_SYNTAX;
+      *error_code = int(ClErr::INVALID_DICT_SYNTAX);
 
     if (*error_code != 0)
       return;
@@ -855,13 +852,13 @@ unstackSelectExpression(int *error_code)
   ClParserValuePtr value;
 
   if (! pop(value)) {
-    *error_code = CLERR_UNDEFINED_VALUE;
+    *error_code = int(ClErr::UNDEFINED_VALUE);
 
     return;
   }
 
   if (! value->convertToInteger()) {
-    *error_code = CLERR_INVALID_CONVERSION;
+    *error_code = int(ClErr::INVALID_CONVERSION);
     return;
   }
 
@@ -971,8 +968,8 @@ unstackInlineOperator(int *error_code)
 
   ClParserStackNode *stack_node = getCurrentStackNode();
 
-  if (stack_node == NULL) {
-    *error_code = CLERR_NULL_EXPRESSION;
+  if (! stack_node) {
+    *error_code = int(ClErr::NULL_EXPRESSION);
     return;
   }
 
@@ -989,13 +986,13 @@ unstackInlineOperator(int *error_code)
     toPrev();
 
     if (! pop(var_ref)) {
-      *error_code = CLERR_INVALID_LVALUE_FOR_ASSIGNMENT;
+      *error_code = int(ClErr::INVALID_LVALUE_FOR_ASSIGNMENT);
       return;
     }
   }
   else {
     if (! pop(var_ref)) {
-      *error_code = CLERR_INVALID_LVALUE_FOR_ASSIGNMENT;
+      *error_code = int(ClErr::INVALID_LVALUE_FOR_ASSIGNMENT);
       return;
     }
 
@@ -1031,7 +1028,7 @@ unstackUnaryOperator(int *error_code)
   ClParserValuePtr value1;
 
   if (! pop(value1)) {
-    *error_code = CLERR_UNDEFINED_VALUE;
+    *error_code = int(ClErr::UNDEFINED_VALUE);
     return;
   }
 
@@ -1066,7 +1063,7 @@ unstackBinaryOperator(int *error_code)
   ClParserValuePtr value2;
 
   if (! pop(value2)) {
-    *error_code = CLERR_UNDEFINED_VALUE;
+    *error_code = int(ClErr::UNDEFINED_VALUE);
     return;
   }
 
@@ -1075,7 +1072,7 @@ unstackBinaryOperator(int *error_code)
   ClParserOperatorPtr op;
 
   if (! pop(op)) {
-    *error_code = CLERR_UNDEFINED_VALUE;
+    *error_code = int(ClErr::UNDEFINED_VALUE);
     return;
   }
 
@@ -1084,7 +1081,7 @@ unstackBinaryOperator(int *error_code)
   ClParserValuePtr value1;
 
   if (! pop(value1)) {
-    *error_code = CLERR_UNDEFINED_VALUE;
+    *error_code = int(ClErr::UNDEFINED_VALUE);
     return;
   }
 
@@ -1115,7 +1112,7 @@ unstackAssignmentOperator(int *error_code)
   ClParserValuePtr value;
 
   if (! pop(value)) {
-    *error_code = CLERR_UNDEFINED_VALUE;
+    *error_code = int(ClErr::UNDEFINED_VALUE);
     return;
   }
 
@@ -1129,8 +1126,8 @@ unstackAssignmentOperator(int *error_code)
 
   ClParserStackNode *stack_node = getCurrentStackNode();
 
-  if (stack_node == NULL) {
-    *error_code = CLERR_INVALID_LVALUE_FOR_ASSIGNMENT;
+  if (! stack_node) {
+    *error_code = int(ClErr::INVALID_LVALUE_FOR_ASSIGNMENT);
     return;
   }
 
@@ -1138,7 +1135,7 @@ unstackAssignmentOperator(int *error_code)
     ClParserVarRefPtr var_ref;
 
     if (! pop(var_ref)) {
-      *error_code = CLERR_INVALID_LVALUE_FOR_ASSIGNMENT;
+      *error_code = int(ClErr::INVALID_LVALUE_FOR_ASSIGNMENT);
       return;
     }
 
@@ -1153,7 +1150,7 @@ unstackAssignmentOperator(int *error_code)
     ClParserStructVarRefPtr svar_ref;
 
     if (! pop(svar_ref)) {
-      *error_code = CLERR_INVALID_LVALUE_FOR_ASSIGNMENT;
+      *error_code = int(ClErr::INVALID_LVALUE_FOR_ASSIGNMENT);
       return;
     }
 
@@ -1165,7 +1162,7 @@ unstackAssignmentOperator(int *error_code)
     push(svar_ref);
   }
   else {
-    *error_code = CLERR_INVALID_LVALUE_FOR_ASSIGNMENT;
+    *error_code = int(ClErr::INVALID_LVALUE_FOR_ASSIGNMENT);
     return;
   }
 }
@@ -1198,7 +1195,7 @@ unstackInternalFunction(int *error_code)
   while (in_brackets) {
     ClParserValuePtr value = unstackExpressionValue(error_code);
 
-    if (*error_code != 0 && *error_code != CLERR_NULL_EXPRESSION)
+    if (*error_code != 0 && *error_code != int(ClErr::NULL_EXPRESSION))
       return;
 
     if      (*error_code == 0) {
@@ -1210,10 +1207,10 @@ unstackInternalFunction(int *error_code)
         if      (op->isType(CL_PARSER_OP_CLOSE_R_BRACKET))
           in_brackets = false;
         else if (! op->isType(CL_PARSER_OP_COMMA))
-          *error_code = CLERR_INVALID_FN_ARG_SYNTAX;
+          *error_code = int(ClErr::INVALID_FN_ARG_SYNTAX);
       }
       else
-        *error_code = CLERR_INVALID_FN_ARG_SYNTAX;
+        *error_code = int(ClErr::INVALID_FN_ARG_SYNTAX);
     }
     else if (value_list.empty()) {
       pop(op);
@@ -1225,13 +1222,13 @@ unstackInternalFunction(int *error_code)
           *error_code = 0;
         }
         else
-          *error_code = CLERR_INVALID_FN_ARG_SYNTAX;
+          *error_code = int(ClErr::INVALID_FN_ARG_SYNTAX);
       }
       else
-        *error_code = CLERR_INVALID_FN_ARG_SYNTAX;
+        *error_code = int(ClErr::INVALID_FN_ARG_SYNTAX);
     }
     else
-      *error_code = CLERR_INVALID_FN_ARG_SYNTAX;
+      *error_code = int(ClErr::INVALID_FN_ARG_SYNTAX);
 
     if (*error_code != 0)
       return;
@@ -1244,7 +1241,7 @@ unstackInternalFunction(int *error_code)
   uint num_values = value_list.size();
 
   if (num_values == 0) {
-    *error_code = CLERR_INVALID_NO_FUNCTION_ARGS;
+    *error_code = int(ClErr::INVALID_NO_FUNCTION_ARGS);
     return;
   }
 
@@ -1264,9 +1261,9 @@ unstackInternalFunction(int *error_code)
 
   if (! is_variable && num_args != num_values) {
     if (num_values < num_args)
-      *error_code = CLERR_TOO_FEW_ARGUMENTS;
+      *error_code = int(ClErr::TOO_FEW_ARGUMENTS);
     else
-      *error_code = CLERR_TOO_MANY_ARGUMENTS;
+      *error_code = int(ClErr::TOO_MANY_ARGUMENTS);
     return;
   }
 
@@ -1308,7 +1305,7 @@ unstackUserFunction(int *error_code)
   while (in_brackets) {
     unstackExpression(error_code);
 
-    if (*error_code != 0 && *error_code != CLERR_NULL_EXPRESSION)
+    if (*error_code != 0 && *error_code != int(ClErr::NULL_EXPRESSION))
       return;
 
     if      (*error_code == 0) {
@@ -1325,10 +1322,10 @@ unstackUserFunction(int *error_code)
         if      (op->isType(CL_PARSER_OP_CLOSE_R_BRACKET))
           in_brackets = false;
         else if (! op->isType(CL_PARSER_OP_COMMA))
-          *error_code = CLERR_INVALID_FN_ARG_SYNTAX;
+          *error_code = int(ClErr::INVALID_FN_ARG_SYNTAX);
       }
       else
-        *error_code = CLERR_INVALID_FN_ARG_SYNTAX;
+        *error_code = int(ClErr::INVALID_FN_ARG_SYNTAX);
     }
     else if (arg_value_list.empty()) {
       pop(op);
@@ -1340,13 +1337,13 @@ unstackUserFunction(int *error_code)
           *error_code = 0;
         }
         else
-          *error_code = CLERR_INVALID_FN_ARG_SYNTAX;
+          *error_code = int(ClErr::INVALID_FN_ARG_SYNTAX);
       }
       else
-        *error_code = CLERR_INVALID_FN_ARG_SYNTAX;
+        *error_code = int(ClErr::INVALID_FN_ARG_SYNTAX);
     }
     else
-      *error_code = CLERR_INVALID_FN_ARG_SYNTAX;
+      *error_code = int(ClErr::INVALID_FN_ARG_SYNTAX);
 
     if (*error_code != 0)
       return;
@@ -1361,16 +1358,16 @@ unstackUserFunction(int *error_code)
   if (userfn->isVarArgs()) {
     if (userfn->getNumArgTypes() > 0 &&
         num_arg_values < userfn->getNumArgTypes() - 1) {
-      *error_code = CLERR_TOO_FEW_ARGUMENTS;
+      *error_code = int(ClErr::TOO_FEW_ARGUMENTS);
       return;
     }
   }
   else {
     if (userfn->getNumArgTypes() != num_arg_values) {
       if (num_arg_values < userfn->getNumArgTypes())
-        *error_code = CLERR_TOO_FEW_ARGUMENTS;
+        *error_code = int(ClErr::TOO_FEW_ARGUMENTS);
       else
-        *error_code = CLERR_TOO_MANY_ARGUMENTS;
+        *error_code = int(ClErr::TOO_MANY_ARGUMENTS);
       return;
     }
   }
@@ -1404,7 +1401,7 @@ unstackStructure(int *error_code)
 
   pop(identifier);
 
-  const string &name = identifier->getName();
+  const std::string &name = identifier->getName();
 
   ClParserVarPtr variable = ClParserInst->getVariable(name);
 
@@ -1419,14 +1416,14 @@ unstackStructure(int *error_code)
   if (! variable->getValue().isValid() ||
       ! (variable->getValue()->isStructure() ||
          variable->getValue()->isStructureArray())) {
-    *error_code = CLERR_INVALID_STRUCT_REF;
+    *error_code = int(ClErr::INVALID_STRUCT_REF);
     return;
   }
 
   ClParserStackNode *stack_node = getCurrentStackNode();
 
-  if (stack_node == NULL || ! stack_node->isOperator()) {
-    *error_code = CLERR_INVALID_STRUCT_REF;
+  if (! stack_node || ! stack_node->isOperator()) {
+    *error_code = int(ClErr::INVALID_STRUCT_REF);
     return;
   }
 
@@ -1441,7 +1438,7 @@ unstackStructure(int *error_code)
     ClParserValuePtr subscript_value;
 
     if (! pop(subscript_value)) {
-      *error_code = CLERR_UNDEFINED_SUBSCRIPT_VALUE;
+      *error_code = int(ClErr::UNDEFINED_SUBSCRIPT_VALUE);
       return;
     }
 
@@ -1451,14 +1448,14 @@ unstackStructure(int *error_code)
 
     stack_node = getCurrentStackNode();
 
-    if (stack_node == NULL || ! stack_node->isOperator()) {
-      *error_code = CLERR_INVALID_STRUCT_REF;
+    if (! stack_node || ! stack_node->isOperator()) {
+      *error_code = int(ClErr::INVALID_STRUCT_REF);
       return;
     }
   }
   else {
     if (variable->getValue()->getType() != CL_PARSER_VALUE_TYPE_STRUCTURE) {
-      *error_code = CLERR_INVALID_STRUCT_REF;
+      *error_code = int(ClErr::INVALID_STRUCT_REF);
       return;
     }
   }
@@ -1471,23 +1468,23 @@ unstackStructure(int *error_code)
 
   stack_node = getCurrentStackNode();
 
-  while (stack_node != NULL &&
+  while (stack_node &&
          stack_node->isIdentifier() &&
          stack_node->getIdentifier()->isStructPart()) {
     pop(identifier);
 
-    const string &name = identifier->getName();
+    const std::string &name = identifier->getName();
 
     if (var_ref.isValid()) {
       ClParserValuePtr svalue;
 
       if (! var_ref->getValue(svalue)) {
-        *error_code = CLERR_INVALID_STRUCT_REF;
+        *error_code = int(ClErr::INVALID_STRUCT_REF);
         return;
       }
 
       if (! svalue->isStructure()) {
-        *error_code = CLERR_INVALID_STRUCT_REF;
+        *error_code = int(ClErr::INVALID_STRUCT_REF);
         return;
       }
 
@@ -1497,7 +1494,7 @@ unstackStructure(int *error_code)
 
       if (! structure->getValue(name, structure_value)) {
         if (structure->getIsFixedType()) {
-          *error_code = CLERR_INVALID_STRUCT_REF;
+          *error_code = int(ClErr::INVALID_STRUCT_REF);
           return;
         }
 
@@ -1515,8 +1512,8 @@ unstackStructure(int *error_code)
 
     stack_node = getCurrentStackNode();
 
-    if (stack_node == NULL || ! stack_node->isOperator()) {
-      *error_code = CLERR_INVALID_STRUCT_REF;
+    if (! stack_node || ! stack_node->isOperator()) {
+      *error_code = int(ClErr::INVALID_STRUCT_REF);
       return;
     }
 
@@ -1529,7 +1526,7 @@ unstackStructure(int *error_code)
       ClParserValuePtr subscript_value;
 
       if (! pop(subscript_value)) {
-        *error_code = CLERR_UNDEFINED_SUBSCRIPT_VALUE;
+        *error_code = int(ClErr::UNDEFINED_SUBSCRIPT_VALUE);
         return;
       }
 
@@ -1539,14 +1536,14 @@ unstackStructure(int *error_code)
 
       stack_node = getCurrentStackNode();
 
-      if (stack_node == NULL || ! stack_node->isOperator()) {
-        *error_code = CLERR_INVALID_STRUCT_REF;
+      if (! stack_node || ! stack_node->isOperator()) {
+        *error_code = int(ClErr::INVALID_STRUCT_REF);
         return;
       }
     }
     else {
       if (variable->getValue()->getType() != CL_PARSER_VALUE_TYPE_STRUCTURE) {
-        *error_code = CLERR_INVALID_STRUCT_REF;
+        *error_code = int(ClErr::INVALID_STRUCT_REF);
         return;
       }
     }
@@ -1558,27 +1555,27 @@ unstackStructure(int *error_code)
     stack_node = getCurrentStackNode();
   }
 
-  if (stack_node == NULL ||
+  if (! stack_node ||
       ! stack_node->isIdentifier() ||
       ! stack_node->getIdentifier()->isVariable()) {
-    *error_code = CLERR_INVALID_STRUCT_REF;
+    *error_code = int(ClErr::INVALID_STRUCT_REF);
     return;
   }
 
   pop(identifier);
 
-  const string &name1 = identifier->getName();
+  const std::string &name1 = identifier->getName();
 
   if (var_ref.isValid()) {
     ClParserValuePtr svalue;
 
     if (! var_ref->getValue(svalue)) {
-      *error_code = CLERR_INVALID_STRUCT_REF;
+      *error_code = int(ClErr::INVALID_STRUCT_REF);
       return;
     }
 
     if (! svalue->isStructure()) {
-      *error_code = CLERR_INVALID_STRUCT_REF;
+      *error_code = int(ClErr::INVALID_STRUCT_REF);
       return;
     }
 
@@ -1588,7 +1585,7 @@ unstackStructure(int *error_code)
 
     if (! structure->getValue(name1, structure_value)) {
       if (structure->getIsFixedType()) {
-        *error_code = CLERR_INVALID_STRUCT_REF;
+        *error_code = int(ClErr::INVALID_STRUCT_REF);
         return;
       }
 
@@ -1604,8 +1601,7 @@ unstackStructure(int *error_code)
 
   stack_node = getCurrentStackNode();
 
-  if (stack_node != NULL &&
-      stack_node->isOperator(CL_PARSER_OP_OPEN_S_BRACKET)) {
+  if (stack_node && stack_node->isOperator(CL_PARSER_OP_OPEN_S_BRACKET)) {
     unstackArrayValue(error_code);
 
     if (*error_code != 0)
@@ -1614,7 +1610,7 @@ unstackStructure(int *error_code)
     ClParserValuePtr subscript_value;
 
     if (! pop(subscript_value)) {
-      *error_code = CLERR_UNDEFINED_SUBSCRIPT_VALUE;
+      *error_code = int(ClErr::UNDEFINED_SUBSCRIPT_VALUE);
       return;
     }
 
@@ -1627,7 +1623,7 @@ unstackStructure(int *error_code)
     ClParserValuePtr value1;
 
     if (! svar_ref->getValue(value1)) {
-      *error_code = CLERR_UNDEFINED_SUBSCRIPT_VALUE;
+      *error_code = int(ClErr::UNDEFINED_SUBSCRIPT_VALUE);
       return;
     }
 
@@ -1653,8 +1649,8 @@ unstackVariable(int *error_code)
 
   pop(identifier);
 
-  const string &   name  = identifier->getName();
-  ClParserScopePtr scope = identifier->getScope();
+  const std::string &name  = identifier->getName();
+  ClParserScopePtr   scope = identifier->getScope();
 
   ClParserVarPtr variable;
 
@@ -1667,12 +1663,11 @@ unstackVariable(int *error_code)
 
   ClParserStackNode *stack_node = getCurrentStackNode();
 
-  if (stack_node != NULL &&
-      stack_node->isOperator(CL_PARSER_OP_OPEN_S_BRACKET)) {
+  if (stack_node && stack_node->isOperator(CL_PARSER_OP_OPEN_S_BRACKET)) {
     ClParserValuePtr subscript_value;
 
     if (! variable.isValid() || ! variable->getValue().isValid()) {
-      *error_code = CLERR_UNDEFINED_VARIABLE;
+      *error_code = int(ClErr::UNDEFINED_VARIABLE);
       return;
     }
 
@@ -1682,7 +1677,7 @@ unstackVariable(int *error_code)
       return;
 
     if (! pop(subscript_value)) {
-      *error_code = CLERR_UNDEFINED_SUBSCRIPT_VALUE;
+      *error_code = int(ClErr::UNDEFINED_SUBSCRIPT_VALUE);
       return;
     }
 
@@ -1709,7 +1704,7 @@ unstackVariable(int *error_code)
     ClParserValuePtr value1;
 
     if (! var_ref->getValue(value1)) {
-      *error_code = CLERR_UNDEFINED_SUBSCRIPT_VALUE;
+      *error_code = int(ClErr::UNDEFINED_SUBSCRIPT_VALUE);
       return;
     }
 
@@ -1735,8 +1730,8 @@ unstackFunction(int *error_code)
 
   pop(identifier);
 
-  const string &   name  = identifier->getName();
-  ClParserScopePtr scope = identifier->getScope();
+  const std::string &name  = identifier->getName();
+  ClParserScopePtr   scope = identifier->getScope();
 
   ClParserFuncPtr function;
 
@@ -1746,7 +1741,7 @@ unstackFunction(int *error_code)
     function = ClParserInst->getFunction(name);
 
   if (! function.isValid()) {
-    *error_code = CLERR_UNDEFINED_FUNCTION;
+    *error_code = int(ClErr::UNDEFINED_FUNCTION);
     return;
   }
 
@@ -1772,13 +1767,13 @@ unstackFunction(int *error_code)
 
     if (stack_node->isOperator(CL_PARSER_OP_CLOSE_R_BRACKET) &&
         i < num_args - 1) {
-      *error_code = CLERR_TOO_FEW_ARGUMENTS;
+      *error_code = int(ClErr::TOO_FEW_ARGUMENTS);
       return;
     }
 
     if (stack_node->isOperator(CL_PARSER_OP_COMMA) &&
         i == num_args - 1) {
-      *error_code = CLERR_TOO_MANY_ARGUMENTS;
+      *error_code = int(ClErr::TOO_MANY_ARGUMENTS);
       return;
     }
 
@@ -1809,7 +1804,7 @@ unstackFunction(int *error_code)
   endTempStack();
 
   if (! value.isValid()) {
-    *error_code = CLERR_UNDEFINED_FUNCTION;
+    *error_code = int(ClErr::UNDEFINED_FUNCTION);
     return;
   }
 
@@ -1823,8 +1818,7 @@ unstackFunction(int *error_code)
 
 void
 ClParserStackMgr::
-stackFunctionStackNode(ClParserStackNode *stack_node,
-                       ClParserFuncValue *function_value)
+stackFunctionStackNode(ClParserStackNode *stack_node, ClParserFuncValue *function_value)
 {
   ClParserValuePtr value;
 
@@ -1833,7 +1827,7 @@ stackFunctionStackNode(ClParserStackNode *stack_node,
     int num_args = function_value->function->getNumArgs();
 
     for (int i = 0; i < num_args; ++i) {
-      const string &arg = function_value->function->getArg(i);
+      const std::string &arg = function_value->function->getArg(i);
 
       if (arg == stack_node->getIdentifier()->getName()) {
         value = ClParserValueMgrInst->createValue(function_value->values[i]);
@@ -1862,8 +1856,8 @@ unstackArgValue(int *error_code)
   ClParserVarRefPtr var_ref;
 
   if (! pop(var_ref) && ! pop(value)) {
-    *error_code = CLERR_UNDEFINED_VALUE;
-    return NULL;
+    *error_code = int(ClErr::UNDEFINED_VALUE);
+    return nullptr;
   }
 
   return new ClParserArgValue(var_ref, value);
@@ -1885,8 +1879,8 @@ skipExpression(int *error_code)
 
   ClParserStackNode *stack_node = getCurrentStackNode();
 
-  if (stack_node == NULL) {
-    *error_code = CLERR_NULL_EXPRESSION;
+  if (! stack_node) {
+    *error_code = int(ClErr::NULL_EXPRESSION);
     return;
   }
 
@@ -1918,7 +1912,7 @@ skipExpression(int *error_code)
 
         stack_node = getCurrentStackNode();
 
-        if (stack_node == NULL)
+        if (! stack_node)
           return;
 
         while (! stack_node->isOperator() ||
@@ -1932,7 +1926,7 @@ skipExpression(int *error_code)
 
           stack_node = getCurrentStackNode();
 
-          if (stack_node == NULL)
+          if (! stack_node)
             return;
         }
 
@@ -1948,7 +1942,7 @@ skipExpression(int *error_code)
 
         stack_node = getCurrentStackNode();
 
-        if (stack_node == NULL)
+        if (! stack_node)
           return;
 
         while (! stack_node->isOperator() ||
@@ -1962,7 +1956,7 @@ skipExpression(int *error_code)
 
           stack_node = getCurrentStackNode();
 
-          if (stack_node == NULL)
+          if (! stack_node)
             return;
         }
 
@@ -1978,7 +1972,7 @@ skipExpression(int *error_code)
 
         stack_node = getCurrentStackNode();
 
-        if (stack_node == NULL)
+        if (! stack_node)
           return;
 
         while (! stack_node->isOperator() ||
@@ -1992,7 +1986,7 @@ skipExpression(int *error_code)
 
           stack_node = getCurrentStackNode();
 
-          if (stack_node == NULL)
+          if (! stack_node)
             return;
         }
 
@@ -2008,7 +2002,7 @@ skipExpression(int *error_code)
 
         stack_node = getCurrentStackNode();
 
-        if (stack_node == NULL)
+        if (! stack_node)
           return;
 
         while (! stack_node->isOperator() ||
@@ -2022,7 +2016,7 @@ skipExpression(int *error_code)
 
           stack_node = getCurrentStackNode();
 
-          if (stack_node == NULL)
+          if (! stack_node)
             return;
         }
 
@@ -2038,7 +2032,7 @@ skipExpression(int *error_code)
 
         stack_node = getCurrentStackNode();
 
-        if (stack_node == NULL)
+        if (! stack_node)
           return;
 
         popStackNode();
@@ -2051,7 +2045,7 @@ skipExpression(int *error_code)
       else if (op->isPunctuation())
         end_expression = true;
       else {
-        *error_code = CLERR_INVALID_OPERATOR;
+        *error_code = int(ClErr::INVALID_OPERATOR);
 
         return;
       }
@@ -2063,7 +2057,7 @@ skipExpression(int *error_code)
 
       stack_node = getCurrentStackNode();
 
-      if (stack_node == NULL)
+      if (! stack_node)
         return;
 
       popStackNode();
@@ -2075,7 +2069,7 @@ skipExpression(int *error_code)
 
       stack_node = getCurrentStackNode();
 
-      if (stack_node == NULL)
+      if (! stack_node)
         return;
 
       while (! stack_node->isOperator() ||
@@ -2089,7 +2083,7 @@ skipExpression(int *error_code)
 
         stack_node = getCurrentStackNode();
 
-        if (stack_node == NULL)
+        if (! stack_node)
           return;
       }
 
@@ -2109,7 +2103,7 @@ skipExpression(int *error_code)
 
         stack_node = getCurrentStackNode();
 
-        if (stack_node == NULL)
+        if (! stack_node)
           return;
       }
       while (stack_node->isIdentifier() &&
@@ -2119,7 +2113,7 @@ skipExpression(int *error_code)
 
       stack_node = getCurrentStackNode();
 
-      if (stack_node == NULL)
+      if (! stack_node)
         return;
 
       if (stack_node->isOperator() &&
@@ -2133,7 +2127,7 @@ skipExpression(int *error_code)
 
         stack_node = getCurrentStackNode();
 
-        if (stack_node == NULL)
+        if (! stack_node)
           return;
 
         while (! stack_node->isOperator() ||
@@ -2147,7 +2141,7 @@ skipExpression(int *error_code)
 
           stack_node = getCurrentStackNode();
 
-          if (stack_node == NULL)
+          if (! stack_node)
             return;
         }
 
@@ -2160,7 +2154,7 @@ skipExpression(int *error_code)
 
       stack_node = getCurrentStackNode();
 
-      if (stack_node == NULL)
+      if (! stack_node)
         return;
 
       if (stack_node->isOperator() &&
@@ -2174,7 +2168,7 @@ skipExpression(int *error_code)
 
         stack_node = getCurrentStackNode();
 
-        if (stack_node == NULL)
+        if (! stack_node)
           return;
 
         while (! stack_node->isOperator() ||
@@ -2188,7 +2182,7 @@ skipExpression(int *error_code)
 
           stack_node = getCurrentStackNode();
 
-          if (stack_node == NULL)
+          if (! stack_node)
             return;
         }
 
@@ -2201,7 +2195,7 @@ skipExpression(int *error_code)
 
       stack_node = getCurrentStackNode();
 
-      if (stack_node == NULL)
+      if (! stack_node)
         return;
 
       popStackNode();
@@ -2213,7 +2207,7 @@ skipExpression(int *error_code)
 
       stack_node = getCurrentStackNode();
 
-      if (stack_node == NULL)
+      if (! stack_node)
         return;
 
       while (! stack_node->isOperator() ||
@@ -2227,21 +2221,21 @@ skipExpression(int *error_code)
 
         stack_node = getCurrentStackNode();
 
-        if (stack_node == NULL)
+        if (! stack_node)
           return;
       }
 
       popStackNode();
     }
     else {
-      *error_code = CLERR_INVALID_CHARACTER;
+      *error_code = int(ClErr::INVALID_CHARACTER);
 
       return;
     }
 
     stack_node = getCurrentStackNode();
 
-    if (stack_node == NULL)
+    if (! stack_node)
       end_expression = true;
   }
 }
@@ -2358,7 +2352,7 @@ pop(ClParserIdentifierPtr &identifier)
 {
   ClParserStackNode *stack_node = getCurrentStackNode();
 
-  if (stack_node == NULL || ! stack_node->isIdentifier())
+  if (! stack_node || ! stack_node->isIdentifier())
     return false;
 
   identifier = stack_node->getIdentifier();
@@ -2374,7 +2368,7 @@ pop(ClParserInternFnPtr &internfn)
 {
   ClParserStackNode *stack_node = getCurrentStackNode();
 
-  if (stack_node == NULL || ! stack_node->isInternFn())
+  if (! stack_node || ! stack_node->isInternFn())
     return false;
 
   internfn = stack_node->getInternFn();
@@ -2390,7 +2384,7 @@ pop(ClParserOperatorPtr &op)
 {
   ClParserStackNode *stack_node = getCurrentStackNode();
 
-  if (stack_node == NULL || ! stack_node->isOperator())
+  if (! stack_node || ! stack_node->isOperator())
     return false;
 
   op = stack_node->getOperator();
@@ -2406,7 +2400,7 @@ pop(ClParserTypePtr &type)
 {
   ClParserStackNode *stack_node = getCurrentStackNode();
 
-  if (stack_node == NULL || ! stack_node->isType())
+  if (! stack_node || ! stack_node->isType())
     return false;
 
   type = stack_node->getType();
@@ -2422,7 +2416,7 @@ pop(ClParserUserFnPtr &userfn)
 {
   ClParserStackNode *stack_node = getCurrentStackNode();
 
-  if (stack_node == NULL || ! stack_node->isUserFn())
+  if (! stack_node || ! stack_node->isUserFn())
     return false;
 
   userfn = stack_node->getUserFn();
@@ -2438,7 +2432,7 @@ pop(ClParserValuePtr &value)
 {
   ClParserStackNode *stack_node = getCurrentStackNode();
 
-  if (stack_node == NULL)
+  if (! stack_node)
     return false;
 
   if      (stack_node->isValue()) {
@@ -2480,7 +2474,7 @@ pop(ClParserVarRefPtr &var_ref)
 {
   ClParserStackNode *stack_node = getCurrentStackNode();
 
-  if (stack_node == NULL || ! stack_node->isVarRef())
+  if (! stack_node || ! stack_node->isVarRef())
     return false;
 
   var_ref = stack_node->getVarRef();
@@ -2496,7 +2490,7 @@ pop(ClParserStructVarRefPtr &svar_ref)
 {
   ClParserStackNode *stack_node = getCurrentStackNode();
 
-  if (stack_node == NULL || ! stack_node->isStructVarRef())
+  if (! stack_node || ! stack_node->isStructVarRef())
     return false;
 
   svar_ref = stack_node->getStructVarRef();
@@ -2639,7 +2633,7 @@ removeCurrentStackNode()
 {
   ClParserStackNode *stack_node = getCurrentStackNode();
 
-  if (stack_node != NULL)
+  if (stack_node)
     popStackNode();
 }
 
@@ -2828,7 +2822,7 @@ ClParserStack::
 getCurrentStackNodeP() const
 {
   if (current_stack_node_ == stack_node_list_.end())
-    return NULL;
+    return nullptr;
 
   return *current_stack_node_;
 }
@@ -2846,7 +2840,7 @@ print() const
 
 void
 ClParserStack::
-print(ostream &os) const
+print(std::ostream &os) const
 {
   StackNodeList::const_iterator p1 = stack_node_list_.begin();
   StackNodeList::const_iterator p2 = stack_node_list_.end  ();
@@ -2867,15 +2861,18 @@ debugPrintCurrent() const
   StackNodeList::const_iterator p1 = stack_node_list_.begin();
   StackNodeList::const_iterator p2 = stack_node_list_.end  ();
 
+  std::string marker = "\u00ab";
+  //std::string marker = "#";
+
   for ( ; p1 != p2; ++p1) {
     if (current_stack_node_ == p1)
-      fprintf(stderr, "#");
+      fprintf(stderr, "%s", marker.c_str());
 
     (*p1)->debugPrint();
   }
 
   if (current_stack_node_ == stack_node_list_.end())
-    fprintf(stderr, "#");
+    fprintf(stderr, "%s", marker.c_str());
 
   fprintf(stderr, "<\n");
 }
@@ -2897,13 +2894,13 @@ debugPrint() const
 
 ClParserStackNode::
 ClParserStackNode() :
- type_(CL_PARSER_STACK_NODE_NONE)
+ type_(ClParserStackNodeType::NONE)
 {
 }
 
 ClParserStackNode::
 ClParserStackNode(ClParserOperatorPtr op) :
- type_(CL_PARSER_STACK_NODE_OPERATOR)
+ type_(ClParserStackNodeType::OPERATOR)
 {
   data_.op = new ClParserOperatorPtr;
 
@@ -2912,7 +2909,7 @@ ClParserStackNode(ClParserOperatorPtr op) :
 
 ClParserStackNode::
 ClParserStackNode(ClParserInternFnPtr internfn) :
- type_(CL_PARSER_STACK_NODE_INTERN_FN)
+ type_(ClParserStackNodeType::INTERN_FN)
 {
   data_.internfn = new ClParserInternFnPtr;
 
@@ -2921,7 +2918,7 @@ ClParserStackNode(ClParserInternFnPtr internfn) :
 
 ClParserStackNode::
 ClParserStackNode(ClParserValuePtr value) :
- type_(CL_PARSER_STACK_NODE_VALUE)
+ type_(ClParserStackNodeType::VALUE)
 {
   data_.value = new ClParserValuePtr;
 
@@ -2930,7 +2927,7 @@ ClParserStackNode(ClParserValuePtr value) :
 
 ClParserStackNode::
 ClParserStackNode(ClParserVarRefPtr var_ref) :
- type_(CL_PARSER_STACK_NODE_VAR_REF)
+ type_(ClParserStackNodeType::VAR_REF)
 {
   data_.var_ref = new ClParserVarRefPtr;
 
@@ -2939,7 +2936,7 @@ ClParserStackNode(ClParserVarRefPtr var_ref) :
 
 ClParserStackNode::
 ClParserStackNode(ClParserStructVarRefPtr svar_ref) :
- type_(CL_PARSER_STACK_NODE_STRUCT_VAR_REF)
+ type_(ClParserStackNodeType::STRUCT_VAR_REF)
 {
   data_.svar_ref = new ClParserStructVarRefPtr;
 
@@ -2948,7 +2945,7 @@ ClParserStackNode(ClParserStructVarRefPtr svar_ref) :
 
 ClParserStackNode::
 ClParserStackNode(ClParserIdentifierPtr identifier) :
- type_(CL_PARSER_STACK_NODE_IDENTIFIER)
+ type_(ClParserStackNodeType::IDENTIFIER)
 {
   data_.identifier = new ClParserIdentifierPtr;
 
@@ -2957,7 +2954,7 @@ ClParserStackNode(ClParserIdentifierPtr identifier) :
 
 ClParserStackNode::
 ClParserStackNode(ClParserUserFnPtr userfn) :
- type_(CL_PARSER_STACK_NODE_USER_FN)
+ type_(ClParserStackNodeType::USER_FN)
 {
   data_.userfn = new ClParserUserFnPtr;
 
@@ -2966,7 +2963,7 @@ ClParserStackNode(ClParserUserFnPtr userfn) :
 
 ClParserStackNode::
 ClParserStackNode(ClParserTypePtr type) :
- type_(CL_PARSER_STACK_NODE_TYPE)
+ type_(ClParserStackNodeType::TYPE)
 {
   data_.type = new ClParserTypePtr;
 
@@ -2977,15 +2974,15 @@ ClParserStackNode::
 ~ClParserStackNode()
 {
   switch (type_) {
-    case CL_PARSER_STACK_NODE_OPERATOR      : delete data_.op        ; break;
-    case CL_PARSER_STACK_NODE_INTERN_FN     : delete data_.internfn  ; break;
-    case CL_PARSER_STACK_NODE_VALUE         : delete data_.value     ; break;
-    case CL_PARSER_STACK_NODE_VAR_REF       : delete data_.var_ref   ; break;
-    case CL_PARSER_STACK_NODE_STRUCT_VAR_REF: delete data_.svar_ref  ; break;
-    case CL_PARSER_STACK_NODE_IDENTIFIER    : delete data_.identifier; break;
-    case CL_PARSER_STACK_NODE_USER_FN       : delete data_.userfn    ; break;
-    case CL_PARSER_STACK_NODE_TYPE          : delete data_.type      ; break;
-    default                                 : break;
+    case ClParserStackNodeType::OPERATOR      : delete data_.op        ; break;
+    case ClParserStackNodeType::INTERN_FN     : delete data_.internfn  ; break;
+    case ClParserStackNodeType::VALUE         : delete data_.value     ; break;
+    case ClParserStackNodeType::VAR_REF       : delete data_.var_ref   ; break;
+    case ClParserStackNodeType::STRUCT_VAR_REF: delete data_.svar_ref  ; break;
+    case ClParserStackNodeType::IDENTIFIER    : delete data_.identifier; break;
+    case ClParserStackNodeType::USER_FN       : delete data_.userfn    ; break;
+    case ClParserStackNodeType::TYPE          : delete data_.type      ; break;
+    default: break;
   }
 }
 
@@ -2993,7 +2990,7 @@ bool
 ClParserStackNode::
 isOperator(ClParserOperatorType type)
 {
-  return (type_ == CL_PARSER_STACK_NODE_OPERATOR &&
+  return (type_ == ClParserStackNodeType::OPERATOR &&
           (*data_.op)->isType(type));
 }
 
@@ -3001,21 +2998,21 @@ void
 ClParserStackNode::
 stack()
 {
-  if      (type_ == CL_PARSER_STACK_NODE_OPERATOR)
+  if      (type_ == ClParserStackNodeType::OPERATOR)
     ClParserStackMgrInst->push(*data_.op);
-  else if (type_ == CL_PARSER_STACK_NODE_INTERN_FN)
+  else if (type_ == ClParserStackNodeType::INTERN_FN)
     ClParserStackMgrInst->push(*data_.internfn);
-  else if (type_ == CL_PARSER_STACK_NODE_USER_FN)
+  else if (type_ == ClParserStackNodeType::USER_FN)
     ClParserStackMgrInst->push(*data_.userfn);
-  else if (type_ == CL_PARSER_STACK_NODE_VALUE)
+  else if (type_ == ClParserStackNodeType::VALUE)
     ClParserStackMgrInst->push(*data_.value);
-  else if (type_ == CL_PARSER_STACK_NODE_VAR_REF)
+  else if (type_ == ClParserStackNodeType::VAR_REF)
     ClParserStackMgrInst->push(*data_.var_ref);
-  else if (type_ == CL_PARSER_STACK_NODE_STRUCT_VAR_REF)
+  else if (type_ == ClParserStackNodeType::STRUCT_VAR_REF)
     ClParserStackMgrInst->push(*data_.svar_ref);
-  else if (type_ == CL_PARSER_STACK_NODE_IDENTIFIER)
+  else if (type_ == ClParserStackNodeType::IDENTIFIER)
     ClParserStackMgrInst->push(*data_.identifier);
-  else if (type_ == CL_PARSER_STACK_NODE_TYPE)
+  else if (type_ == ClParserStackNodeType::TYPE)
     ClParserStackMgrInst->push(*data_.type);
   else
     assert(false);
@@ -3026,31 +3023,31 @@ ClParserStackNode::
 print() const
 {
   switch (type_) {
-    case CL_PARSER_STACK_NODE_OPERATOR      : (*data_.op        )->print(); break;
-    case CL_PARSER_STACK_NODE_INTERN_FN     : (*data_.internfn  )->print(); break;
-    case CL_PARSER_STACK_NODE_USER_FN       : (*data_.userfn    )->print(); break;
-    case CL_PARSER_STACK_NODE_VALUE         : (*data_.value     )->print(); break;
-    case CL_PARSER_STACK_NODE_VAR_REF       : (*data_.var_ref   )->print(); break;
-    case CL_PARSER_STACK_NODE_STRUCT_VAR_REF: (*data_.svar_ref  )->print(); break;
-    case CL_PARSER_STACK_NODE_IDENTIFIER    : (*data_.identifier)->print(); break;
-    case CL_PARSER_STACK_NODE_TYPE          : (*data_.type      )->print(); break;
+    case ClParserStackNodeType::OPERATOR      : (*data_.op        )->print(); break;
+    case ClParserStackNodeType::INTERN_FN     : (*data_.internfn  )->print(); break;
+    case ClParserStackNodeType::USER_FN       : (*data_.userfn    )->print(); break;
+    case ClParserStackNodeType::VALUE         : (*data_.value     )->print(); break;
+    case ClParserStackNodeType::VAR_REF       : (*data_.var_ref   )->print(); break;
+    case ClParserStackNodeType::STRUCT_VAR_REF: (*data_.svar_ref  )->print(); break;
+    case ClParserStackNodeType::IDENTIFIER    : (*data_.identifier)->print(); break;
+    case ClParserStackNodeType::TYPE          : (*data_.type      )->print(); break;
     default: break;
   }
 }
 
 void
 ClParserStackNode::
-print(ostream &os) const
+print(std::ostream &os) const
 {
   switch (type_) {
-    case CL_PARSER_STACK_NODE_OPERATOR      : (*data_.op        )->print(os); break;
-    case CL_PARSER_STACK_NODE_INTERN_FN     : (*data_.internfn  )->print(os); break;
-    case CL_PARSER_STACK_NODE_USER_FN       : (*data_.userfn    )->print(os); break;
-    case CL_PARSER_STACK_NODE_VALUE         : (*data_.value     )->print(os); break;
-    case CL_PARSER_STACK_NODE_VAR_REF       : (*data_.var_ref   )->print(os); break;
-    case CL_PARSER_STACK_NODE_STRUCT_VAR_REF: (*data_.svar_ref  )->print(os); break;
-    case CL_PARSER_STACK_NODE_IDENTIFIER    : (*data_.identifier)->print(os); break;
-    case CL_PARSER_STACK_NODE_TYPE          : (*data_.type      )->print(os); break;
+    case ClParserStackNodeType::OPERATOR      : (*data_.op        )->print(os); break;
+    case ClParserStackNodeType::INTERN_FN     : (*data_.internfn  )->print(os); break;
+    case ClParserStackNodeType::USER_FN       : (*data_.userfn    )->print(os); break;
+    case ClParserStackNodeType::VALUE         : (*data_.value     )->print(os); break;
+    case ClParserStackNodeType::VAR_REF       : (*data_.var_ref   )->print(os); break;
+    case ClParserStackNodeType::STRUCT_VAR_REF: (*data_.svar_ref  )->print(os); break;
+    case ClParserStackNodeType::IDENTIFIER    : (*data_.identifier)->print(os); break;
+    case ClParserStackNodeType::TYPE          : (*data_.type      )->print(os); break;
     default: break;
   }
 }
@@ -3060,14 +3057,14 @@ ClParserStackNode::
 debugPrint() const
 {
   switch (type_) {
-    case CL_PARSER_STACK_NODE_OPERATOR      : (*data_.op        )->debugPrint(); break;
-    case CL_PARSER_STACK_NODE_INTERN_FN     : (*data_.internfn  )->debugPrint(); break;
-    case CL_PARSER_STACK_NODE_USER_FN       : (*data_.userfn    )->debugPrint(); break;
-    case CL_PARSER_STACK_NODE_VALUE         : (*data_.value     )->debugPrint(); break;
-    case CL_PARSER_STACK_NODE_VAR_REF       : (*data_.var_ref   )->debugPrint(); break;
-    case CL_PARSER_STACK_NODE_STRUCT_VAR_REF: (*data_.svar_ref  )->debugPrint(); break;
-    case CL_PARSER_STACK_NODE_IDENTIFIER    : (*data_.identifier)->debugPrint(); break;
-    case CL_PARSER_STACK_NODE_TYPE          : (*data_.type      )->debugPrint(); break;
+    case ClParserStackNodeType::OPERATOR      : (*data_.op        )->debugPrint(); break;
+    case ClParserStackNodeType::INTERN_FN     : (*data_.internfn  )->debugPrint(); break;
+    case ClParserStackNodeType::USER_FN       : (*data_.userfn    )->debugPrint(); break;
+    case ClParserStackNodeType::VALUE         : (*data_.value     )->debugPrint(); break;
+    case ClParserStackNodeType::VAR_REF       : (*data_.var_ref   )->debugPrint(); break;
+    case ClParserStackNodeType::STRUCT_VAR_REF: (*data_.svar_ref  )->debugPrint(); break;
+    case ClParserStackNodeType::IDENTIFIER    : (*data_.identifier)->debugPrint(); break;
+    case ClParserStackNodeType::TYPE          : (*data_.type      )->debugPrint(); break;
     default: break;
   }
 }
@@ -3076,7 +3073,7 @@ void
 ClParserStack::
 getVariables(char ***variables, uint *num_variables)
 {
-  *variables     = NULL;
+  *variables     = nullptr;
   *num_variables = 0;
 
   StringVectorT variable_list;
@@ -3101,7 +3098,7 @@ getVariables(char ***variables, uint *num_variables)
     *variables = new char * [*num_variables];
 
     for (uint i = 0; i < *num_variables; ++i) {
-      string variable = variable_list[i];
+      std::string variable = variable_list[i];
 
       (*variables)[i] = CStrUtil::strdup(variable.c_str());
     }

@@ -2,9 +2,6 @@
 
 int ClParserDict::error_code_;
 
-using std::string;
-using std::ostream;
-
 ClParserDictMgr *
 ClParserDictMgr::
 getInstance()
@@ -79,7 +76,7 @@ integerToKey(long integer)
 
 const ClParserKey &
 ClParserDictMgr::
-stringToKey(const string &str)
+stringToKey(const std::string &str)
 {
   StringKeyMap::const_iterator p = string_key_map_.find(str);
 
@@ -442,75 +439,56 @@ integerToKey(long integer) const
 
 const ClParserKey &
 ClParserDict::
-stringToKey(const string &str) const
+stringToKey(const std::string &str) const
 {
   return ClParserDictMgrInst->stringToKey(str);
+}
+
+//------
+
+std::string
+ClParserDict::
+asString() const
+{
+  KeyValueList::const_iterator p1 = key_values_.begin();
+  KeyValueList::const_iterator p2 = key_values_.end  ();
+
+  std::string str = "{{";
+
+  for (int i = 0; p1 != p2; ++p1, ++i) {
+    if (i > 0) str += ",";
+
+    str += (*p1).key.asString();
+
+    str += ",";
+
+    str += (*p1).value->asString();
+  }
+
+  str += "}}";
+
+  return str;
 }
 
 void
 ClParserDict::
 print() const
 {
-  KeyValueList::const_iterator p1 = key_values_.begin();
-  KeyValueList::const_iterator p2 = key_values_.end  ();
-
-  ClParserInst->output("{{");
-
-  for (int i = 0; p1 != p2; ++p1, ++i) {
-    if (i > 0) ClParserInst->output(",");
-
-    (*p1).key.print();
-
-    ClParserInst->output(",");
-
-    (*p1).value->print();
-  }
-
-  ClParserInst->output("}}");
+  ClParserInst->output("%s", asString().c_str());
 }
 
 void
 ClParserDict::
-print(ostream &os) const
+print(std::ostream &os) const
 {
-  KeyValueList::const_iterator p1 = key_values_.begin();
-  KeyValueList::const_iterator p2 = key_values_.end  ();
-
-  os << "{{";
-
-  for (int i = 0; p1 != p2; ++p1, ++i) {
-    if (i > 0) os << ",";
-
-    (*p1).key.print(os);
-
-    os << ",";
-
-    (*p1).value->print(os);
-  }
-
-  os << "}}";
+  os << asString();
 }
 
 void
 ClParserDict::
 debugPrint() const
 {
-  fprintf(stderr, "{{");
-
-  KeyValueList::const_iterator p1 = key_values_.begin();
-  KeyValueList::const_iterator p2 = key_values_.end  ();
-
-  for (int i = 0; p1 != p2; ++p1, ++i) {
-    if (i > 0) fprintf(stderr, ",");
-
-    (*p1).key.debugPrint();
-
-    fprintf(stderr, ",");
-
-    (*p1).value->debugPrint();
-  }
-
-  fprintf(stderr, "}}");
+  fprintf(stderr, "%s", asString().c_str());
 }
 
 //-----------------
@@ -521,7 +499,7 @@ const ClParserObj &
 ClParserDict::
 increment()
 {
-  CITHROW(CLERR_INVALID_OPERATOR);
+  ClErrThrow(ClErr::INVALID_OPERATOR);
 
   return *this;
 }
@@ -530,7 +508,7 @@ const ClParserObj &
 ClParserDict::
 decrement()
 {
-  CITHROW(CLERR_INVALID_OPERATOR);
+  ClErrThrow(ClErr::INVALID_OPERATOR);
 
   return *this;
 }
@@ -543,7 +521,7 @@ ClParserValuePtr
 ClParserDict::
 unaryPlus() const
 {
-  CITHROW(CLERR_INVALID_OPERATOR);
+  ClErrThrow(ClErr::INVALID_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -552,7 +530,7 @@ ClParserValuePtr
 ClParserDict::
 unaryMinus() const
 {
-  CITHROW(CLERR_INVALID_OPERATOR);
+  ClErrThrow(ClErr::INVALID_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -561,7 +539,7 @@ ClParserValuePtr
 ClParserDict::
 bitNot() const
 {
-  CITHROW(CLERR_INVALID_OPERATOR);
+  ClErrThrow(ClErr::INVALID_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -575,7 +553,7 @@ ClParserDict::
 plus(const ClParserObj &obj) const
 {
   if (obj.getBaseType() != CL_PARSER_VALUE_TYPE_DICTIONARY)
-    CITHROW(CLERR_INVALID_TYPE_MIX);
+    ClErrThrow(ClErr::INVALID_TYPE_MIX);
 
   const ClParserDict &dict = reinterpret_cast<const ClParserDict &>(obj);
 
@@ -603,7 +581,7 @@ ClParserValuePtr
 ClParserDict::
 times(const ClParserObj &) const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -621,7 +599,7 @@ ClParserValuePtr
 ClParserDict::
 modulus(const ClParserObj &) const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -630,7 +608,7 @@ ClParserValuePtr
 ClParserDict::
 power(const ClParserObj &) const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -639,7 +617,7 @@ ClParserValuePtr
 ClParserDict::
 approxEqual(const ClParserObj &) const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -648,7 +626,7 @@ ClParserValuePtr
 ClParserDict::
 bitAnd(const ClParserObj &) const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -657,7 +635,7 @@ ClParserValuePtr
 ClParserDict::
 bitOr(const ClParserObj &) const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -666,7 +644,7 @@ ClParserValuePtr
 ClParserDict::
 bitXor(const ClParserObj &) const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -675,7 +653,7 @@ ClParserValuePtr
 ClParserDict::
 bitLShift(const ClParserObj &) const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -684,7 +662,7 @@ ClParserValuePtr
 ClParserDict::
 bitRShift(const ClParserObj &) const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -697,7 +675,7 @@ ClParserValuePtr
 ClParserDict::
 abs() const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -706,7 +684,7 @@ ClParserValuePtr
 ClParserDict::
 ceil() const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -715,7 +693,7 @@ ClParserValuePtr
 ClParserDict::
 floor() const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -724,7 +702,7 @@ ClParserValuePtr
 ClParserDict::
 sign() const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -733,7 +711,7 @@ ClParserValuePtr
 ClParserDict::
 sqr() const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -742,7 +720,7 @@ ClParserValuePtr
 ClParserDict::
 sqrt() const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -751,7 +729,7 @@ ClParserValuePtr
 ClParserDict::
 cos() const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -760,7 +738,7 @@ ClParserValuePtr
 ClParserDict::
 sin() const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -769,7 +747,7 @@ ClParserValuePtr
 ClParserDict::
 tan() const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -778,7 +756,7 @@ ClParserValuePtr
 ClParserDict::
 acos() const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -787,7 +765,7 @@ ClParserValuePtr
 ClParserDict::
 asin() const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -796,7 +774,7 @@ ClParserValuePtr
 ClParserDict::
 atan() const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -805,7 +783,7 @@ ClParserValuePtr
 ClParserDict::
 atan(double) const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -814,7 +792,7 @@ ClParserValuePtr
 ClParserDict::
 exp() const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -823,7 +801,7 @@ ClParserValuePtr
 ClParserDict::
 log() const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -832,7 +810,7 @@ ClParserValuePtr
 ClParserDict::
 log10() const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -841,7 +819,7 @@ ClParserValuePtr
 ClParserDict::
 cosh() const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -850,7 +828,7 @@ ClParserValuePtr
 ClParserDict::
 sinh() const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -859,7 +837,7 @@ ClParserValuePtr
 ClParserDict::
 tanh() const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -868,7 +846,7 @@ ClParserValuePtr
 ClParserDict::
 toChar() const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -877,7 +855,7 @@ ClParserValuePtr
 ClParserDict::
 toInt() const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -886,7 +864,7 @@ ClParserValuePtr
 ClParserDict::
 toReal() const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -895,7 +873,7 @@ ClParserValuePtr
 ClParserDict::
 toString() const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -904,7 +882,7 @@ ClParserValuePtr
 ClParserDict::
 isNan() const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -913,7 +891,7 @@ ClParserValuePtr
 ClParserDict::
 toLower() const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -922,7 +900,7 @@ ClParserValuePtr
 ClParserDict::
 toUpper() const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -945,7 +923,7 @@ ClParserValuePtr
 ClParserDict::
 sum() const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -986,7 +964,16 @@ ClParserValuePtr
 ClParserDict::
 sort(ClParserSortDirection) const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
+
+  return ClParserValuePtr();
+}
+
+ClParserValuePtr
+ClParserDict::
+doAssert() const
+{
+  assert(false);
 
   return ClParserValuePtr();
 }
@@ -1000,14 +987,14 @@ subscriptValue(const ClParserValuePtr *subscripts, uint num_subscripts) const
   error_code_ = 0;
 
   if (num_subscripts != 1) {
-    error_code_ = CLERR_TOO_MANY_SUBSCRIPTS;
+    error_code_ = int(ClErr::TOO_MANY_SUBSCRIPTS);
     return ClParserValuePtr();
   }
 
   if (subscripts[0]->getType() != CL_PARSER_VALUE_TYPE_ARRAY ||
       subscripts[0]->getArray()->getNumDims() != 1 ||
       subscripts[0]->getArray()->getNumData() != 1) {
-    error_code_ = CLERR_INVALID_TYPE_FOR_SUBSCRIPT;
+    error_code_ = int(ClErr::INVALID_TYPE_FOR_SUBSCRIPT);
     return ClParserValuePtr();
   }
 
@@ -1018,7 +1005,7 @@ subscriptValue(const ClParserValuePtr *subscripts, uint num_subscripts) const
   ClParserValuePtr sub_value = getKeyValue(key);
 
   if (! sub_value.isValid()) {
-    error_code_ = CLERR_SUBSCRIPT_OUT_OF_RANGE;
+    error_code_ = int(ClErr::SUBSCRIPT_OUT_OF_RANGE);
     return ClParserValuePtr();
   }
 
@@ -1043,7 +1030,7 @@ getValue(const ClParserKey &key) const
   ClParserValuePtr sub_value = getKeyValue(key);
 
   if (! sub_value.isValid()) {
-    error_code_ = CLERR_SUBSCRIPT_OUT_OF_RANGE;
+    error_code_ = int(ClErr::SUBSCRIPT_OUT_OF_RANGE);
     return ClParserValuePtr();
   }
 
@@ -1093,7 +1080,7 @@ ClParserKey(long integer) :
 }
 
 ClParserKey::
-ClParserKey(const string &str) :
+ClParserKey(const std::string &str) :
  type_(CL_PARSER_VALUE_TYPE_STRING)
 {
   value_ = new ClParserStringKeyValue(str);
@@ -1179,26 +1166,37 @@ operator==(const ClParserKey &key) const
   }
 }
 
-void
+//------
+
+std::string
 ClParserKey::
-print() const
+asString() const
 {
-  ClParserInst->output("%s", value_->toString().c_str());
+  return value_->toString();
 }
 
 void
 ClParserKey::
-print(ostream &os) const
+print() const
 {
-  CStrUtil::fprintf(os, "%s", value_->toString().c_str());
+  ClParserInst->output("%s", asString().c_str());
+}
+
+void
+ClParserKey::
+print(std::ostream &os) const
+{
+  os << asString();
 }
 
 void
 ClParserKey::
 debugPrint() const
 {
-  fprintf(stderr, "%s", value_->toString().c_str());
+  fprintf(stderr, "%s", asString().c_str());
 }
+
+//------
 
 ClParserValuePtr
 ClParserKey::

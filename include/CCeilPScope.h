@@ -25,44 +25,24 @@ class ClParserScopeMgr {
   ClParserScopePtr createScope(ClParserScope *parent, const std::string &name);
 };
 
-class ClParserScope {
- private:
-  ClParserScope       *parent_;
-  std::string          name_;
-  ClParserVarMgr       varMgr_;
-  ClParserFuncMgr      funcMgr_;
-  ClParserInternFnMgr  internFnMgr_;
-  ClParserUserFnMgr    userFnMgr_;
-  ClParserScopeMgr     scopeMgr_;
+//------
 
+class ClParserScope {
  protected:
   friend class ClParserScopeMgr;
   friend class CRefPtr<ClParserScope>;
 
-  ClParserScope(ClParserScope *parent, const std::string &name) :
-   parent_(parent), name_(name) {
-  }
+  ClParserScope(ClParser *parser, const std::string &name);
 
-  ClParserScope(const ClParserScope &scope) :
-   parent_(scope.parent_), name_(scope.name_), varMgr_(scope.varMgr_), funcMgr_(scope.funcMgr_),
-   internFnMgr_(scope.internFnMgr_), userFnMgr_(scope.userFnMgr_), scopeMgr_(scope.scopeMgr_) {
-  }
+  ClParserScope(ClParserScope *parent, const std::string &name);
 
-  const ClParserScope &operator=(const ClParserScope &scope) {
-    parent_      = scope.parent_;
-    name_        = scope.name_;
-    varMgr_      = scope.varMgr_;
-    funcMgr_     = scope.funcMgr_;
-    internFnMgr_ = scope.internFnMgr_;
-    userFnMgr_   = scope.userFnMgr_;
-    scopeMgr_    = scope.scopeMgr_;
+  ClParserScope(const ClParserScope &scope);
 
-    return *this;
-  }
+ ~ClParserScope();
 
-  ClParserScope *dup() const {
-    return new ClParserScope(*this);
-  }
+  const ClParserScope &operator=(const ClParserScope &scope);
+
+  ClParserScope *dup() const;
 
  public:
   const ClParserScope *getParent() const { return parent_; }
@@ -78,19 +58,12 @@ class ClParserScope {
 
   //-----
 
-  ClParserScopePtr getScope(const std::string &name) {
-    return scopeMgr_.getScope(name);
-  }
-
-  ClParserScopePtr getScope(const StringVectorT &names) {
-    return scopeMgr_.getScope(names);
-  }
+  ClParserScopePtr getScope(const std::string &name);
+  ClParserScopePtr getScope(const StringVectorT &names);
 
   //-----
 
-  ClParserVarPtr getVariable(const std::string &name, bool create=false) {
-    return varMgr_.getVariable(name, create);
-  }
+  ClParserVarPtr getVariable(const std::string &name, bool create=false);
 
   //-----
 
@@ -130,6 +103,16 @@ class ClParserScope {
   void print(std::ostream &os) const;
 
   void debugPrint() const;
+
+ private:
+  ClParser*           parser_      { nullptr };
+  ClParserScope*      parent_      { nullptr };
+  std::string         name_;
+  ClParserVarMgr*     varMgr_      { nullptr };
+  ClParserFuncMgr     funcMgr_;
+  ClParserInternFnMgr internFnMgr_;
+  ClParserUserFnMgr   userFnMgr_;
+  ClParserScopeMgr    scopeMgr_;
 };
 
 #endif

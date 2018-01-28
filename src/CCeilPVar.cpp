@@ -3,13 +3,11 @@
 
 #include <cassert>
 
-using std::string;
-using std::ostream;
-
 ClParserVarMgr::
-ClParserVarMgr()
+ClParserVarMgr(ClParser *parser) :
+ parser_(parser)
 {
-  var_map_ = new VarMap;
+  varMap_ = new VarMap;
 
   addStandardVariables();
 }
@@ -17,10 +15,10 @@ ClParserVarMgr()
 ClParserVarMgr::
 ~ClParserVarMgr()
 {
-  delete var_map_;
+  delete varMap_;
 
-  VarMapStack::const_iterator p1 = var_map_stack_.begin();
-  VarMapStack::const_iterator p2 = var_map_stack_.end  ();
+  VarMapStack::const_iterator p1 = varMapStack_.begin();
+  VarMapStack::const_iterator p2 = varMapStack_.end  ();
 
   for ( ; p1 != p2; ++p1)
     delete *p1;
@@ -28,7 +26,7 @@ ClParserVarMgr::
 
 ClParserVarPtr
 ClParserVarMgr::
-createStdVar(const string &name, ClParserValuePtr value)
+createStdVar(const std::string &name, ClParserValuePtr value)
 {
   ClParserVarPtr variable = createVar(name, value);
 
@@ -40,7 +38,7 @@ createStdVar(const string &name, ClParserValuePtr value)
 
 ClParserVarPtr
 ClParserVarMgr::
-createVar(const string &name, ClParserValuePtr value)
+createVar(const std::string &name, ClParserValuePtr value)
 {
   assert(! isVariable(name));
 
@@ -60,7 +58,7 @@ createVarRef(ClParserVarPtr variable, const ClParserValueArray &subscripts)
 
 ClParserStructVarRefPtr
 ClParserVarMgr::
-createStructVarRef(ClParserVarPtr variable, const string &name,
+createStructVarRef(ClParserVarPtr variable, const std::string &name,
                    const ClParserValueArray &subscripts)
 {
   ClParserStructVarRef *svar_ref =
@@ -73,21 +71,21 @@ void
 ClParserVarMgr::
 newVariableList()
 {
-  var_map_stack_.push_back(var_map_);
+  varMapStack_.push_back(varMap_);
 
-  var_map_ = new VarMap;
+  varMap_ = new VarMap;
 }
 
 void
 ClParserVarMgr::
 oldVariableList()
 {
-  if (! var_map_stack_.empty()) {
-    delete var_map_;
+  if (! varMapStack_.empty()) {
+    delete varMap_;
 
-    var_map_ = var_map_stack_.back();
+    varMap_ = varMapStack_.back();
 
-    var_map_stack_.pop_back();
+    varMapStack_.pop_back();
   }
 }
 
@@ -95,9 +93,9 @@ void
 ClParserVarMgr::
 deleteAllVariables()
 {
-  var_map_->clear();
+  varMap_->clear();
 
-  if (var_map_stack_.empty())
+  if (varMapStack_.empty())
     addStandardVariables();
 }
 
@@ -128,68 +126,61 @@ return;
 
   /*--------------*/
 
-  createStdVar("__INTEGER",
-               ClParserValueMgrInst->createValue
-                ((long) CL_PARSER_VALUE_TYPE_INTEGER));
-  createStdVar("__REAL",
-               ClParserValueMgrInst->createValue
-                ((long) CL_PARSER_VALUE_TYPE_REAL));
-  createStdVar("__STRING",
-               ClParserValueMgrInst->createValue
-                ((long) CL_PARSER_VALUE_TYPE_STRING));
-  createStdVar("__ARRAY",
-               ClParserValueMgrInst->createValue
-                ((long) CL_PARSER_VALUE_TYPE_ARRAY));
-  createStdVar("__LIST",
-               ClParserValueMgrInst->createValue
-                ((long) CL_PARSER_VALUE_TYPE_LIST));
-  createStdVar("__DICTIONARY",
-               ClParserValueMgrInst->createValue
-                ((long) CL_PARSER_VALUE_TYPE_DICTIONARY));
-  createStdVar("__STRUCTURE",
-               ClParserValueMgrInst->createValue
-                ((long) CL_PARSER_VALUE_TYPE_STRUCTURE));
+  createStdVar("__INTEGER"   , ClParserValueMgrInst->createValue
+                                ((long) CL_PARSER_VALUE_TYPE_INTEGER));
+  createStdVar("__REAL"      , ClParserValueMgrInst->createValue
+                                ((long) CL_PARSER_VALUE_TYPE_REAL));
+  createStdVar("__STRING"    , ClParserValueMgrInst->createValue
+                                ((long) CL_PARSER_VALUE_TYPE_STRING));
+  createStdVar("__ARRAY"     , ClParserValueMgrInst->createValue
+                                ((long) CL_PARSER_VALUE_TYPE_ARRAY));
+  createStdVar("__LIST"      , ClParserValueMgrInst->createValue
+                                ((long) CL_PARSER_VALUE_TYPE_LIST));
+  createStdVar("__DICTIONARY", ClParserValueMgrInst->createValue
+                                ((long) CL_PARSER_VALUE_TYPE_DICTIONARY));
+  createStdVar("__STRUCTURE" , ClParserValueMgrInst->createValue
+                                ((long) CL_PARSER_VALUE_TYPE_STRUCTURE));
 }
 
 ClParserVarPtr
 ClParserVarMgr::
 addVariable(ClParserVar *var)
 {
-  VarMap *var_map = var_map_;
+  VarMap *varMap = varMap_;
 
-  if (var->isGlobal() && ! var_map_stack_.empty())
-    var_map = var_map_stack_[0];
+  if (var->isGlobal() && ! varMapStack_.empty())
+    varMap = varMapStack_[0];
 
-  const string &name = var->getName();
+  const std::string &name = var->getName();
 
-  (*var_map)[name] = var;
+  (*varMap)[name] = var;
 
-  return (*var_map)[name];
+  return (*varMap)[name];
 }
 
 void
 ClParserVarMgr::
-removeVariable(const string &name)
+removeVariable(const std::string &name)
 {
-  VarMap *var_map = var_map_;
+  VarMap *varMap = varMap_;
 
-  VarMap::iterator p = var_map->find(name);
+  VarMap::iterator p = varMap->find(name);
 
-  if (p != var_map_->end()) {
-    var_map->erase(p);
+  if (p != varMap->end()) {
+    varMap->erase(p);
 
     return;
   }
 
-  int num = var_map_stack_.size();
+  int num = varMapStack_.size();
 
   for (int i = num - 1; i >= 0; --i) {
-    var_map = var_map_stack_[i];
+    varMap = varMapStack_[i];
 
-    p = var_map->find(name);
+    p = varMap->find(name);
 
-    if (p != var_map->end()) {
-      var_map->erase(p);
+    if (p != varMap->end()) {
+      varMap->erase(p);
 
       return;
     }
@@ -198,7 +189,7 @@ removeVariable(const string &name)
 
 bool
 ClParserVarMgr::
-isVariable(const string &name) const
+isVariable(const std::string &name) const
 {
   ClParserVarPtr var;
 
@@ -207,7 +198,7 @@ isVariable(const string &name) const
 
 ClParserVarPtr
 ClParserVarMgr::
-getVariable(const string &name, bool create) const
+getVariable(const std::string &name, bool create) const
 {
   ClParserVarPtr var;
 
@@ -222,7 +213,7 @@ getVariable(const string &name, bool create) const
 
 bool
 ClParserVarMgr::
-getVariableI(const string &name, ClParserVarPtr &var) const
+getVariableI(const std::string &name, ClParserVarPtr &var) const
 {
   if (name == "")
     return false;
@@ -230,9 +221,9 @@ getVariableI(const string &name, ClParserVarPtr &var) const
   if (! ClParserVar::isValidName(name))
     return false;
 
-  VarMap::iterator p = var_map_->find(name);
+  VarMap::iterator p = varMap_->find(name);
 
-  if (p != var_map_->end()) {
+  if (p != varMap_->end()) {
     var = (*p).second;
 
     return true;
@@ -240,14 +231,14 @@ getVariableI(const string &name, ClParserVarPtr &var) const
 
   bool found = false;
 
-  int num = var_map_stack_.size();
+  int num = varMapStack_.size();
 
   for (int i = num - 1; i >= 0; i--) {
-    VarMap *var_map_ = var_map_stack_[i];
+    VarMap *varMap = varMapStack_[i];
 
-    VarMap::iterator p = var_map_->find(name);
+    VarMap::iterator p = varMap->find(name);
 
-    if (p != var_map_->end()) {
+    if (p != varMap->end()) {
       var = (*p).second;
 
       found = true;
@@ -270,7 +261,7 @@ getVariableI(const string &name, ClParserVarPtr &var) const
 
 ClParserValuePtr
 ClParserVarMgr::
-getVariableValue(const string &name) const
+getVariableValue(const std::string &name) const
 {
   ClParserVarPtr var;
 
@@ -282,7 +273,7 @@ getVariableValue(const string &name) const
 
 void
 ClParserVarMgr::
-setVariableValue(const string &name, ClParserValuePtr value)
+setVariableValue(const std::string &name, ClParserValuePtr value)
 {
   ClParserVarPtr var;
 
@@ -296,19 +287,19 @@ void
 ClParserVarMgr::
 printAllVariables() const
 {
-  VarMap::iterator p1 = var_map_->begin();
-  VarMap::iterator p2 = var_map_->end  ();
+  VarMap::iterator p1 = varMap_->begin();
+  VarMap::iterator p2 = varMap_->end  ();
 
   for ( ; p1 != p2; ++p1)
     (*p1).second->print();
 
-  int num = var_map_stack_.size();
+  int num = varMapStack_.size();
 
   for (int i = num - 1; i >= 0; i--) {
-    ClParserInst->output("\n");
+    parser_->output("\n");
 
-    VarMap::iterator p1 = var_map_stack_[i]->begin();
-    VarMap::iterator p2 = var_map_stack_[i]->end  ();
+    VarMap::iterator p1 = varMapStack_[i]->begin();
+    VarMap::iterator p2 = varMapStack_[i]->end  ();
 
     for ( ; p1 != p2; ++p1)
       (*p1).second->print();
@@ -317,9 +308,9 @@ printAllVariables() const
 
 void
 ClParserVarMgr::
-addVariableProc(const string &name, ClParserVarMgr::VarProc proc, void *data)
+addVariableProc(const std::string &name, ClParserVarMgr::VarProc proc, void *data)
 {
-  if (proc == NULL)
+  if (! proc)
     return;
 
   VarProcData *proc_data = new VarProcData(name, proc, data);
@@ -329,7 +320,7 @@ addVariableProc(const string &name, ClParserVarMgr::VarProc proc, void *data)
 
 void
 ClParserVarMgr::
-deleteVariableProc(const string &name, ClParserVarMgr::VarProc proc, void *data)
+deleteVariableProc(const std::string &name, ClParserVarMgr::VarProc proc, void *data)
 {
   VarProcDataList::const_iterator p1 = var_proc_data_list_.begin();
   VarProcDataList::const_iterator p2 = var_proc_data_list_.end  ();
@@ -384,20 +375,20 @@ setValue(ClParserValuePtr value)
 
 bool
 ClParserVar::
-isValidName(const string &name)
+isValidName(const std::string &name)
 {
   return CStrUtil::isIdentifier(name);
 }
 
 ClParserVar::
-ClParserVar(const string &name) :
+ClParserVar(const std::string &name) :
  name_(name), value_(ClParserValueMgrInst->createValue(0L)), flags_(0)
 {
   init();
 }
 
 ClParserVar::
-ClParserVar(const string &name, ClParserValuePtr value) :
+ClParserVar(const std::string &name, ClParserValuePtr value) :
  name_(name), value_(value), flags_(0)
 {
   init();
@@ -428,8 +419,8 @@ ClParserVar::
 init()
 {
   if (! isValidName(name_) ||
-      ! ClParserInst->isValidNewName(CL_PARSER_NAME_TYPE_VARIABLE, name_))
-    CITHROW(CLERR_INVALID_VARIABLE_NAME);
+      ! ClParserInst->isValidNewName(ClParserNameType::VARIABLE, name_))
+    ClErrThrow(ClErr::INVALID_VARIABLE_NAME);
 
   if (name_[0] == '_')
     flags_ |= CLP_VAR_GLOBAL;
@@ -460,12 +451,12 @@ print() const
 
 void
 ClParserVar::
-print(ostream &os) const
+print(std::ostream &os) const
 {
   if (isHidden())
     return;
 
-  CStrUtil::fprintf(os, "%s = ", name_.c_str());
+  os << name_ << " = ";
 
   value_->print(os);
 }
@@ -846,7 +837,7 @@ print() const
 
 void
 ClParserVarRef::
-print(ostream &os) const
+print(std::ostream &os) const
 {
   os << "&";
 
@@ -883,14 +874,14 @@ debugPrint() const
 //--------------------
 
 ClParserStructVarRef::
-ClParserStructVarRef(ClParserVarPtr variable, const string &name,
+ClParserStructVarRef(ClParserVarPtr variable, const std::string &name,
                      const ClParserValueArray &subscripts) :
  ClParserVarRef(variable, subscripts)
 {
   ClParserValuePtr value = variable_->getValue();
 
   if (! value->isType(CL_PARSER_VALUE_TYPE_STRUCTURE))
-    CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+    ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   names_.push_back(name);
 }
@@ -904,7 +895,7 @@ dup() const
 
 void
 ClParserStructVarRef::
-addName(const string &name)
+addName(const std::string &name)
 {
   names_.push_back(name);
 }
@@ -920,7 +911,7 @@ setValue(ClParserValuePtr value)
   uint num_names = names_.size();
 
   for (uint i = 0; i < num_names - 1; ++i) {
-    const string name = names_[i];
+    const std::string name = names_[i];
 
     if (! structure->getValue(name, svalue))
       return false;
@@ -931,7 +922,7 @@ setValue(ClParserValuePtr value)
     structure = svalue->getStructure();
   }
 
-  const string name = names_[num_names - 1];
+  const std::string name = names_[num_names - 1];
 
   return structure->setValue(name, value);
 }
@@ -947,7 +938,7 @@ getValue(ClParserValuePtr &value) const
   uint num_names = names_.size();
 
   for (uint i = 0; i < num_names - 1; ++i) {
-    const string name = names_[i];
+    const std::string name = names_[i];
 
     if (! structure->getValue(name, svalue))
       return false;
@@ -958,7 +949,7 @@ getValue(ClParserValuePtr &value) const
     structure = svalue->getStructure();
   }
 
-  const string name = names_[num_names - 1];
+  const std::string name = names_[num_names - 1];
 
   if (! structure->getValue(name, value))
     return false;
@@ -986,7 +977,7 @@ print() const
 
 void
 ClParserStructVarRef::
-print(ostream &os) const
+print(std::ostream &os) const
 {
   os << "&";
 

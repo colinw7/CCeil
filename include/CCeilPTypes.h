@@ -14,9 +14,9 @@ typedef std::vector<int>          IntVectorT;
 typedef std::vector<long>         LongVectorT;
 typedef std::vector<unsigned int> UIntVectorT;
 
-enum ClParserSortDirection {
-  CL_SORT_ASCENDING  = 0,
-  CL_SORT_DESCENDING = 1
+enum class ClParserSortDirection {
+  ASCENDING  = 0,
+  DESCENDING = 1
 };
 
 enum ClParserValueType {
@@ -102,36 +102,36 @@ enum ClParserOperatorType {
   CL_PARSER_OP_BIT_RSHIFT_EQUALS = CL_PARSER_OP_ASSIGNMENT + 11
 };
 
-enum CLArgType {
-  CL_ARG_TYPE_NONE     = -1,
+enum class CLArgType {
+  NONE     = -1,
 
-  CL_ARG_TYPE_SKIP     = 0,
-  CL_ARG_TYPE_REAL     = 1,
-  CL_ARG_TYPE_INTEGER  = 2,
-  CL_ARG_TYPE_STRING   = 3,
-  CL_ARG_TYPE_TEXT     = 4,
-  CL_ARG_TYPE_VALUE    = 5,
-  CL_ARG_TYPE_WORD     = 6,
+  SKIP     = 0,
+  REAL     = 1,
+  INTEGER  = 2,
+  STRING   = 3,
+  TEXT     = 4,
+  VALUE    = 5,
+  WORD     = 6,
 
-  CL_ARG_TYPE_REALARR  = 11,
-  CL_ARG_TYPE_INTARR   = 12,
-  CL_ARG_TYPE_STRARR   = 13,
-  CL_ARG_TYPE_EXPR     = 14,
-  CL_ARG_TYPE_WORDARR  = 15,
-  CL_ARG_TYPE_FLTARR   = 16,
+  REALARR  = 11,
+  INTARR   = 12,
+  STRARR   = 13,
+  EXPR     = 14,
+  WORDARR  = 15,
+  FLTARR   = 16,
 
-  CL_ARG_TYPE_SKIP_N   = 21,
-  CL_ARG_TYPE_TYPED    = 22,
+  SKIP_N   = 21,
+  TYPED    = 22,
 
-  CL_ARG_TYPE_REALS    = 31,
-  CL_ARG_TYPE_FLOATS   = 32,
-  CL_ARG_TYPE_INTEGERS = 33,
-  CL_ARG_TYPE_WORDS    = 34,
-  CL_ARG_TYPE_STRINGS  = 35,
-  CL_ARG_TYPE_CHARS    = 36,
+  REALS    = 31,
+  FLOATS   = 32,
+  INTEGERS = 33,
+  WORDS    = 34,
+  STRINGS  = 35,
+  CHARS    = 36,
 
-  CL_ARG_TYPE_STRMAT   = 41,
-  CL_ARG_TYPE_CHRMAT   = 42
+  STRMAT   = 41,
+  CHRMAT   = 42
 };
 
 //------

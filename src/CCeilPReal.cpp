@@ -2,9 +2,6 @@
 #include <COSNaN.h>
 #include <cerrno>
 
-using std::string;
-using std::ostream;
-
 void
 ClParserReal::
 copy(const ClParserObj &obj)
@@ -158,7 +155,7 @@ divide(const ClParserObj &obj) const
 
   if      (real.real_ == 0.0) {
     if (ClParserInst->getMathFail())
-      CITHROW(CLERR_DIVIDE_BY_ZERO);
+      ClErrThrow(ClErr::DIVIDE_BY_ZERO);
 
     if (real_ < 0.0)
       SetNegInf(result);
@@ -185,7 +182,7 @@ modulus(const ClParserObj &obj) const
   double result = CMathGen::modulus(real_, real.real_);
 
   if (errno != 0 && ClParserInst->getMathFail())
-    CITHROW(CLERR_DIVIDE_BY_ZERO);
+    ClErrThrow(ClErr::DIVIDE_BY_ZERO);
 
   return ClParserValueMgrInst->createValue(result);
 }
@@ -202,7 +199,7 @@ power(const ClParserObj &obj) const
   double result = CMathGen::pow(real_, real.real_);
 
   if (errno != 0 && ClParserInst->getMathFail())
-    CITHROW(CLERR_DIVIDE_BY_ZERO);
+    ClErrThrow(ClErr::DIVIDE_BY_ZERO);
 
   return ClParserValueMgrInst->createValue(result);
 }
@@ -368,7 +365,7 @@ sqrt() const
   double result = CMathGen::sqrt(real_);
 
   if (errno != 0 && ClParserInst->getMathFail())
-    CITHROW(CLERR_DIVIDE_BY_ZERO);
+    ClErrThrow(ClErr::DIVIDE_BY_ZERO);
 
   return ClParserValueMgrInst->createValue(result);
 }
@@ -424,7 +421,7 @@ acos() const
   double result = ClParserInst->fromRadians(CMathGen::acos(real_));
 
   if (errno != 0 && ClParserInst->getMathFail())
-    CITHROW(CLERR_DIVIDE_BY_ZERO);
+    ClErrThrow(ClErr::DIVIDE_BY_ZERO);
 
   return ClParserValueMgrInst->createValue(result);
 }
@@ -438,7 +435,7 @@ asin() const
   double result = ClParserInst->fromRadians(CMathGen::asin(real_));
 
   if (errno != 0 && ClParserInst->getMathFail())
-    CITHROW(CLERR_DIVIDE_BY_ZERO);
+    ClErrThrow(ClErr::DIVIDE_BY_ZERO);
 
   return ClParserValueMgrInst->createValue(result);
 }
@@ -494,7 +491,7 @@ log() const
   double result = CMathGen::log(real_);
 
   if (errno != 0 && ClParserInst->getMathFail())
-    CITHROW(CLERR_DIVIDE_BY_ZERO);
+    ClErrThrow(ClErr::DIVIDE_BY_ZERO);
 
   return ClParserValueMgrInst->createValue(result);
 }
@@ -508,7 +505,7 @@ log10() const
   double result = CMathGen::log10(real_);
 
   if (errno != 0 && ClParserInst->getMathFail())
-    CITHROW(CLERR_DIVIDE_BY_ZERO);
+    ClErrThrow(ClErr::DIVIDE_BY_ZERO);
 
   return ClParserValueMgrInst->createValue(result);
 }
@@ -559,7 +556,7 @@ ClParserValuePtr
 ClParserReal::
 toChar() const
 {
-  string result(" ");
+  std::string result(" ");
 
   result[0] = (char) real_;
 
@@ -593,12 +590,7 @@ ClParserValuePtr
 ClParserReal::
 toString() const
 {
-  string result;
-
-  if (COSNaN::is_nan(real_))
-    result = "NaN";
-  else
-    result = ClParserInst->toString(real_);
+  std::string result = asString();
 
   return ClParserValueMgrInst->createValue(result);
 }
@@ -616,7 +608,7 @@ ClParserValuePtr
 ClParserReal::
 toLower() const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -625,7 +617,7 @@ ClParserValuePtr
 ClParserReal::
 toUpper() const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -661,7 +653,7 @@ ClParserValuePtr
 ClParserReal::
 index(const ClParserObj &) const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -670,7 +662,7 @@ ClParserValuePtr
 ClParserReal::
 rindex(const ClParserObj &) const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -682,6 +674,15 @@ sort(ClParserSortDirection) const
   double result = real_;
 
   return ClParserValueMgrInst->createValue(result);
+}
+
+ClParserValuePtr
+ClParserReal::
+doAssert() const
+{
+  assert(real_);
+
+  return ClParserValuePtr();
 }
 
 //-----------------
@@ -709,44 +710,39 @@ cmp(const ClParserObj &obj) const
     return 0;
 }
 
-void
+//------
+
+std::string
 ClParserReal::
-print() const
+asString() const
 {
   if      (IsPosInf(real_))
-    ClParserInst->output("%s", ClParserInst->toString("+Inf").c_str());
+    return "+Inf";
   else if (IsNegInf(real_))
-    ClParserInst->output("%s", ClParserInst->toString("-Inf").c_str());
+    return "-Inf";
   else if (COSNaN::is_nan(real_))
-    ClParserInst->output("%s", ClParserInst->toString("NaN").c_str());
+    return "NaN";
   else
-    ClParserInst->output("%s", ClParserInst->toString(real_).c_str());
+    return ClParserInst->toString(real_);
 }
 
 void
 ClParserReal::
-print(ostream &os) const
+print() const
 {
-  if      (IsPosInf(real_))
-    os << ClParserInst->toString("+Inf");
-  else if (IsNegInf(real_))
-    os << ClParserInst->toString("-Inf");
-  else if (COSNaN::is_nan(real_))
-    os << ClParserInst->toString("NaN");
-  else
-    os << ClParserInst->toString(real_);
+  ClParserInst->output("%s", asString().c_str());
+}
+
+void
+ClParserReal::
+print(std::ostream &os) const
+{
+  os << asString();
 }
 
 void
 ClParserReal::
 debugPrint() const
 {
-  if      (IsPosInf(real_))
-    fprintf(stderr, " +Inf");
-  else if (IsNegInf(real_))
-    fprintf(stderr, " -Inf");
-  else if (COSNaN::is_nan(real_))
-    fprintf(stderr, " NaN ");
-  else
-    fprintf(stderr, " %g ", real_);
+  fprintf(stderr, " %s", asString().c_str());
 }

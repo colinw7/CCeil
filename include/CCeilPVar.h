@@ -13,31 +13,14 @@
 
 /**** Private Structures ****/
 
+class ClParser;
+
 class ClParserVarMgr {
  public:
   typedef void (*VarProc)(ClParserVarPtr, void *);
 
- private:
-  struct VarProcData {
-    std::string  name;
-    VarProc      proc;
-    void        *data;
-
-    VarProcData(const std::string &name1, VarProc proc1, void *data1) :
-     name(name1), proc(proc1), data(data1) {
-    }
-  };
-
-  typedef std::map<std::string,ClParserVarPtr> VarMap;
-  typedef std::vector<VarMap *>                VarMapStack;
-  typedef std::list<VarProcData *>             VarProcDataList;
-
-  VarMap          *var_map_;
-  VarMapStack      var_map_stack_;
-  VarProcDataList  var_proc_data_list_;
-
  public:
-  ClParserVarMgr();
+  ClParserVarMgr(ClParser *parser);
  ~ClParserVarMgr();
 
   ClParserVarPtr createStdVar(const std::string &name, ClParserValuePtr value);
@@ -75,14 +58,31 @@ class ClParserVarMgr {
   bool getVariableI(const std::string &name, ClParserVarPtr &var) const;
 
   void addStandardVariables();
+
+ private:
+  struct VarProcData {
+    std::string  name;
+    VarProc      proc { nullptr };
+    void        *data { nullptr };
+
+    VarProcData(const std::string &name1, VarProc proc1, void *data1) :
+     name(name1), proc(proc1), data(data1) {
+    }
+  };
+
+  typedef std::map<std::string,ClParserVarPtr> VarMap;
+  typedef std::vector<VarMap *>                VarMapStack;
+  typedef std::list<VarProcData *>             VarProcDataList;
+
+  ClParser*        parser_             { nullptr };
+  VarMap          *varMap_             { nullptr };
+  VarMapStack      varMapStack_;
+  VarProcDataList  var_proc_data_list_;
 };
 
-class ClParserVar {
- private:
-  std::string      name_;
-  ClParserValuePtr value_;
-  uint             flags_;
+//------
 
+class ClParserVar {
  public:
   static bool isValidName(const std::string &name);
 
@@ -161,7 +161,14 @@ class ClParserVar {
  private:
   void init();
   void term();
+
+ private:
+  std::string      name_;
+  ClParserValuePtr value_;
+  uint             flags_;
 };
+
+//------
 
 // Variable Ref
 //   variable_   : associated variable
@@ -170,12 +177,6 @@ class ClParserVar {
 //               : one or two values e.g. a[1,2][3,4])
 
 class ClParserVarRef {
- protected:
-  typedef ClParserValueArray ValueArray;
-
-  ClParserVarPtr variable_;
-  ValueArray     subscripts_;
-
  protected:
   friend class ClParserVarMgr;
   friend class CRefPtr<ClParserVarRef>;
@@ -209,17 +210,20 @@ class ClParserVarRef {
 
     return os;
   }
+
+ protected:
+  typedef ClParserValueArray ValueArray;
+
+  ClParserVarPtr variable_;
+  ValueArray     subscripts_;
 };
+
+//------
 
 // Struct Variable Ref
 //   name_ : structure part name
 
 class ClParserStructVarRef : public ClParserVarRef {
- private:
-  typedef StringVectorT NameList;
-
-  NameList names_;
-
  protected:
   friend class ClParserVarMgr;
   friend class CRefPtr<ClParserStructVarRef>;
@@ -247,6 +251,11 @@ class ClParserStructVarRef : public ClParserVarRef {
 
     return os;
   }
+
+ private:
+  typedef StringVectorT NameList;
+
+  NameList names_;
 };
 
 #endif

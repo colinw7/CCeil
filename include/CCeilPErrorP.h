@@ -1,0 +1,103 @@
+#define PARSER_NO_ERRORS 84
+
+static const char *
+parser_error_strings[PARSER_NO_ERRORS] = {
+  /* General Syntax */
+
+  "Null Expression",
+  "Missing Opening Round Bracket",
+  "Missing Closing Round Bracket",
+  "Missing Closing Square Bracket",
+  "Missing Colon Operator for <exp> ? <exp> : <exp>",
+  "Unterminated String",
+  "Digits Missing from Exponential Definition",
+  "Invalid Character",
+  "Missing Function Name",
+  "Extra Characters at End of Function Definition",
+  "Syntax Error in Structure Definition",
+  "Syntax Error in Structure Variable Dimension",
+  "Invalid Operator",
+  "Invalid Expression",
+  "Invalid Unary Expression",
+  "Invalid Binary Expression",
+  "Invalid Array Syntax",
+  "Invalid List Syntax",
+  "Invalid Dictionary Syntax",
+  "Invalid Function Argument Syntax",
+
+  /* Usage Syntax */
+
+  "Invalid Number of Arguments for Function",
+  "Invalid Number of Subscripts for Array",
+  "Function Name conflicts with Internal Function",
+  "Too Few Arguments for Function",
+  "Too Many Arguments for Function",
+  "Subscript Out of Range",
+  "Subscript not an Integer",
+  "Subscript can not be applied to this Type",
+  "Too Many Subscripts",
+  "Invalid Left Hand Side for Assignment",
+  "Arrays have different Sizes",
+  "Arrays Sizes are Incompatible",
+  "Argument to Array Function is not an Array",
+  "Zero Dimension for Structure Variable",
+  "Invalid Structure Variable Name",
+  "Missing Dimensions for Structure Variable",
+  "Invalid Structure Reference",
+  "Invalid Value Type for Operator",
+  "Invalid Mix of Value Types",
+  "Invalid Variable Name",
+  "Invalid Function Name",
+  "Invalid Structure Name",
+  "Multiply Defined Function Variable",
+  "Invalid Name for Structure Type",
+  "Invalid Right Hand Side for Assignment",
+  "Invalid Dimension",
+  "Value out of Range",
+
+  /* Conversion */
+
+  "Invalid Conversion of String To Real",
+  "Invalid Conversion of Array To Real",
+  "Invalid Conversion of List To Real",
+  "Invalid Conversion of Dictionary To Real",
+  "Invalid Conversion of Structure To Real",
+  "Invalid Conversion of String To Integer",
+  "Invalid Conversion of Array To Integer",
+  "Invalid Conversion of List To Integer",
+  "Invalid Conversion of Dictionary To Integer",
+  "Invalid Conversion of Structure To Integer",
+  "Invalid Conversion of Real To String",
+  "Invalid Conversion of Integer To String",
+  "Invalid Conversion of Array To String",
+  "Invalid Conversion of List To String",
+  "Invalid Conversion of Dictionary To String",
+  "Invalid Conversion of Structure To String",
+  "Invalid Conversion to Structure",
+  "Invalid Conversion to Array of Structures",
+  "Invalid Conversion to Array",
+  "Invalid Conversion of Array",
+  "Invalid Conversion",
+
+  /* Evaluation */
+
+  "Negative or Zero value for Logarithm",
+  "Negative value for Square Root",
+  "Arc Sine value outside range (-1.0 -> 1.0)",
+  "Arc Cosine value outside range (-1.0 -> 1.0)",
+  "Divide by Zero",
+  "Non Integer Power of Negative Number",
+  "Zero raised to a Negative Power is Undefined",
+  "Value raised to a Negative Power is Invalid",
+  "Power Failed",
+  "Application Defined Function Failed",
+
+  /* Undefined */
+
+  "Undefined Function Name",
+  "Undefined Variable Name",
+  "Undefined Structure Data Type",
+  "Undefined Value",
+  "Undefined Subscript Value",
+  "Undefined Right Hand Side Assignment Value",
+};

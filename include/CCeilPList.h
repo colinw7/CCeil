@@ -70,10 +70,16 @@ class ClParserList : public ClParserObj {
 
   int cmp(const ClParserObj &rhs) const;
 
+  //------
+
+  std::string asString() const;
+
   void print() const;
   void print(std::ostream &os) const;
 
   void debugPrint() const;
+
+  //------
 
   ClParserValuePtr subscriptValue(const uint *subscripts, uint num_subscripts) const;
   ClParserValuePtr subscriptValue(const UIntVectorT &subscripts) const;
@@ -145,9 +151,13 @@ class ClParserList : public ClParserObj {
   ClParserValuePtr sum() const;
   ClParserValuePtr dim() const;
   ClParserValuePtr len() const;
-  ClParserValuePtr index(const ClParserObj &obj) const;
+
+  ClParserValuePtr index (const ClParserObj &obj) const;
   ClParserValuePtr rindex(const ClParserObj &obj) const;
+
   ClParserValuePtr sort(ClParserSortDirection direction) const;
+
+  ClParserValuePtr doAssert() const;
 
  private:
   void addListValues(const ClParserList &list);

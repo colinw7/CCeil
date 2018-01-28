@@ -1,8 +1,5 @@
 #include <CCeilPI.h>
 
-using std::string;
-using std::ostream;
-
 ClParserTypeMgr::
 ClParserTypeMgr()
 {
@@ -41,7 +38,7 @@ createType()
 
 ClParserTypePtr
 ClParserTypeMgr::
-createType(const string &name)
+createType(const std::string &name)
 {
   ClParserType *type = new ClParserType(name);
 
@@ -50,13 +47,13 @@ createType(const string &name)
 
 ClParserTypePtr
 ClParserTypeMgr::
-createType(const string &name, const string &arg_string)
+createType(const std::string &name, const std::string &arg_string)
 {
   /* Check if Valid Structure Name */
 
   if (! CStrUtil::isIdentifier(name) ||
-      ! ClParserInst->isValidNewName(CL_PARSER_NAME_TYPE_STRUCT, name))
-    CITHROW(CLERR_INVALID_STRUCT_NAME);
+      ! ClParserInst->isValidNewName(ClParserNameType::STRUCT, name))
+    ClErrThrow(ClErr::INVALID_STRUCT_NAME);
 
   ClParserType *type = new ClParserType(name);
 
@@ -64,8 +61,8 @@ createType(const string &name, const string &arg_string)
 
   /* Parse Arg String */
 
-  string type_string;
-  string variable;
+  std::string type_string;
+  std::string variable;
 
   uint len = arg_string.size();
 
@@ -77,17 +74,17 @@ createType(const string &name, const string &arg_string)
     //uint j = 0;
 
     if (! CStrUtil::readIdentifier(arg_string, &i, type_string))
-      CITHROW(CLERR_INVALID_STRUCTURE_TYPE_NAME);
+      ClErrThrow(ClErr::INVALID_STRUCTURE_TYPE_NAME);
 
     ClParserTypePtr type1 = ClParserInst->getType(type_string);
 
     if (! type1.isValid())
-      CITHROW(CLERR_UNDEFINED_STRUCT_TYPE);
+      ClErrThrow(ClErr::UNDEFINED_STRUCT_TYPE);
 
     CStrUtil::skipSpace(arg_string, &i);
 
     if (! CStrUtil::readIdentifier(arg_string, &i, variable))
-      CITHROW(CLERR_INVALID_STRUCT_VAR_NAME);
+      ClErrThrow(ClErr::INVALID_STRUCT_VAR_NAME);
 
     UIntVectorT dims;
 
@@ -99,18 +96,18 @@ createType(const string &name, const string &arg_string)
 
         //j = 0;
 
-        string dim_string = "";
+        std::string dim_string = "";
 
         while (arg_string[i] != '\0' && isdigit(arg_string[i]))
           dim_string += arg_string[i++];
 
         if (dim_string == "")
-          CITHROW(CLERR_STRUCT_DIM_SYNTAX_ERROR);
+          ClErrThrow(ClErr::STRUCT_DIM_SYNTAX_ERROR);
 
         int dim;
 
         if (! CStrUtil::toInteger(dim_string, &dim))
-          CITHROW(CLERR_ZERO_STRUCT_DIM);
+          ClErrThrow(ClErr::ZERO_STRUCT_DIM);
 
         dims.push_back(dim);
 
@@ -119,14 +116,14 @@ createType(const string &name, const string &arg_string)
       while (i < len && arg_string[i] == ',');
 
       if (arg_string[i] != ']')
-        CITHROW(CLERR_STRUCT_DIM_SYNTAX_ERROR);
+        ClErrThrow(ClErr::STRUCT_DIM_SYNTAX_ERROR);
 
       ++i;
 
       uint num_dims = dims.size();
 
       if (num_dims == 0)
-        CITHROW(CLERR_MISSING_STRUCT_DIMS);
+        ClErrThrow(ClErr::MISSING_STRUCT_DIMS);
     }
 
     type->addSubType(variable, dims);
@@ -134,7 +131,7 @@ createType(const string &name, const string &arg_string)
     CStrUtil::skipSpace(arg_string, &i);
 
     if (i < len && arg_string[i] != ',')
-      CITHROW(CLERR_STRUCT_SYNTAX_ERROR);
+      ClErrThrow(ClErr::STRUCT_SYNTAX_ERROR);
 
     if (arg_string[i] == ',')
       ++i;
@@ -158,7 +155,7 @@ ClParserTypePtr
 ClParserTypeMgr::
 addType(ClParserType *type)
 {
-  const string &name = type->getName();
+  const std::string &name = type->getName();
 
   TypeMap *type_map = type_map_;
 
@@ -172,7 +169,7 @@ addType(ClParserType *type)
 
 void
 ClParserTypeMgr::
-deleteType(const string &name)
+deleteType(const std::string &name)
 {
   removeType(getType(name));
 }
@@ -184,7 +181,7 @@ removeType(ClParserTypePtr type)
   if (type->isBuiltinType())
     return;
 
-  const string &name = type->getName();
+  const std::string &name = type->getName();
 
   TypeMap::iterator p = type_map_->find(name);
 
@@ -209,14 +206,14 @@ removeType(ClParserTypePtr type)
 
 bool
 ClParserTypeMgr::
-isType(const string &name) const
+isType(const std::string &name) const
 {
   return (getType(name).isValid());
 }
 
 ClParserTypePtr
 ClParserTypeMgr::
-getType(const string &name) const
+getType(const std::string &name) const
 {
   if      (name == "int")
     return getIntegerType();
@@ -305,13 +302,13 @@ printAllTypes() const
 //-----------------------
 
 ClParserType::
-ClParserType(const string &name) :
+ClParserType(const std::string &name) :
  name_(name), is_fixed_(false)
 {
 }
 
 ClParserType::
-ClParserType(const string &name, const ClParserSubTypeArray &sub_types) :
+ClParserType(const std::string &name, const ClParserSubTypeArray &sub_types) :
  name_(name), is_fixed_(false)
 {
   uint num_sub_types = sub_types.size();
@@ -334,7 +331,7 @@ dup() const
 
 void
 ClParserType::
-addSubType(const string &name, uint *dims, uint num_dims)
+addSubType(const std::string &name, uint *dims, uint num_dims)
 {
   ClParserTypePtr type = ClParserInst->getType(name_);
 
@@ -346,7 +343,7 @@ addSubType(const string &name, uint *dims, uint num_dims)
 
 void
 ClParserType::
-addSubType(const string &name, const UIntVectorT &dims)
+addSubType(const std::string &name, const UIntVectorT &dims)
 {
   ClParserTypePtr type = ClParserInst->getType(name_);
 
@@ -358,7 +355,7 @@ addSubType(const string &name, const UIntVectorT &dims)
 
 int
 ClParserType::
-getSubTypeNumber(const string &name)
+getSubTypeNumber(const std::string &name)
 {
   if (isBuiltinType())
     return -1;
@@ -424,9 +421,9 @@ print() const
 
 void
 ClParserType::
-print(ostream &os) const
+print(std::ostream &os) const
 {
-  CStrUtil::fprintf(os, "struct %s { ", name_.c_str());
+  os << "struct " << name_ << " { ";
 
   uint num_sub_types = sub_types_.size();
 
@@ -474,7 +471,7 @@ printName() const
 
 void
 ClParserType::
-printName(ostream &os) const
+printName(std::ostream &os) const
 {
   if      (isIntegerType())
     os << "int";
@@ -489,8 +486,7 @@ printName(ostream &os) const
 //-----------------
 
 ClParserSubType::
-ClParserSubType(const string &name, ClParserTypePtr type, uint *dims,
-                uint num_dims) :
+ClParserSubType(const std::string &name, ClParserTypePtr type, uint *dims, uint num_dims) :
  name_(name), type_(type)
 {
   for (uint i = 0; i < num_dims; i++)
@@ -500,8 +496,7 @@ ClParserSubType(const string &name, ClParserTypePtr type, uint *dims,
 }
 
 ClParserSubType::
-ClParserSubType(const string &name, ClParserTypePtr type,
-                const UIntVectorT &dims) :
+ClParserSubType(const std::string &name, ClParserTypePtr type, const UIntVectorT &dims) :
  name_(name), type_(type), dims_(dims)
 {
   createTypeValue();
@@ -570,11 +565,11 @@ print() const
 
 void
 ClParserSubType::
-print(ostream &os) const
+print(std::ostream &os) const
 {
   type_->printName(os);
 
-  CStrUtil::fprintf(os, "%s", name_.c_str());
+  os << name_;
 
   uint num_dims = dims_.size();
 
@@ -582,7 +577,7 @@ print(ostream &os) const
     os << "[";
 
     for (uint j = 0; j < num_dims; j++) {
-      CStrUtil::fprintf(os, "%d", dims_[j]);
+      os << dims_[j];
 
       if (j != num_dims - 1)
         os << ", ";

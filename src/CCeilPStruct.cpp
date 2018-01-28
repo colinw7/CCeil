@@ -1,8 +1,5 @@
 #include <CCeilPI.h>
 
-using std::string;
-using std::ostream;
-
 ClParserStructPtr
 ClParserStruct::
 createStruct()
@@ -23,8 +20,7 @@ createStruct(ClParserTypePtr type)
 
 ClParserStructPtr
 ClParserStruct::
-createStruct(ClParserTypePtr type, const ClParserValuePtr *values,
-             uint num_values)
+createStruct(ClParserTypePtr type, const ClParserValuePtr *values, uint num_values)
 {
   ClParserStruct *structure = new ClParserStruct(type, values, num_values);
 
@@ -62,7 +58,7 @@ ClParserStruct(ClParserTypePtr type) :
  ClParserObj(CL_PARSER_VALUE_TYPE_STRUCTURE), type_(type)
 {
   if (type_.isValid() && type_->isBuiltinType())
-    CITHROW(CLERR_INVALID_STRUCTURE_TYPE_NAME);
+    ClErrThrow(ClErr::INVALID_STRUCTURE_TYPE_NAME);
 
   uint num_sub_types = (type_.isValid() ? type_->getNumSubTypes() : 0);
 
@@ -76,10 +72,10 @@ ClParserStruct(ClParserTypePtr type, const ClParserValueArray &values) :
  ClParserObj(CL_PARSER_VALUE_TYPE_STRUCTURE), type_(type)
 {
   if (type_.isValid() && type_->isBuiltinType())
-    CITHROW(CLERR_INVALID_STRUCTURE_TYPE_NAME);
+    ClErrThrow(ClErr::INVALID_STRUCTURE_TYPE_NAME);
 
   if (! type_.isValid())
-    CITHROW(CLERR_INVALID_STRUCTURE_TYPE_NAME);
+    ClErrThrow(ClErr::INVALID_STRUCTURE_TYPE_NAME);
 
   uint num_values = values.size();
 
@@ -89,7 +85,7 @@ ClParserStruct(ClParserTypePtr type, const ClParserValueArray &values) :
     ClParserValuePtr value1 = ClParserValueMgrInst->createValue(values[i]);
 
     if (! value1->convertToType(type_->getSubType(i)->getValue()))
-      CITHROW(CLERR_INVALID_CONVERSION);
+      ClErrThrow(ClErr::INVALID_CONVERSION);
 
     values_[type_->getSubType(i)->getName()] = value1;
   }
@@ -100,15 +96,14 @@ ClParserStruct(ClParserTypePtr type, const ClParserValueArray &values) :
 }
 
 ClParserStruct::
-ClParserStruct(ClParserTypePtr type, const ClParserValuePtr *values,
-               uint num_values) :
+ClParserStruct(ClParserTypePtr type, const ClParserValuePtr *values, uint num_values) :
  ClParserObj(CL_PARSER_VALUE_TYPE_STRUCTURE), type_(type)
 {
   if (type_.isValid() && type_->isBuiltinType())
-    CITHROW(CLERR_INVALID_STRUCTURE_TYPE_NAME);
+    ClErrThrow(ClErr::INVALID_STRUCTURE_TYPE_NAME);
 
   if (! type_.isValid())
-    CITHROW(CLERR_INVALID_STRUCTURE_TYPE_NAME);
+    ClErrThrow(ClErr::INVALID_STRUCTURE_TYPE_NAME);
 
   uint i = 0;
 
@@ -116,7 +111,7 @@ ClParserStruct(ClParserTypePtr type, const ClParserValuePtr *values,
     ClParserValuePtr value1 = ClParserValueMgrInst->createValue(values[i]);
 
     if (! value1->convertToType(type_->getSubType(i)->getValue()))
-      CITHROW(CLERR_INVALID_CONVERSION);
+      ClErrThrow(ClErr::INVALID_CONVERSION);
 
     values_[type_->getSubType(i)->getName()] = value1;
   }
@@ -203,7 +198,7 @@ getValuesEnd() const
 
 void
 ClParserStruct::
-addName(const string &name)
+addName(const std::string &name)
 {
   if (! type_.isValid())
     type_ = ClParserInst->createType();
@@ -215,7 +210,7 @@ addName(const string &name)
 
 bool
 ClParserStruct::
-getValue(const string &name, ClParserValuePtr &value) const
+getValue(const std::string &name, ClParserValuePtr &value) const
 {
   ValueMap::const_iterator p1 = values_.find(name);
 
@@ -229,7 +224,7 @@ getValue(const string &name, ClParserValuePtr &value) const
 
 bool
 ClParserStruct::
-setValue(const string &name, ClParserValuePtr value)
+setValue(const std::string &name, ClParserValuePtr value)
 {
   ValueMap::iterator p1 = values_.find(name);
 
@@ -303,50 +298,45 @@ cmp(const ClParserObj &obj) const
   return 0;
 }
 
-void
+//------
+
+std::string
 ClParserStruct::
-print() const
+asString() const
 {
   ValueMap::const_iterator p1 = values_.begin();
   ValueMap::const_iterator p2 = values_.end  ();
 
-  for (uint i = 0; p1 != p2; ++p1, ++i) {
-    if (i > 0) ClParserInst->output(" ");
+  std::string str;
 
-    p1->second->print();
+  for (uint i = 0; p1 != p2; ++p1, ++i) {
+    if (i > 0) str += " ";
+
+    str += p1->second->asString();
   }
+
+  return str;
 }
 
 void
 ClParserStruct::
-print(ostream &os) const
+print() const
 {
-  ValueMap::const_iterator p1 = values_.begin();
-  ValueMap::const_iterator p2 = values_.end  ();
+  ClParserInst->output("%s", asString().c_str());
+}
 
-  for (uint i = 0; p1 != p2; ++p1, ++i) {
-    if (i > 0) os << " ";
-
-    p1->second->print(os);
-  }
+void
+ClParserStruct::
+print(std::ostream &os) const
+{
+  os << asString();
 }
 
 void
 ClParserStruct::
 debugPrint() const
 {
-  fprintf(stderr, "{");
-
-  ValueMap::const_iterator p1 = values_.begin();
-  ValueMap::const_iterator p2 = values_.end  ();
-
-  for (uint i = 0; p1 != p2; ++p1, ++i) {
-    if (i > 0) fprintf(stderr, " ");
-
-    p1->second->debugPrint();
-  }
-
-  fprintf(stderr, "}");
+  fprintf(stderr, "{%s}", asString().c_str());
 }
 
 //-----------------
@@ -437,7 +427,7 @@ process(const ClParserStruct &lstructure, const ClParserObj &robj) const
   const ClParserStruct &rstructure = reinterpret_cast<const ClParserStruct &>(robj);
 
   if (lstructure.getType() != rstructure.getType())
-    CITHROW(CLERR_INVALID_TYPE_MIX);
+    ClErrThrow(ClErr::INVALID_TYPE_MIX);
 
   ClParserStructPtr lstructure1 = lstructure.dupStruct();
 
@@ -917,7 +907,7 @@ ClParserValuePtr
 ClParserStruct::
 toInt() const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -926,7 +916,7 @@ ClParserValuePtr
 ClParserStruct::
 toReal() const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -935,7 +925,7 @@ ClParserValuePtr
 ClParserStruct::
 toString() const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -1078,3 +1068,13 @@ sort(ClParserSortDirection direction) const
 
   return ClParserValueMgrInst->createValue(structure);
 }
+
+ClParserValuePtr
+ClParserStruct::
+doAssert() const
+{
+  assert(false);
+
+  return ClParserValuePtr();
+}
+

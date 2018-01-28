@@ -1,9 +1,5 @@
 #include <CCeilPI.h>
 
-using std::list;
-using std::string;
-using std::ostream;
-
 int ClParserArray::error_code_ = 0;
 
 ClParserArrayPtr
@@ -152,7 +148,7 @@ createArray(const UIntVectorT &dims, const char *str)
 
 ClParserArrayPtr
 ClParserArray::
-createArray(const UIntVectorT &dims, const string &str)
+createArray(const UIntVectorT &dims, const std::string &str)
 {
   ClParserArray *array = new ClParserArray(dims, str);
 
@@ -353,7 +349,7 @@ ClParserArray(const uint *dims, uint num_dims, const char **strings) :
   uint num_data = getNumData();
 
   for (uint i = 0; i < num_data; ++i) {
-    uint len = (strings[i] != NULL ? strlen(strings[i]) : 0);
+    uint len = (strings[i] ? strlen(strings[i]) : 0);
 
     values_.setLinearValue(i, ClParserValueMgrInst->createValue(strings[i], len));
   }
@@ -378,7 +374,7 @@ ClParserArray(const UIntVectorT &dims, const char **strings) :
   uint num_data = getNumData();
 
   for (uint i = 0; i < num_data; ++i) {
-    uint len = (strings[i] != NULL ? strlen(strings[i]) : 0);
+    uint len = (strings[i] ? strlen(strings[i]) : 0);
 
     values_.setLinearValue(i, ClParserValueMgrInst->createValue(strings[i], len));
   }
@@ -413,14 +409,14 @@ ClParserArray(const UIntVectorT &dims, long integer) :
 }
 
 ClParserArray::
-ClParserArray(const uint *dims, uint num_dims, const string &str) :
+ClParserArray(const uint *dims, uint num_dims, const std::string &str) :
  ClParserObj(CL_PARSER_VALUE_TYPE_ARRAY), type_(CL_PARSER_VALUE_TYPE_STRING),
  values_(dims, num_dims, ClParserValueMgrInst->createValue(str))
 {
 }
 
 ClParserArray::
-ClParserArray(const UIntVectorT &dims, const string &str) :
+ClParserArray(const UIntVectorT &dims, const std::string &str) :
  ClParserObj(CL_PARSER_VALUE_TYPE_ARRAY), type_(CL_PARSER_VALUE_TYPE_STRING),
  values_(dims, ClParserValueMgrInst->createValue(str))
 {
@@ -453,7 +449,7 @@ ClParserArray(const uint *dims, uint num_dims, const ClParserValuePtr *values) :
   for (uint i = 0; i < num_data; ++i) {
     if (values[i]->getType() != CL_PARSER_VALUE_TYPE_STRUCTURE ||
         (type.isValid() && values[i]->getStructure()->getType() != type)) {
-      CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+      ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
       return;
     }
 
@@ -473,7 +469,7 @@ ClParserArray(const uint *dims, uint num_dims, const ClParserValuePtr *values) :
     int num_values = structure->getNumValues();
 
     for (int j = 0; j < num_values; ++j) {
-      const string &name = type->getSubType(j)->getName();
+      const std::string &name = type->getSubType(j)->getName();
 
       ClParserValuePtr value;
 
@@ -761,7 +757,7 @@ bool
 ClParserArray::
 toReals(double **reals, uint **dims, uint *num_dims) const
 {
-  toReals(reals, NULL);
+  toReals(reals, nullptr);
 
   uint *dims1;
 
@@ -778,7 +774,7 @@ bool
 ClParserArray::
 toReals(double **reals, UIntVectorT &dims) const
 {
-  toReals(reals, NULL);
+  toReals(reals, nullptr);
 
   values_.getDims(dims);
 
@@ -789,7 +785,7 @@ bool
 ClParserArray::
 toReals(float **reals, uint **dims, uint *num_dims) const
 {
-  toReals(reals, NULL);
+  toReals(reals, nullptr);
 
   uint *dims1;
 
@@ -850,7 +846,7 @@ bool
 ClParserArray::
 toIntegers(int **integers, uint **dims, uint *num_dims) const
 {
-  toIntegers(integers, NULL);
+  toIntegers(integers, nullptr);
 
   uint *dims1;
 
@@ -867,7 +863,7 @@ bool
 ClParserArray::
 toIntegers(uint **integers, uint **dims, uint *num_dims) const
 {
-  toIntegers(integers, NULL);
+  toIntegers(integers, nullptr);
 
   uint *dims1;
 
@@ -884,7 +880,7 @@ bool
 ClParserArray::
 toIntegers(long **integers, uint **dims, uint *num_dims) const
 {
-  toIntegers(integers, NULL);
+  toIntegers(integers, nullptr);
 
   uint *dims1;
 
@@ -901,7 +897,7 @@ bool
 ClParserArray::
 toIntegers(long **integers, UIntVectorT &dims) const
 {
-  toIntegers(integers, NULL);
+  toIntegers(integers, nullptr);
 
   values_.getDims(dims);
 
@@ -1029,7 +1025,7 @@ bool
 ClParserArray::
 toStrings(char ***strings, uint **dims, uint *num_dims) const
 {
-  toStrings(strings, NULL);
+  toStrings(strings, nullptr);
 
   uint *dims1;
 
@@ -1046,7 +1042,7 @@ bool
 ClParserArray::
 toStrings(char ***strings, UIntVectorT &dims) const
 {
-  toStrings(strings, NULL);
+  toStrings(strings, nullptr);
 
   values_.getDims(dims);
 
@@ -1066,7 +1062,7 @@ toStrings(char ***strings, uint *num_strings) const
 
     values_.getLinearValue(i, value);
 
-    string str = value->getString()->getText();
+    std::string str = value->getString()->getText();
 
     (*strings)[i] = strdup((char *) str.c_str());
   }
@@ -1355,12 +1351,12 @@ getSubArray(int ind) const
   error_code_ = 0;
 
   if (getNumDims() < 2) {
-    error_code_ = CLERR_INVALID_TYPE_FOR_SUBSCRIPT;
+    error_code_ = int(ClErr::INVALID_TYPE_FOR_SUBSCRIPT);
     return ClParserArrayPtr();
   }
 
   if (! indexToData(&ind, 0)) {
-    error_code_ = CLERR_SUBSCRIPT_OUT_OF_RANGE;
+    error_code_ = int(ClErr::SUBSCRIPT_OUT_OF_RANGE);
     return ClParserArrayPtr();
   }
 
@@ -1381,7 +1377,7 @@ ClParserArray::
 getSubArray(int start, int end) const
 {
   if (! indexToData(&start, 0) || ! indexToData(&end, 0) || start > end) {
-    error_code_ = CLERR_SUBSCRIPT_OUT_OF_RANGE;
+    error_code_ = int(ClErr::SUBSCRIPT_OUT_OF_RANGE);
     return ClParserArrayPtr();
   }
 
@@ -1402,12 +1398,12 @@ ClParserArray::
 getSubValue(int ind) const
 {
   if (getNumDims() != 1) {
-    error_code_ = CLERR_INVALID_TYPE_FOR_SUBSCRIPT;
+    error_code_ = int(ClErr::INVALID_TYPE_FOR_SUBSCRIPT);
     return ClParserValuePtr();
   }
 
   if (! indexToData(&ind, 0)) {
-    error_code_ = CLERR_SUBSCRIPT_OUT_OF_RANGE;
+    error_code_ = int(ClErr::SUBSCRIPT_OUT_OF_RANGE);
     return ClParserValuePtr();
   }
 
@@ -1543,7 +1539,7 @@ expandTo(const ClParserArray &array)
   for (uint i = 0; i < num_dims1; ++i) {
     if (      getDim(num_dims1 - i - 1) !=
         array.getDim(num_dims2 - i - 1)) {
-      error_code_ = CLERR_INVALID_TYPE_MIX;
+      error_code_ = int(ClErr::INVALID_TYPE_MIX);
       return false;
     }
   }
@@ -2382,19 +2378,7 @@ ClParserValuePtr
 ClParserArray::
 toString() const
 {
-  string str = "[";
-
-  for (uint i = 0; i < getNumData(); ++i) {
-    ClParserValuePtr value;
-
-    values_.getLinearValue(i, value);
-
-    str += " " + value->toString()->getString()->getText();
-  }
-
-  str += " ]";
-
-  return ClParserValueMgrInst->createValue(str);
+  return ClParserValueMgrInst->createValue(asString());
 }
 
 ClParserValuePtr
@@ -2558,7 +2542,7 @@ ClParserArray::
 index(const ClParserObj &obj) const
 {
   if (obj.getBaseType() != type_)
-    CITHROW(CLERR_INVALID_TYPE_MIX);
+    ClErrThrow(ClErr::INVALID_TYPE_MIX);
 
   ClParserValuePtr value = ClParserValueMgrInst->createValue(obj);
 
@@ -2581,7 +2565,7 @@ ClParserArray::
 rindex(const ClParserObj &obj) const
 {
   if (obj.getBaseType() != type_)
-    CITHROW(CLERR_INVALID_TYPE_MIX);
+    ClErrThrow(ClErr::INVALID_TYPE_MIX);
 
   ClParserValuePtr value = ClParserValueMgrInst->createValue(obj);
 
@@ -2607,7 +2591,7 @@ sort(ClParserSortDirection direction) const
 
   uint num_data = array->getNumData();
 
-  list<ClParserValuePtr> values;
+  std::list<ClParserValuePtr> values;
 
   for (uint i = 0; i < num_data; ++i) {
     ClParserValuePtr value;
@@ -2619,13 +2603,22 @@ sort(ClParserSortDirection direction) const
 
   values.sort(ClParserValueCmp(direction));
 
-  list<ClParserValuePtr>::const_iterator p1 = values.begin();
-  list<ClParserValuePtr>::const_iterator p2 = values.end  ();
+  std::list<ClParserValuePtr>::const_iterator p1 = values.begin();
+  std::list<ClParserValuePtr>::const_iterator p2 = values.end  ();
 
   for (uint i = 0; p1 != p2; ++p1, ++i)
     array->values_.setLinearValue(i, *p1);
 
   return ClParserValueMgrInst->createValue(array);
+}
+
+ClParserValuePtr
+ClParserArray::
+doAssert() const
+{
+  assert(false);
+
+  return ClParserValuePtr();
 }
 
 //-----------------
@@ -2640,17 +2633,17 @@ internFn(ClParserInternFnPtr internfn, const ClParserValuePtr *values,
   ClParserArrayPtr array1 = values[0]->getArray();
 
   switch (internfn->getType()) {
-    case CL_PARSER_INTERNFN_IS_CTYPE: {
+    case CLParserInternFnType::IS_CTYPE: {
       if (array1->type_ == CL_PARSER_VALUE_TYPE_INTEGER) {
-        string is_type;
+        std::string is_type;
 
         if (! values[1]->stringValue(is_type))
           return ClParserValuePtr();
 
         CStrUtil::IsCType is_func = CStrUtil::getIsCType(is_type);
 
-        if (is_func == NULL) {
-          error_code_ = CLERR_INVALID_TYPE_FOR_OPERATOR;
+        if (! is_func) {
+          error_code_ = int(ClErr::INVALID_TYPE_FOR_OPERATOR);
           return ClParserValuePtr();
         }
 
@@ -2671,13 +2664,13 @@ internFn(ClParserInternFnPtr internfn, const ClParserValuePtr *values,
         return ClParserValueMgrInst->createValue(array);
       }
       else {
-        error_code_ = CLERR_INVALID_TYPE_FOR_OPERATOR;
+        error_code_ = int(ClErr::INVALID_TYPE_FOR_OPERATOR);
         return ClParserValuePtr();
       }
     }
-    case CL_PARSER_INTERNFN_SUBARR: {
+    case CLParserInternFnType::SUBARR: {
       if (array1->getNumDims() > 1) {
-        error_code_ = CLERR_INVALID_TYPE_FOR_OPERATOR;
+        error_code_ = int(ClErr::INVALID_TYPE_FOR_OPERATOR);
         return ClParserValuePtr();
       }
 
@@ -2698,7 +2691,7 @@ internFn(ClParserInternFnPtr internfn, const ClParserValuePtr *values,
 
       return ClParserValueMgrInst->createValue(array);
     }
-    case CL_PARSER_INTERNFN_SUM: {
+    case CLParserInternFnType::SUM: {
       ClParserValuePtr value;
 
       for (uint i = 0; i < array1->getNumData(); ++i) {
@@ -2714,7 +2707,7 @@ internFn(ClParserInternFnPtr internfn, const ClParserValuePtr *values,
 
       return value;
     }
-    case CL_PARSER_INTERNFN_TOLOWER: {
+    case CLParserInternFnType::TOLOWER: {
       ClParserArrayPtr array =
         createArray(CL_PARSER_VALUE_TYPE_STRING, &num_values, 1);
 
@@ -2723,7 +2716,7 @@ internFn(ClParserInternFnPtr internfn, const ClParserValuePtr *values,
 
         array->values_.getLinearValue(i, value);
 
-        string str = value->toString()->getString()->getText();
+        std::string str = value->toString()->getString()->getText();
 
         str = CStrUtil::toLower(str);
 
@@ -2733,7 +2726,7 @@ internFn(ClParserInternFnPtr internfn, const ClParserValuePtr *values,
 
       return ClParserValueMgrInst->createValue(array);
     }
-    case CL_PARSER_INTERNFN_TOUPPER: {
+    case CLParserInternFnType::TOUPPER: {
       ClParserArrayPtr array =
         createArray(CL_PARSER_VALUE_TYPE_STRING, &num_values, 1);
 
@@ -2742,7 +2735,7 @@ internFn(ClParserInternFnPtr internfn, const ClParserValuePtr *values,
 
         array->values_.getLinearValue(i, value);
 
-        string str = value->toString()->getString()->getText();
+        std::string str = value->toString()->getString()->getText();
 
         str = CStrUtil::toUpper(str);
 
@@ -2766,12 +2759,12 @@ arrayTimes(const ClParserArray &array)
   error_code_ = 0;
 
   if (type_ != array.type_ || ! values_.sameDimension(array.values_)) {
-    error_code_ = CLERR_INCOMPATIBLE_ARRAYS;
+    error_code_ = int(ClErr::INCOMPATIBLE_ARRAYS);
     return ClParserArrayPtr();
   }
 
   if (getNumDims() != 1) {
-    error_code_ = CLERR_INCOMPATIBLE_ARRAYS;
+    error_code_ = int(ClErr::INCOMPATIBLE_ARRAYS);
     return ClParserArrayPtr();
   }
 
@@ -2796,62 +2789,125 @@ arrayTimes(const ClParserArray &array)
   return tarray;
 }
 
-void
+//------
+
+std::string
 ClParserArray::
-print() const
+asString() const
 {
-  ClParserInst->output("[");
+  std::string str = "[";
 
-  for (uint i = 0; i < getNumData(); ++i) {
-    if (i > 0) ClParserInst->output(",");
+  if       (getNumDims() == 1) {
+    uint n = getDim(0);
 
-    ClParserValuePtr value;
+    for (uint i = 0; i < n; ++i) {
+      if (i > 0) str += ",";
 
-    values_.getLinearValue(i, value);
+      ClParserValuePtr value;
 
-    value->print();
+      values_.getLinearValue(i, value);
+
+      str += value->asString();
+    }
+  }
+  else if (getNumDims() == 2) {
+    uint n1 = getDim(0);
+    uint n2 = getDim(1);
+
+    uint k = 0;
+
+    for (uint i = 0; i < n1; ++i) {
+      if (i > 0) str += ",";
+
+      str += "[";
+
+      for (uint j = 0; j < n2; ++j, ++k) {
+        if (j > 0) str += ",";
+
+        ClParserValuePtr value;
+
+        values_.getLinearValue(k, value);
+
+        str += value->asString();
+      }
+
+      str += "]";
+    }
+  }
+  else if (getNumDims() == 3) {
+    uint n1 = getDim(0);
+    uint n2 = getDim(1);
+    uint n3 = getDim(2);
+
+    uint l = 0;
+
+    for (uint i = 0; i < n1; ++i) {
+      if (i > 0) str += ",";
+
+      str += "[";
+
+      for (uint j = 0; j < n2; ++j) {
+        if (j > 0) str += ",";
+
+        str += "[";
+
+        for (uint k = 0; k < n3; ++k, ++l) {
+          if (k > 0) str += ",";
+
+          ClParserValuePtr value;
+
+          values_.getLinearValue(l, value);
+
+          str += value->asString();
+        }
+
+        str += "]";
+      }
+
+      str += "]";
+    }
+  }
+  else {
+    uint n = getNumData();
+
+    for (uint i = 0; i < n; ++i) {
+      if (i > 0) str += ",";
+
+      ClParserValuePtr value;
+
+      values_.getLinearValue(i, value);
+
+      str += value->asString();
+    }
   }
 
-  ClParserInst->output("]");
+  str += "]";
+
+  return str;
 }
 
 void
 ClParserArray::
-print(ostream &os) const
+print() const
 {
-  os << "[";
+  ClParserInst->output("%s", asString().c_str());
+}
 
-  for (uint i = 0; i < getNumData(); ++i) {
-    if (i > 0) os << ",";
-
-    ClParserValuePtr value;
-
-    values_.getLinearValue(i, value);
-
-    value->print(os);
-  }
-
-  os << "]";
+void
+ClParserArray::
+print(std::ostream &os) const
+{
+  os << asString();
 }
 
 void
 ClParserArray::
 debugPrint() const
 {
-  fprintf(stderr, "[");
-
-  for (uint i = 0; i < getNumData(); ++i) {
-    if (i > 0) fprintf(stderr, ",");
-
-    ClParserValuePtr value;
-
-    values_.getLinearValue(i, value);
-
-    value->debugPrint();
-  }
-
-  fprintf(stderr, "]");
+  fprintf(stderr, "%s", asString().c_str());
 }
+
+//------
 
 bool
 ClParserArray::

@@ -1,7 +1,5 @@
 #include <CCeilL.h>
 
-using std::string;
-
 /*------------------------------------------------------------------*
  *
  * setDebug
@@ -138,8 +136,8 @@ void
 ClLanguageDebug::
 print(const char *format, ...)
 {
-  string  msg;
-  va_list vargs;
+  std::string msg;
+  va_list     vargs;
 
   va_start(vargs, format);
 

@@ -36,9 +36,9 @@
 #define CL_PARSER_OP_BINARY      (1<< 9)
 #define CL_PARSER_OP_ASSIGNMENT  (1<< 8)
 
-enum CLParserOperatorAssociate {
-  CL_PARSER_OP_ASSOCIATE_L_TO_R = 1,
-  CL_PARSER_OP_ASSOCIATE_R_TO_L = 2
+enum class CLParserOperatorAssociate {
+  L_TO_R = 1,
+  R_TO_L = 2
 };
 
 /**** Private Structures ****/
@@ -65,21 +65,21 @@ class ClParserOperatorMgr {
 };
 
 struct ClParserOperatorData {
-  ClParserOperatorType  type;
-  const char           *token;
-  const char           *name;
-  uint                  precedence;
-  uint                  associativity;
-  uint                  types;
+  ClParserOperatorType      type;
+  const char*               token         { nullptr };
+  const char*               name          { nullptr };
+  uint                      precedence    { 0 };
+  CLParserOperatorAssociate associativity { CLParserOperatorAssociate::L_TO_R };
+  uint                      types;
 };
 
 struct ClParserOpData {
-  ClParserOperatorType type;
-  std::string          token;
-  std::string          name;
-  uint                 precedence;
-  uint                 associativity;
-  uint                 types;
+  ClParserOperatorType      type;
+  std::string               token;
+  std::string               name;
+  uint                      precedence;
+  CLParserOperatorAssociate associativity;
+  uint                      types;
 };
 
 class ClParserOperator {

@@ -1,8 +1,5 @@
 #include <CCeilPI.h>
 
-using std::string;
-using std::ostream;
-
 int             ClParserUserFn::error_code_;
 ClParserUserFn *ClParserUserFn::execUserFn_;
 
@@ -40,7 +37,7 @@ createUserFn(const ClUserFnData &data)
 
 ClParserUserFnPtr
 ClParserUserFnMgr::
-createUserFn(const string &name, uint type, int *arg_types,
+createUserFn(const std::string &name, uint type, int *arg_types,
              uint num_arg_types, ClParserUserFnProc proc, void *data)
 {
   IntVectorT arg_types1;
@@ -53,7 +50,7 @@ createUserFn(const string &name, uint type, int *arg_types,
 
 ClParserUserFnPtr
 ClParserUserFnMgr::
-createUserFn(const string &name, uint type, const IntVectorT &arg_types,
+createUserFn(const std::string &name, uint type, const IntVectorT &arg_types,
              ClParserUserFnProc proc, void *data)
 {
   ClParserUserFn *userfn =
@@ -80,14 +77,14 @@ addUserFn(ClParserUserFnPtr userfn)
 
 void
 ClParserUserFnMgr::
-removeUserFn(const string &name)
+removeUserFn(const std::string &name)
 {
   user_function_map_.erase(name);
 }
 
 bool
 ClParserUserFnMgr::
-isUserFn(const string &name) const
+isUserFn(const std::string &name) const
 {
   UserFnMap::const_iterator p = user_function_map_.find(name);
 
@@ -96,7 +93,7 @@ isUserFn(const string &name) const
 
 ClParserUserFnPtr
 ClParserUserFnMgr::
-getUserFn(const string &name) const
+getUserFn(const std::string &name) const
 {
   UserFnMap::const_iterator p = user_function_map_.find(name);
 
@@ -108,7 +105,7 @@ getUserFn(const string &name) const
 
 void
 ClParserUserFnMgr::
-stringToTypes(const string &str, int *type, IntVectorT &arg_types)
+stringToTypes(const std::string &str, int *type, IntVectorT &arg_types)
 {
   int i   = 0;
   int len = str.size();
@@ -160,7 +157,7 @@ stringToTypes(const string &str, int *type, IntVectorT &arg_types)
 
           i = len;
 
-          string arg = CStrUtil::stripSpaces(str.substr(j));
+          std::string arg = CStrUtil::stripSpaces(str.substr(j));
 
           if (arg != "...") {
             ClParserInst->error("Illegal Argument Type '%s'\n", arg.c_str());
@@ -213,7 +210,7 @@ setExecArgList(CLArgType type, va_list *vargs)
 }
 
 ClParserUserFn::
-ClParserUserFn(const string &name, uint type, const IntVectorT &arg_types,
+ClParserUserFn(const std::string &name, uint type, const IntVectorT &arg_types,
                ClParserUserFnProc proc, void *data) :
  ind_(0), type_(type), name_(name), proc_(proc), data_(data)
 {
@@ -222,8 +219,8 @@ ClParserUserFn(const string &name, uint type, const IntVectorT &arg_types,
   // Ensure valid name
 
   if (! isValidName(name_) ||
-      ! ClParserInst->isValidNewName(CL_PARSER_NAME_TYPE_USERFN, name_)) {
-    error_code_ = CLERR_INVALID_FUNCTION_NAME;
+      ! ClParserInst->isValidNewName(ClParserNameType::USERFN, name_)) {
+    error_code_ = int(ClErr::INVALID_FUNCTION_NAME);
     return;
   }
 
@@ -269,7 +266,7 @@ exec(ClParserValuePtr *values, uint num_values, int *error_code)
   termArgs();
 
   if (*error_code < 0) {
-    *error_code = CLERR_USER_FUNCTION_FAILED;
+    *error_code = int(ClErr::USER_FUNCTION_FAILED);
     return ClParserValuePtr();
   }
 
@@ -330,9 +327,9 @@ print() const
 
 void
 ClParserUserFn::
-print(ostream &os) const
+print(std::ostream &os) const
 {
-  CStrUtil::fprintf(os, " %s ", name_.c_str());
+  os << " " << name_ << " ";
 }
 
 void
@@ -344,7 +341,7 @@ debugPrint() const
 
 bool
 ClParserUserFn::
-isValidName(const string &name)
+isValidName(const std::string &name)
 {
   return CStrUtil::isIdentifier(name);
 }
@@ -355,50 +352,50 @@ getArgList(CLArgType type, va_list *vargs)
 {
   uint num = 0;
 
-  while (type != CL_ARG_TYPE_NONE) {
+  while (type != CLArgType::NONE) {
     if (num >= exec_data_.num_values_)
-      return getArgsFail(CLERR_INVALID_NO_FUNCTION_ARGS);
+      return getArgsFail(int(ClErr::INVALID_NO_FUNCTION_ARGS));
 
-    if      (type == CL_ARG_TYPE_REAL) {
+    if      (type == CLArgType::REAL) {
       double *real = va_arg(*vargs, double *);
 
       if (! exec_data_.values_[num]->realValue(real))
-        return getArgsFail(CLERR_INVALID_CONVERSION);
+        return getArgsFail(int(ClErr::INVALID_CONVERSION));
     }
-    else if (type == CL_ARG_TYPE_INTEGER) {
+    else if (type == CLArgType::INTEGER) {
       long *integer = va_arg(*vargs, long *);
 
       if (! exec_data_.values_[num]->integerValue(integer))
-        return getArgsFail(CLERR_INVALID_CONVERSION);
+        return getArgsFail(int(ClErr::INVALID_CONVERSION));
     }
-    else if (type == CL_ARG_TYPE_WORD) {
+    else if (type == CLArgType::WORD) {
       int *integer = va_arg(*vargs, int *);
 
       if (! exec_data_.values_[num]->integerValue(integer))
-        return getArgsFail(CLERR_INVALID_CONVERSION);
+        return getArgsFail(int(ClErr::INVALID_CONVERSION));
     }
-    else if (type == CL_ARG_TYPE_STRING) {
-      string str1;
+    else if (type == CLArgType::STRING) {
+      std::string str1;
 
       char **str = va_arg(*vargs, char **);
 
       if (! exec_data_.values_[num]->stringValue(str1))
-        return getArgsFail(CLERR_INVALID_CONVERSION);
+        return getArgsFail(int(ClErr::INVALID_CONVERSION));
 
       *str = CStrUtil::strdup(str1.c_str());
 
       exec_data_.free_strings_.push_back(*str);
     }
-    else if (type == CL_ARG_TYPE_CHARS) {
+    else if (type == CLArgType::CHARS) {
       char **chars = va_arg(*vargs, char **);
       int   *len   = va_arg(*vargs, int *);
 
       if (! exec_data_.values_[num]->stringValue(chars, len))
-        return getArgsFail(CLERR_INVALID_CONVERSION);
+        return getArgsFail(int(ClErr::INVALID_CONVERSION));
 
       exec_data_.free_chars_.push_back(*chars);
     }
-    else if (type == CL_ARG_TYPE_REALS) {
+    else if (type == CLArgType::REALS) {
       uint *dims;
       uint  num_dims;
 
@@ -406,7 +403,7 @@ getArgList(CLArgType type, va_list *vargs)
       int     *num_reals = va_arg(*vargs, int *);
 
       if (! exec_data_.values_[num]->realArrayValue(reals, &dims, &num_dims))
-        return getArgsFail(CLERR_INVALID_CONVERSION);
+        return getArgsFail(int(ClErr::INVALID_CONVERSION));
 
       if (num_dims != 1) {
         ClParserInst->error("Invalid Real Array Dimension");
@@ -418,7 +415,7 @@ getArgList(CLArgType type, va_list *vargs)
       exec_data_.free_array_reals_    .push_back(*reals);
       exec_data_.free_array_real_dims_.push_back(dims);
     }
-    else if (type == CL_ARG_TYPE_FLOATS) {
+    else if (type == CLArgType::FLOATS) {
       uint *dims;
       uint  num_dims;
 
@@ -426,7 +423,7 @@ getArgList(CLArgType type, va_list *vargs)
       int    *num_reals = va_arg(*vargs, int *);
 
       if (! exec_data_.values_[num]->realArrayValue(reals, &dims, &num_dims))
-        return getArgsFail(CLERR_INVALID_CONVERSION);
+        return getArgsFail(int(ClErr::INVALID_CONVERSION));
 
       if (num_dims != 1) {
         ClParserInst->error("Invalid Real Array Dimension");
@@ -438,7 +435,7 @@ getArgList(CLArgType type, va_list *vargs)
       exec_data_.free_array_floats_    .push_back(*reals);
       exec_data_.free_array_float_dims_.push_back(dims);
     }
-    else if (type == CL_ARG_TYPE_INTEGERS) {
+    else if (type == CLArgType::INTEGERS) {
       uint *dims;
       uint  num_dims;
 
@@ -446,7 +443,7 @@ getArgList(CLArgType type, va_list *vargs)
       int   *num_integers = va_arg(*vargs, int *);
 
       if (! exec_data_.values_[num]->integerArrayValue(integers, &dims, &num_dims))
-        return getArgsFail(CLERR_INVALID_CONVERSION);
+        return getArgsFail(int(ClErr::INVALID_CONVERSION));
 
       if (num_dims != 1) {
         ClParserInst->error("Invalid Integer Array Dimension");
@@ -458,7 +455,7 @@ getArgList(CLArgType type, va_list *vargs)
       exec_data_.free_array_integers_    .push_back(*integers);
       exec_data_.free_array_integer_dims_.push_back(dims);
     }
-    else if (type == CL_ARG_TYPE_WORDS) {
+    else if (type == CLArgType::WORDS) {
       uint *dims;
       uint  num_dims;
 
@@ -466,7 +463,7 @@ getArgList(CLArgType type, va_list *vargs)
       int  *num_integers = va_arg(*vargs, int *);
 
       if (! exec_data_.values_[num]->integerArrayValue(integers, &dims, &num_dims))
-        return getArgsFail(CLERR_INVALID_CONVERSION);
+        return getArgsFail(int(ClErr::INVALID_CONVERSION));
 
       if (num_dims != 1) {
         ClParserInst->error("Invalid Integer Array Dimension");
@@ -478,7 +475,7 @@ getArgList(CLArgType type, va_list *vargs)
       exec_data_.free_array_words_    .push_back(*integers);
       exec_data_.free_array_word_dims_.push_back(dims);
     }
-    else if (type == CL_ARG_TYPE_STRINGS) {
+    else if (type == CLArgType::STRINGS) {
       uint *dims;
       uint  num_dims;
 
@@ -486,7 +483,7 @@ getArgList(CLArgType type, va_list *vargs)
       int    *num_strings = va_arg(*vargs, int *);
 
       if (! exec_data_.values_[num]->stringArrayValue(strings, &dims, &num_dims))
-        return getArgsFail(CLERR_INVALID_CONVERSION);
+        return getArgsFail(int(ClErr::INVALID_CONVERSION));
 
       if (num_dims != 1) {
         ClParserInst->error("Invalid String Array Dimension");
@@ -498,9 +495,9 @@ getArgList(CLArgType type, va_list *vargs)
       exec_data_.free_array_strings_    .push_back(*strings);
       exec_data_.free_array_string_dims_.push_back(dims);
     }
-    else if (type == CL_ARG_TYPE_SKIP)
+    else if (type == CLArgType::SKIP)
       ;
-    else if (type == CL_ARG_TYPE_SKIP_N) {
+    else if (type == CLArgType::SKIP_N) {
       int n = va_arg(*vargs, int);
 
       if (n <= 0)
@@ -509,7 +506,7 @@ getArgList(CLArgType type, va_list *vargs)
         num += n - 1;
     }
     else
-      return getArgsFail(CLERR_INVALID_TYPE_FOR_OPERATOR);
+      return getArgsFail(int(ClErr::INVALID_TYPE_FOR_OPERATOR));
 
     num++;
 
@@ -527,39 +524,39 @@ setArgList(CLArgType type, va_list *vargs)
 
   uint num = 0;
 
-  while (type != CL_ARG_TYPE_NONE) {
+  while (type != CLArgType::NONE) {
     if (num >= exec_data_.num_values_)
-      return setArgsFail(CLERR_INVALID_NO_FUNCTION_ARGS);
+      return setArgsFail(int(ClErr::INVALID_NO_FUNCTION_ARGS));
 
-    if      (type == CL_ARG_TYPE_REAL) {
+    if      (type == CLArgType::REAL) {
       double real = va_arg(*vargs, double);
 
       value = ClParserValueMgrInst->createValue(real);
 
       exec_data_.values_[num] = value;
     }
-    else if (type == CL_ARG_TYPE_INTEGER) {
+    else if (type == CLArgType::INTEGER) {
       long integer = va_arg(*vargs, long);
 
       value = ClParserValueMgrInst->createValue(integer);
 
       exec_data_.values_[num] = value;
     }
-    else if (type == CL_ARG_TYPE_WORD) {
+    else if (type == CLArgType::WORD) {
       int integer = va_arg(*vargs, int);
 
       value = ClParserValueMgrInst->createValue((long) integer);
 
       exec_data_.values_[num] = value;
     }
-    else if (type == CL_ARG_TYPE_STRING) {
+    else if (type == CLArgType::STRING) {
       char *str = va_arg(*vargs, char *);
 
       value = ClParserValueMgrInst->createValue(str);
 
       exec_data_.values_[num] = value;
     }
-    else if (type == CL_ARG_TYPE_CHARS) {
+    else if (type == CLArgType::CHARS) {
       char *chars = va_arg(*vargs, char *);
       int   len   = va_arg(*vargs, int);
 
@@ -567,7 +564,7 @@ setArgList(CLArgType type, va_list *vargs)
 
       exec_data_.values_[num] = value;
     }
-    else if (type == CL_ARG_TYPE_REALS) {
+    else if (type == CLArgType::REALS) {
       uint dims[1];
 
       double *reals     = va_arg(*vargs, double *);
@@ -579,7 +576,7 @@ setArgList(CLArgType type, va_list *vargs)
 
       exec_data_.values_[num] = value;
     }
-    else if (type == CL_ARG_TYPE_FLOATS) {
+    else if (type == CLArgType::FLOATS) {
       uint dims[1];
 
       float *reals     = va_arg(*vargs, float *);
@@ -591,7 +588,7 @@ setArgList(CLArgType type, va_list *vargs)
 
       exec_data_.values_[num] = value;
     }
-    else if (type == CL_ARG_TYPE_INTEGERS) {
+    else if (type == CLArgType::INTEGERS) {
       uint dims[1];
 
       long *integers     = va_arg(*vargs, long *);
@@ -603,7 +600,7 @@ setArgList(CLArgType type, va_list *vargs)
 
       exec_data_.values_[num] = value;
     }
-    else if (type == CL_ARG_TYPE_WORDS) {
+    else if (type == CLArgType::WORDS) {
       uint dims[1];
 
       int *integers     = va_arg(*vargs, int *);
@@ -615,7 +612,7 @@ setArgList(CLArgType type, va_list *vargs)
 
       exec_data_.values_[num] = value;
     }
-    else if (type == CL_ARG_TYPE_STRINGS) {
+    else if (type == CLArgType::STRINGS) {
       uint dims[1];
 
       const char **strings     = (const char **) va_arg(*vargs, char **);
@@ -627,9 +624,9 @@ setArgList(CLArgType type, va_list *vargs)
 
       exec_data_.values_[num] = value;
     }
-    else if (type == CL_ARG_TYPE_SKIP)
+    else if (type == CLArgType::SKIP)
       ;
-    else if (type == CL_ARG_TYPE_SKIP_N) {
+    else if (type == CLArgType::SKIP_N) {
       int n = va_arg(*vargs, int);
 
       if (n <= 0)
@@ -638,7 +635,7 @@ setArgList(CLArgType type, va_list *vargs)
         num += n - 1;
     }
     else
-      return setArgsFail(CLERR_INVALID_TYPE_FOR_OPERATOR);
+      return setArgsFail(int(ClErr::INVALID_TYPE_FOR_OPERATOR));
 
     num++;
 

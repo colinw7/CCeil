@@ -46,7 +46,9 @@ class ClParserObj {
 
   //------
 
-  // Print
+  // String/Print
+
+  virtual std::string asString() const = 0;
 
   virtual void print() const = 0;
   virtual void print(std::ostream &os) const = 0;
@@ -121,9 +123,13 @@ class ClParserObj {
   virtual ClParserValuePtr min() const = 0;
   virtual ClParserValuePtr max() const = 0;
   virtual ClParserValuePtr sum() const = 0;
-  virtual ClParserValuePtr index(const ClParserObj &value) const = 0;
+
+  virtual ClParserValuePtr index (const ClParserObj &value) const = 0;
   virtual ClParserValuePtr rindex(const ClParserObj &value) const = 0;
+
   virtual ClParserValuePtr sort(ClParserSortDirection direction) const = 0;
+
+  virtual ClParserValuePtr doAssert() const = 0;
 
   //------
 

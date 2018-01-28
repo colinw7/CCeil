@@ -19,7 +19,7 @@ class ClLanguageConverterMgr {
 
  public:
   static ClLanguageConverterMgr *getInstance() {
-    static ClLanguageConverterMgr *instance = NULL;
+    static ClLanguageConverterMgr *instance = nullptr;
 
     if (! instance)
       instance = new ClLanguageConverterMgr;

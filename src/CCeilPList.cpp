@@ -1,7 +1,5 @@
 #include <CCeilPI.h>
 
-using std::ostream;
-
 int ClParserList::error_code_ = 0;
 
 ClParserListPtr
@@ -337,59 +335,50 @@ getMinValue() const
   return value;
 }
 
-void
+//------
+
+std::string
 ClParserList::
-print() const
+asString() const
 {
   ClParserValueList::const_iterator p1 = values_.begin();
   ClParserValueList::const_iterator p2 = values_.end  ();
 
-  ClParserInst->output("{");
+  std::string str = "{";
 
   for (int i = 0 ; p1 != p2; ++p1, ++i) {
     if (i > 0) ClParserInst->output(",");
 
-    (*p1)->print();
+    str += (*p1)->asString();
   }
 
-  ClParserInst->output("}");
+  str += "}";
+
+  return str;
 }
 
 void
 ClParserList::
-print(ostream &os) const
+print() const
 {
-  ClParserValueList::const_iterator p1 = values_.begin();
-  ClParserValueList::const_iterator p2 = values_.end  ();
+  ClParserInst->output("%s", asString().c_str());
+}
 
-  os << "{";
-
-  for (int i = 0 ; p1 != p2; ++p1, ++i) {
-    if (i > 0) os << ",";
-
-    (*p1)->print(os);
-  }
-
-  os << "}";
+void
+ClParserList::
+print(std::ostream &os) const
+{
+  os << asString();
 }
 
 void
 ClParserList::
 debugPrint() const
 {
-  fprintf(stderr, "{");
-
-  ClParserValueList::const_iterator p1 = values_.begin();
-  ClParserValueList::const_iterator p2 = values_.end  ();
-
-  for (int i = 0; p1 != p2; ++p1, ++i) {
-    if (i > 0) fprintf(stderr, ",");
-
-    (*p1)->debugPrint();
-  }
-
-  fprintf(stderr, "}");
+  fprintf(stderr, "%s", asString().c_str());
 }
+
+//------
 
 int
 ClParserList::
@@ -430,7 +419,7 @@ const ClParserObj &
 ClParserList::
 increment()
 {
-  CITHROW(CLERR_INVALID_OPERATOR);
+  ClErrThrow(ClErr::INVALID_OPERATOR);
 
   return *this;
 }
@@ -439,7 +428,7 @@ const ClParserObj &
 ClParserList::
 decrement()
 {
-  CITHROW(CLERR_INVALID_OPERATOR);
+  ClErrThrow(ClErr::INVALID_OPERATOR);
 
   return *this;
 }
@@ -544,7 +533,7 @@ ClParserList::
 times(const ClParserObj &obj) const
 {
   if (obj.getBaseType() != CL_PARSER_VALUE_TYPE_INTEGER)
-    CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+    ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   const ClParserInteger &integer =
     reinterpret_cast<const ClParserInteger &>(obj);
@@ -552,7 +541,7 @@ times(const ClParserObj &obj) const
   long num = integer.getValue();
 
   if (num < 0)
-    CITHROW(CLERR_VALUE_OUT_OF_RANGE);
+    ClErrThrow(ClErr::VALUE_OUT_OF_RANGE);
 
   ClParserListPtr list = dupList();
 
@@ -581,7 +570,7 @@ ClParserValuePtr
 ClParserList::
 modulus(const ClParserObj &) const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -590,7 +579,7 @@ ClParserValuePtr
 ClParserList::
 power(const ClParserObj &) const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -599,7 +588,7 @@ ClParserValuePtr
 ClParserList::
 approxEqual(const ClParserObj &) const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -608,7 +597,7 @@ ClParserValuePtr
 ClParserList::
 bitAnd(const ClParserObj &) const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -617,7 +606,7 @@ ClParserValuePtr
 ClParserList::
 bitOr(const ClParserObj &) const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -626,7 +615,7 @@ ClParserValuePtr
 ClParserList::
 bitXor(const ClParserObj &) const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -636,7 +625,7 @@ ClParserList::
 bitLShift(const ClParserObj &obj) const
 {
   if (obj.getBaseType() != CL_PARSER_VALUE_TYPE_INTEGER)
-    CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+    ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   const ClParserInteger &integer =
     reinterpret_cast<const ClParserInteger &>(obj);
@@ -655,7 +644,7 @@ ClParserList::
 bitRShift(const ClParserObj &obj) const
 {
   if (obj.getBaseType() != CL_PARSER_VALUE_TYPE_INTEGER)
-    CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+    ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   const ClParserInteger &integer =
     reinterpret_cast<const ClParserInteger &>(obj);
@@ -677,7 +666,7 @@ ClParserValuePtr
 ClParserList::
 abs() const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -686,7 +675,7 @@ ClParserValuePtr
 ClParserList::
 ceil() const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -695,7 +684,7 @@ ClParserValuePtr
 ClParserList::
 floor() const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -704,7 +693,7 @@ ClParserValuePtr
 ClParserList::
 sign() const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -713,7 +702,7 @@ ClParserValuePtr
 ClParserList::
 sqr() const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -722,7 +711,7 @@ ClParserValuePtr
 ClParserList::
 sqrt() const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -731,7 +720,7 @@ ClParserValuePtr
 ClParserList::
 cos() const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -740,7 +729,7 @@ ClParserValuePtr
 ClParserList::
 sin() const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -749,7 +738,7 @@ ClParserValuePtr
 ClParserList::
 tan() const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -758,7 +747,7 @@ ClParserValuePtr
 ClParserList::
 acos() const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -767,7 +756,7 @@ ClParserValuePtr
 ClParserList::
 asin() const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -776,7 +765,7 @@ ClParserValuePtr
 ClParserList::
 atan() const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -785,7 +774,7 @@ ClParserValuePtr
 ClParserList::
 atan(double) const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -794,7 +783,7 @@ ClParserValuePtr
 ClParserList::
 exp() const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -803,7 +792,7 @@ ClParserValuePtr
 ClParserList::
 log() const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -812,7 +801,7 @@ ClParserValuePtr
 ClParserList::
 log10() const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -821,7 +810,7 @@ ClParserValuePtr
 ClParserList::
 cosh() const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -830,7 +819,7 @@ ClParserValuePtr
 ClParserList::
 sinh() const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -839,7 +828,7 @@ ClParserValuePtr
 ClParserList::
 tanh() const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -848,7 +837,7 @@ ClParserValuePtr
 ClParserList::
 toChar() const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -857,7 +846,7 @@ ClParserValuePtr
 ClParserList::
 toInt() const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -866,7 +855,7 @@ ClParserValuePtr
 ClParserList::
 toReal() const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -875,7 +864,7 @@ ClParserValuePtr
 ClParserList::
 toString() const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -884,7 +873,7 @@ ClParserValuePtr
 ClParserList::
 isNan() const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -893,7 +882,7 @@ ClParserValuePtr
 ClParserList::
 toLower() const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -902,7 +891,7 @@ ClParserValuePtr
 ClParserList::
 toUpper() const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValuePtr();
 }
@@ -991,6 +980,15 @@ sort(ClParserSortDirection direction) const
   return ClParserValueMgrInst->createValue(list);
 }
 
+ClParserValuePtr
+ClParserList::
+doAssert() const
+{
+  assert(false);
+
+  return ClParserValuePtr();
+}
+
 //-----------------
 
 ClParserValuePtr
@@ -1000,7 +998,7 @@ subscriptValue(const uint *subscripts, uint num_subscripts) const
   error_code_ = 0;
 
   if (num_subscripts > 2) {
-    error_code_ = CLERR_TOO_MANY_SUBSCRIPTS;
+    error_code_ = int(ClErr::TOO_MANY_SUBSCRIPTS);
     return ClParserValuePtr();
   }
 
@@ -1024,7 +1022,7 @@ subscriptValue(const UIntVectorT &subscripts) const
   uint num_subscripts = subscripts.size();
 
   if (num_subscripts > 2) {
-    error_code_ = CLERR_TOO_MANY_SUBSCRIPTS;
+    error_code_ = int(ClErr::TOO_MANY_SUBSCRIPTS);
     return ClParserValuePtr();
   }
 

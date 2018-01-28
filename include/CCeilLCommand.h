@@ -25,7 +25,7 @@ class ClLanguageCommand {
   uint                   line_num_;
 
  public:
-  ClLanguageCommand(uint ident, void *data=NULL, const std::string &args="",
+  ClLanguageCommand(uint ident, void *data=nullptr, const std::string &args="",
                     const ClLanguageCommandList &command_list=ClLanguageCommandList());
 
   virtual ~ClLanguageCommand();

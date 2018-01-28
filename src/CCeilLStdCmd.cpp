@@ -9,13 +9,10 @@
 #include <csignal>
 #include <algorithm>
 
-using std::string;
-using std::vector;
-
 #define LOUT(a) ClLanguageMgrInst->output(a)
 
-typedef vector<ClLanguageProcArg *> ClLanguageProcArgArray;
-typedef vector<ClLanguageFuncArg *> ClLanguageFuncArgArray;
+typedef std::vector<ClLanguageProcArg *> ClLanguageProcArgArray;
+typedef std::vector<ClLanguageFuncArg *> ClLanguageFuncArgArray;
 
 static bool             ClStdCommandsInit
                          (ClModuleInitType init_type, void *);
@@ -77,13 +74,15 @@ static ClParserValuePtr ClStdExecCommand
                          (ClParserValuePtr *, uint, void *, int *);
 static ClParserValuePtr ClStdParseCommand
                          (ClParserValuePtr *, uint, void *, int *);
+static void             ClStdSetCommand
+                         (ClLanguageCommand *, ClLanguageArgs *, void *);
 static void             ClStdGetEnvCommand
                          (ClLanguageCommand *, ClLanguageArgs *, void *);
 static void             ClStdSetEnvCommand
                          (ClLanguageCommand *, ClLanguageArgs *, void *);
 static void             ClStdUnSetEnvCommand
                          (ClLanguageCommand *, ClLanguageArgs *, void *);
-static void             ClStdSetCommand
+static void             ClStdConfigCommand
                          (ClLanguageCommand *, ClLanguageArgs *, void *);
 static ClParserValuePtr ClStdRandCommand
                          (ClParserValuePtr *, uint, void *, int *);
@@ -335,6 +334,13 @@ ClStdCommandsInit(ClModuleInitType flag, void *)
 
     /******/
 
+    /* Variables */
+
+    if (ClParserInst->getDollarPrefix())
+      ClLanguageMgrInst->defineCommand("set", ClStdSetCommand);
+
+    /******/
+
     /* Environment Variables */
 
     ClLanguageMgrInst->defineCommand("getenv"  , ClStdGetEnvCommand  );
@@ -371,7 +377,7 @@ ClStdCommandsInit(ClModuleInitType flag, void *)
 
     /* Set */
 
-    ClLanguageMgrInst->defineCommand("set", ClStdSetCommand);
+    ClLanguageMgrInst->defineCommand("config", ClStdConfigCommand);
 
     /******/
 
@@ -465,9 +471,9 @@ static bool
 ClStdCommandsSet(const char *option, const char *args, void *)
 {
   if (option[0] == '\0') {
-    CAngleType angle_type = ClParserInst->getAngleType();
-    string     prompt     = ClLanguageMgrInst->getPrompt();
-    bool       math_fail  = ClParserInst->getMathFail();
+    CAngleType  angle_type = ClParserInst->getAngleType();
+    std::string prompt     = ClLanguageMgrInst->getPrompt();
+    bool        math_fail  = ClParserInst->getMathFail();
 
     ClLanguageMgrInst->output("angle_type     %s\n"  , CUtil::toString(angle_type).c_str());
     ClLanguageMgrInst->output("prompt         '%s'\n", prompt.c_str());
@@ -496,9 +502,7 @@ ClStdCommandsSet(const char *option, const char *args, void *)
 
     args1->startArgs(0);
 
-    if (args1->getStringArgList(args,
-                                CL_ARG_TYPE_STRING, &prompt,
-                                CL_ARG_TYPE_NONE) != 1)
+    if (args1->getStringArgList(args, CLArgType::STRING, &prompt, CLArgType::NONE) != 1)
       return false;
 
     /* Set Prompt */
@@ -510,8 +514,8 @@ ClStdCommandsSet(const char *option, const char *args, void *)
     delete args1;
   }
   else if (CStrUtil::casecmp(option, "real_format") == 0) {
-    char   *format;
-    string  real_format;
+    char*       format;
+    std::string real_format;
 
     bool rc = false;
 
@@ -519,9 +523,7 @@ ClStdCommandsSet(const char *option, const char *args, void *)
 
     args1->startArgs(0);
 
-    if (args1->getStringArgList(args,
-                                CL_ARG_TYPE_STRING, &format,
-                                CL_ARG_TYPE_NONE) == 1) {
+    if (args1->getStringArgList(args, CLArgType::STRING, &format, CLArgType::NONE) == 1) {
       CStrParse parse(format);
 
       if (parse.readRealFormat(real_format)) {
@@ -543,8 +545,8 @@ ClStdCommandsSet(const char *option, const char *args, void *)
     return rc;
   }
   else if (CStrUtil::casecmp(option, "integer_format") == 0) {
-    char   *format;
-    string  integer_format;
+    char*       format;
+    std::string integer_format;
 
     bool rc = false;
 
@@ -552,9 +554,7 @@ ClStdCommandsSet(const char *option, const char *args, void *)
 
     args1->startArgs(0);
 
-    if (args1->getStringArgList(args,
-                                CL_ARG_TYPE_STRING, &format,
-                                CL_ARG_TYPE_NONE) == 1) {
+    if (args1->getStringArgList(args, CLArgType::STRING, &format, CLArgType::NONE) == 1) {
       CStrParse parse(format);
 
       if (parse.readIntegerFormat(integer_format)) {
@@ -576,8 +576,8 @@ ClStdCommandsSet(const char *option, const char *args, void *)
     return rc;
   }
   else if (CStrUtil::casecmp(option, "string_format") == 0) {
-    char   *format;
-    string  string_format;
+    char*       format;
+    std::string string_format;
 
     bool rc = false;
 
@@ -585,9 +585,7 @@ ClStdCommandsSet(const char *option, const char *args, void *)
 
     args1->startArgs(0);
 
-    if (args1->getStringArgList(args,
-                                CL_ARG_TYPE_STRING, &format,
-                                CL_ARG_TYPE_NONE) == 1) {
+    if (args1->getStringArgList(args, CLArgType::STRING, &format, CLArgType::NONE) == 1) {
       CStrParse parse(format);
 
       if (parse.readStringFormat(string_format)) {
@@ -807,21 +805,18 @@ ClStdCommandsHelp(const char *, void *)
 static void
 ClStdImportCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
 {
-  char *name;
-
   if (args->checkNumberOfArgs(0, 1) != 0)
     return;
 
   uint num = args->getNumArgs();
 
   if (num == 1) {
-    bool flag;
+    char *name;
 
-    if (args->getArgList(CL_ARG_TYPE_TEXT, &name,
-                         CL_ARG_TYPE_NONE) != 1)
+    if (args->getArgList(CLArgType::TEXT, &name, CLArgType::NONE) != 1)
       return;
 
-    flag = ClModuleMgrInst->importModule(name);
+    bool flag = ClModuleMgrInst->importModule(name);
 
     if (! flag)
       ClLanguageMgrInst->error("Failed to Import Module '%s'", name);
@@ -921,7 +916,7 @@ ClStdNewCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
 static void
 ClStdRunCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
 {
-  string        file_name;
+  std::string   file_name;
   int           error_code;
   StringVectorT file_names;
 
@@ -997,15 +992,15 @@ ClStdProcCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
   ClLanguageArgList       arg_list;
   ClLanguageProcArg      *proc_arg;
   ClLanguageProcArgArray  proc_args;
-  string                  arg_string;
-  string                  name_string;
+  std::string             arg_string;
+  std::string             name_string;
   ClParserFuncPtr         old_pfunction;
   ClLanguageFunc         *old_lfunction;
   ClLanguageProc         *old_procedure;
 
   CL_LANGUAGE_TRACE("ClStdProcCommand");
 
-  const string &cargs = command->getArgs();
+  const std::string &cargs = command->getArgs();
 
   const ClLanguageCommandList &command_list = command->getCommandList();
 
@@ -1161,15 +1156,15 @@ ClStdFuncCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
   ClLanguageFuncArg      *func_arg;
   IntVectorT              arg_types;
   ClLanguageFuncArgArray  func_args;
-  string                  arg_string;
-  string                  name_string;
+  std::string             arg_string;
+  std::string             name_string;
   ClParserFuncPtr         old_pfunction;
   ClLanguageFunc         *old_lfunction;
   ClLanguageProc         *old_procedure;
 
   CL_LANGUAGE_TRACE("ClStdFuncCommand");
 
-  const string &cargs = command->getArgs();
+  const std::string &cargs = command->getArgs();
 
   const ClLanguageCommandList &command_list = command->getCommandList();
 
@@ -1237,7 +1232,7 @@ ClStdFuncCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
   num_args = arg_list.size();
 
   for (i = 0; i < num_args; i++) {
-    string name = arg_list[i];
+    std::string name = arg_list[i];
 
     //uint len = name.size();
 
@@ -1337,22 +1332,18 @@ ClStdFuncCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 /*------------------------------------------------------------------*
  *
  * ClStdForCommand
- *   Routine called when a 'for ... endfor' block command
- *   is entered.
+ *   Routine called when a 'for ... endfor' block command is entered.
  *
- *   The semi-colon separated expressions contained in
- *   round brackets are used as the initial, while and
- *   iterate expressions.
+ *   The semi-colon separated expressions contained in round brackets
+ *   are used as the initial, while and iterate expressions.
  *
- *   The initial expression is evaluated and the list of
- *   language commands enclosed by 'for ... endfor' pair are
- *   then continually executed followed by the iterate
- *   expression while the while expression evaluates to a
+ *   The initial expression is evaluated and the list of language commands
+ *   enclosed by 'for ... endfor' pair are then continually executed followed
+ *   by the iterate expression while the while expression evaluates to a
  *   non-zero integer.
  *
- *   Any break commands exit the loop, any continue commands
- *   skip any remaining loop commands, and any gotos which
- *   jump outside the loop terminate it.
+ *   Any break commands exit the loop, any continue commands skip any remaining
+ *   loop commands, and any gotos which jump outside the loop terminate it.
  *
  * CALL:
  *   ClStdForCommand(ClLanguageCommand *command);
@@ -1375,15 +1366,9 @@ ClStdFuncCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 static void
 ClStdForCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 {
-  bool             flag;
-  ClParserValuePtr value;
-  string           for_expr1;
-  string           for_expr2;
-  string           for_expr3;
-
   CL_LANGUAGE_TRACE("ClStdForCommand");
 
-  const string &cargs = command->getArgs();
+  const std::string &cargs = command->getArgs();
 
   /*
    * Extract 3 Expressions from For Arguments :-
@@ -1398,8 +1383,7 @@ ClStdForCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
   parse.skipSpace();
 
   if (! parse.isChar('(')) {
-    ClLanguageMgrInst->syntaxError
-     ("missing open brackets for 'for' expression list");
+    ClLanguageMgrInst->syntaxError("missing open brackets for 'for' expression list");
     return;
   }
 
@@ -1409,9 +1393,10 @@ ClStdForCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 
   int i = parse.getPos();
 
+  std::string for_expr1;
+
   if (! args->readArgList(cargs, &i, ';', for_expr1)) {
-    ClLanguageMgrInst->syntaxError
-     ("missing condition expression in 'for' expression list");
+    ClLanguageMgrInst->syntaxError("missing condition expression in 'for' expression list");
     return;
   }
 
@@ -1420,6 +1405,8 @@ ClStdForCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
   parse.skipSpace();
 
   i = parse.getPos();
+
+  std::string for_expr2;
 
   if (! args->readArgList(cargs, &i, ';', for_expr2)) {
     ClLanguageMgrInst->syntaxError
@@ -1432,6 +1419,8 @@ ClStdForCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
   parse.skipSpace();
 
   i = parse.getPos();
+
+  std::string for_expr3;
 
   if (! args->readArgList(cargs, &i, ')', for_expr3)) {
     ClLanguageMgrInst->syntaxError
@@ -1451,12 +1440,14 @@ ClStdForCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 
   /*************/
 
+  ClParserValuePtr value;
+
   /* Process Init Expression */
 
   ClParserExpr expr1(for_expr1);
 
   if (! expr1.exec(value)) {
-    ClLanguageMgrInst->expressionError(CLERR_INVALID_EXPRESSION,
+    ClLanguageMgrInst->expressionError(ClErr::INVALID_EXPRESSION,
       "'for' expression 1 - '%s'", for_expr1.c_str());
     return;
   }
@@ -1473,7 +1464,7 @@ ClStdForCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
   ClParserExpr expr2(for_expr2);
 
   if      (! expr2.exec(value)) {
-    ClLanguageMgrInst->expressionError(CLERR_INVALID_EXPRESSION,
+    ClLanguageMgrInst->expressionError(ClErr::INVALID_EXPRESSION,
       "'for' expression 2 - '%s'", for_expr2.c_str());
     return;
   }
@@ -1483,7 +1474,7 @@ ClStdForCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
     return;
   }
 
-  flag = value->toBool();
+  bool flag = value->toBool();
 
   /*************/
 
@@ -1505,7 +1496,7 @@ ClStdForCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
     ClParserExpr expr3(for_expr3);
 
     if      (! expr3.exec(value)) {
-      ClLanguageMgrInst->expressionError(CLERR_INVALID_EXPRESSION,
+      ClLanguageMgrInst->expressionError(ClErr::INVALID_EXPRESSION,
         "'for' expression 3 - '%s'", for_expr3.c_str());
       return;
     }
@@ -1521,7 +1512,7 @@ ClStdForCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 
     if      (! expr2.exec(value)) {
       ClLanguageMgrInst->expressionError
-       (CLERR_INVALID_EXPRESSION, "'for' expression 2 - '%s'", for_expr2.c_str());
+       (ClErr::INVALID_EXPRESSION, "'for' expression 2 - '%s'", for_expr2.c_str());
       return;
     }
     else if (! value.isValid()) {
@@ -1537,21 +1528,17 @@ ClStdForCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 /*------------------------------------------------------------------*
  *
  * ClStdForEachCommand
- *   Routine called when a 'foreach ... endforeach' block
- *   command is entered.
+ *   Routine called when a 'foreach ... endforeach' block command is entered.
  *
- *   The 'foreach' str should be followed by the name of
- *   the variable to store the iteration value and a
- *   bracketed expression which will evaluate to the array
+ *   The 'foreach' str should be followed by the name of the variable to store
+ *   the iteration value and a bracketed expression which will evaluate to the array
  *   to be iterated.
  *
- *   The expression is evaluated and the list of language
- *   commands enclosed by the 'foreach ... endforeach' pair
- *   are executed for each value of the resltant array.
+ *   The expression is evaluated and the list of language commands enclosed by the
+ *   'foreach ... endforeach' pair are executed for each value of the resltant array.
  *
- *   Any break commands exit the loop, any continue commands
- *   skip any remaining loop commands, and any gotos which
- *   jump outside the loop terminate it.
+ *   Any break commands exit the loop, any continue commands skip any remaining loop
+ *   commands, and any gotos which jump outside the loop terminate it.
  *
  * CALL:
  *   ClStdForEachCommand(ClLanguageCommand *command);
@@ -1576,7 +1563,7 @@ ClStdForEachCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 {
   CL_LANGUAGE_TRACE("ClStdForEachCommand");
 
-  const string &cargs = command->getArgs();
+  const std::string &cargs = command->getArgs();
 
   /* Get Variable Name */
 
@@ -1594,7 +1581,7 @@ ClStdForEachCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
     lvalue = true;
   }
 
-  string var_name;
+  std::string var_name;
 
   parse.readNonSpace(var_name);
 
@@ -1620,7 +1607,7 @@ ClStdForEachCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 
   int i = parse.getPos();
 
-  string arg_string;
+  std::string arg_string;
 
   if (! args->readArgList(cargs, &i, ')', arg_string)) {
     ClLanguageMgrInst->syntaxError
@@ -1634,8 +1621,7 @@ ClStdForEachCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 
   if (! parse.eof()) {
     ClLanguageMgrInst->syntaxError
-      ("spurious characters '%s' after 'foreach' expression",
-       parse.getAt().c_str());
+      ("spurious characters '%s' after 'foreach' expression", parse.getAt().c_str());
     return;
   }
 
@@ -1651,7 +1637,7 @@ ClStdForEachCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
     return;
   }
 
-  string expression = arg_list[0];
+  std::string expression = arg_list[0];
 
   /*************/
 
@@ -1662,7 +1648,7 @@ ClStdForEachCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
   ClParserValuePtr value;
 
   if      (! expr.exec(value)) {
-    ClLanguageMgrInst->expressionError(CLERR_INVALID_EXPRESSION,
+    ClLanguageMgrInst->expressionError(ClErr::INVALID_EXPRESSION,
       "'foreach' expression 1 - '%s'", expression.c_str());
     return;
   }
@@ -1687,8 +1673,7 @@ ClStdForEachCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
   for (uint i = 0; i < num_values; i++) {
     /* Set Variable Value */
 
-    ClParserVarPtr variable =
-      ClParserInst->createVar(var_name, values[i]);
+    ClParserVarPtr variable = ClParserInst->createVar(var_name, values[i]);
 
     /************/
 
@@ -1702,8 +1687,7 @@ ClStdForEachCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
     if (lvalue) {
       int error_code;
 
-      ClParserInst->assignSubscriptValue(expression, i + 1,
-                                         variable->getValue(), &error_code);
+      ClParserInst->assignSubscriptValue(expression, i + 1, variable->getValue(), &error_code);
 
       if (error_code != 0) {
         ClLanguageMgrInst->expressionError(error_code,
@@ -1752,15 +1736,15 @@ ClStdWhileCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 {
   int               i;
   bool              flag;
-  string            line;
+  std::string       line;
   ClParserValuePtr  value;
   int               num_args;
   ClLanguageArgList arg_list;
-  string            expression;
+  std::string       expression;
 
   CL_LANGUAGE_TRACE("ClStdWhileCommand");
 
-  const string &cargs = command->getArgs();
+  const std::string &cargs = command->getArgs();
 
   /* Extract While Expression */
 
@@ -1813,7 +1797,7 @@ ClStdWhileCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
     ClParserExpr expr(expression);
 
     if      (! expr.exec(value)) {
-      ClLanguageMgrInst->expressionError(CLERR_INVALID_EXPRESSION, "'while' expression - '%s'",
+      ClLanguageMgrInst->expressionError(ClErr::INVALID_EXPRESSION, "'while' expression - '%s'",
                                          expression.c_str());
       return;
     }
@@ -1872,17 +1856,17 @@ ClStdWhileCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 static void
 ClStdUntilCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 {
-  int                i;
-  bool               flag;
-  string             line;
-  ClParserValuePtr value;
-  int                num_args;
-  ClLanguageArgList  arg_list;
-  string             expression;
+  int               i;
+  bool              flag;
+  std::string       line;
+  ClParserValuePtr  value;
+  int               num_args;
+  ClLanguageArgList arg_list;
+  std::string       expression;
 
   CL_LANGUAGE_TRACE("ClStdUntilCommand");
 
-  const string &cargs = command->getArgs();
+  const std::string &cargs = command->getArgs();
 
   /* Extract Until Expression */
 
@@ -1914,8 +1898,7 @@ ClStdUntilCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 
   if (! parse.eof()) {
     ClLanguageMgrInst->syntaxError
-     ("spurious characters '%s' after 'until' expression",
-      parse.getAt().c_str());
+     ("spurious characters '%s' after 'until' expression", parse.getAt().c_str());
     return;
   }
 
@@ -1946,7 +1929,7 @@ ClStdUntilCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
     ClParserExpr expr(expression);
 
     if      (! expr.exec(value)) {
-      ClLanguageMgrInst->expressionError(CLERR_INVALID_EXPRESSION,
+      ClLanguageMgrInst->expressionError(ClErr::INVALID_EXPRESSION,
         "'until' expression - '%s'", expression.c_str());
       return;
     }
@@ -1998,17 +1981,17 @@ ClStdUntilCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 static void
 ClStdRepeatCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 {
-  int                i;
-  string             line;
-  long               count;
-  ClParserValuePtr value;
-  int                num_args;
-  ClLanguageArgList  arg_list;
-  string             expression;
+  int               i;
+  std::string       line;
+  long              count;
+  ClParserValuePtr  value;
+  int               num_args;
+  ClLanguageArgList arg_list;
+  std::string       expression;
 
   CL_LANGUAGE_TRACE("ClStdRepeatCommand");
 
-  const string &cargs = command->getArgs();
+  const std::string &cargs = command->getArgs();
 
   /* Extract Repeat Expression */
 
@@ -2040,8 +2023,7 @@ ClStdRepeatCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 
   if (! parse.eof()) {
     ClLanguageMgrInst->syntaxError
-     ("spurious characters '%s' after 'repeat' expression",
-      parse.getAt().c_str());
+     ("spurious characters '%s' after 'repeat' expression", parse.getAt().c_str());
     return;
   }
 
@@ -2062,7 +2044,7 @@ ClStdRepeatCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
   ClParserExpr expr(expression);
 
   if      (! expr.exec(value)) {
-    ClLanguageMgrInst->expressionError(CLERR_INVALID_EXPRESSION,
+    ClLanguageMgrInst->expressionError(ClErr::INVALID_EXPRESSION,
       "'repeat' expression - '%s'", expression.c_str());
     return;
   }
@@ -2074,8 +2056,7 @@ ClStdRepeatCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 
   if (! value->integerValue(&count)) {
     ClLanguageMgrInst->expressionError
-     (CLERR_INVALID_CONVERSION, "'repeat' expression - '%s'",
-      expression.c_str());
+     (ClErr::INVALID_CONVERSION, "'repeat' expression - '%s'", expression.c_str());
     return;
   }
 
@@ -2143,16 +2124,16 @@ ClStdIfCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 {
   int               i;
   bool              flag;
-  string            line;
+  std::string       line;
   ClParserValuePtr  value;
   int               num_args;
   ClLanguageArgList arg_list;
-  string            expression;
+  std::string       expression;
   int               num_commands;
 
   CL_LANGUAGE_TRACE("ClStdIfCommand");
 
-  const string &cargs = command->getArgs();
+  const std::string &cargs = command->getArgs();
 
   const ClLanguageCommandList &command_list = command->getCommandList();
 
@@ -2190,8 +2171,7 @@ ClStdIfCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 
   if (! parse.eof()) {
     ClLanguageMgrInst->syntaxError
-     ("spurious characters '%s' after 'if' expression",
-      parse.getAt().c_str());
+     ("spurious characters '%s' after 'if' expression", parse.getAt().c_str());
     goto fail;
   }
 
@@ -2215,7 +2195,7 @@ ClStdIfCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
   ClParserExpr expr(expression);
 
   if      (! expr.exec(value)) {
-    ClLanguageMgrInst->expressionError(CLERR_INVALID_EXPRESSION,
+    ClLanguageMgrInst->expressionError(ClErr::INVALID_EXPRESSION,
       "'if' expression - '%s'", expression.c_str());
     goto fail;
   }
@@ -2239,7 +2219,7 @@ ClStdIfCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
       if (flag)
         break;
 
-      const string &args1 = commands[i]->getArgs();
+      const std::string &args1 = commands[i]->getArgs();
 
       /* Extract Else If Expression */
 
@@ -2271,8 +2251,7 @@ ClStdIfCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 
       if (! parse.eof()) {
         ClLanguageMgrInst->syntaxError
-         ("spurious characters '%s' after 'elseif' expression",
-          parse.getAt().c_str());
+         ("spurious characters '%s' after 'elseif' expression", parse.getAt().c_str());
         goto fail;
       }
 
@@ -2295,7 +2274,7 @@ ClStdIfCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
       ClParserExpr expr(expression);
 
       if      (! expr.exec(value)) {
-        ClLanguageMgrInst->expressionError(CLERR_INVALID_EXPRESSION,
+        ClLanguageMgrInst->expressionError(ClErr::INVALID_EXPRESSION,
           "'elseif' expression - '%s'", expression.c_str());
         goto fail;
       }
@@ -2311,7 +2290,7 @@ ClStdIfCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
       if (flag)
         break;
 
-      const string &args1 = commands[i]->getArgs();
+      const std::string &args1 = commands[i]->getArgs();
 
       CStrParse parse(args1);
 
@@ -2319,8 +2298,7 @@ ClStdIfCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 
       if (! parse.eof()) {
         ClLanguageMgrInst->syntaxError
-         ("spurious characters '%s' after 'else' expression",
-          parse.getAt().c_str());
+         ("spurious characters '%s' after 'else' expression", parse.getAt().c_str());
         goto fail;
       }
 
@@ -2407,8 +2385,7 @@ ClStdElseIfCommand(ClLanguageCommand *, ClLanguageArgs *, void *)
  *------------------------------------------------------------------*/
 
 static void
-ClStdElseCommand(ClLanguageCommand *,
-                 ClLanguageArgs *, void *)
+ClStdElseCommand(ClLanguageCommand *, ClLanguageArgs *, void *)
 {
   CL_LANGUAGE_TRACE("ClStdElseCommand");
 
@@ -2453,7 +2430,7 @@ ClStdElseCommand(ClLanguageCommand *,
 static void
 ClStdGotoCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
 {
-  string               arg;
+  std::string          arg;
   int                  error_code;
   ClLanguageLabelData *label_data;
 
@@ -2493,8 +2470,7 @@ ClStdGotoCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
     return;
   }
 
-  ClLanguageMgrInst->getGoto().set(label_data->getName(),
-                                   label_data->getDepth());
+  ClLanguageMgrInst->getGoto().set(label_data->getName(), label_data->getDepth());
 }
 
 /*------------------------------------------------------------------*
@@ -2684,13 +2660,13 @@ ClStdReturnCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
 static void
 ClStdOnCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
 {
-  int    flag;
-  string type;
-  string command1;
+  int         flag;
+  std::string type;
+  std::string command1;
 
   CL_LANGUAGE_TRACE("ClStdOnCommand");
 
-  const string &cargs = command->getArgs();
+  const std::string &cargs = command->getArgs();
 
   /*-------------------*/
 
@@ -2710,8 +2686,7 @@ ClStdOnCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
 
   if (! parse.eof()) {
     ClLanguageMgrInst->syntaxError
-     ("spurious characters '%s' at end of 'on' expression",
-      parse.getAt().c_str());
+     ("spurious characters '%s' at end of 'on' expression", parse.getAt().c_str());
     return;
   }
 
@@ -2752,13 +2727,13 @@ ClStdOnCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
 static void
 ClStdRaiseCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
 {
-  int    flag;
-  string type;
-  string data;
+  int         flag;
+  std::string type;
+  std::string data;
 
   CL_LANGUAGE_TRACE("ClStdRaiseCommand");
 
-  const string &cargs = command->getArgs();
+  const std::string &cargs = command->getArgs();
 
   /*-------------------*/
 
@@ -2780,8 +2755,7 @@ ClStdRaiseCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
 
   if (! parse.eof()) {
     ClLanguageMgrInst->syntaxError
-     ("spurious characters '%s' at end of 'raise' expression",
-      parse.getAt().c_str());
+     ("spurious characters '%s' at end of 'raise' expression", parse.getAt().c_str());
     return;
   }
 
@@ -2824,16 +2798,16 @@ ClStdRaiseCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
 static void
 ClStdDefineCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
 {
-  string::size_type  p;
-  string             lhs, rhs;
-  int                error_code;
-  string             name_string;
-  ClLanguageFunc    *old_lfunction;
-  ClLanguageProc    *old_procedure;
+  std::string::size_type p;
+  std::string            lhs, rhs;
+  int                    error_code;
+  std::string            name_string;
+  ClLanguageFunc*        old_lfunction;
+  ClLanguageProc*        old_procedure;
 
   CL_LANGUAGE_TRACE("ClStdDefineCommand");
 
-  const string &cargs = command->getArgs();
+  const std::string &cargs = command->getArgs();
 
   /* Extract Procedure Name */
 
@@ -2854,8 +2828,7 @@ ClStdDefineCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
 
   if (old_procedure != 0 && ! old_procedure->canDelete()) {
     ClLanguageMgrInst->syntaxError
-     ("'define' Existing procedure '%s' cannot be deleted",
-      name_string.c_str());
+     ("'define' Existing procedure '%s' cannot be deleted", name_string.c_str());
     return;
   }
 
@@ -2863,7 +2836,7 @@ ClStdDefineCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
 
   p = cargs.find('=');
 
-  if (p == string::npos) {
+  if (p == std::string::npos) {
     ClLanguageMgrInst->syntaxError("missing equals sign for 'define'");
     return;
   }
@@ -2947,12 +2920,12 @@ ClStdDefineCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
 static void
 ClStdStructCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
 {
-  string type_arg_list;
-  string structure_name;
+  std::string type_arg_list;
+  std::string structure_name;
 
   CL_LANGUAGE_TRACE("ClStdStructCommand");
 
-  const string &cargs = command->getArgs();
+  const std::string &cargs = command->getArgs();
 
   /* Extract Structure Name */
 
@@ -3042,13 +3015,11 @@ ClStdStructCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
 static void
 ClStdInputCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
 {
-  ClParserValuePtr value;
-  int              evaluate;
-  string           variable;
-  string           variable1;
-  int              error_code;
-  int              arg_offset;
-  string           prompt_string;
+  int         evaluate;
+  std::string variable;
+  std::string variable1;
+  int         arg_offset;
+  std::string prompt_string;
 
   CL_LANGUAGE_TRACE("ClStdInputCommand");
 
@@ -3059,12 +3030,14 @@ ClStdInputCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
 
   /* Check for specified Input File */
 
+  int error_code;
+
   std::string arg = args->getArg(1, &error_code);
 
   if (error_code != 0)
     return;
 
-  FILE *fp = 0;
+  FILE *fp = nullptr;
 
   if (arg[0] == '@') {
     int i = 1;
@@ -3074,18 +3047,17 @@ ClStdInputCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
     CStrUtil::stripSpaces(name);
 
     if (! ClParserVar::isValidName(name)) {
-      ClLanguageMgrInst->syntaxError
-       ("invalid 'input' file variable %s", arg.c_str());
+      ClLanguageMgrInst->syntaxError("invalid 'input' file variable %s", arg.c_str());
       return;
     }
 
-    value = ClParserInst->getVariableValue(name);
+    ClParserValuePtr value = ClParserInst->getVariableValue(name);
 
     long fp1;
 
     if (! value->integerValue(&fp1)) {
       ClLanguageMgrInst->expressionError
-       (CLERR_INVALID_CONVERSION, "'input' file variable '%s'", name.c_str());
+       (ClErr::INVALID_CONVERSION, "'input' file variable '%s'", name.c_str());
       return;
     }
 
@@ -3181,7 +3153,7 @@ ClStdInputCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
   else {
     /* Set Variable to Entered String */
 
-    value = ClParserValueMgrInst->createValue(line);
+    ClParserValuePtr value = ClParserValueMgrInst->createValue(line);
 
     if (! value.isValid())
       goto set_value;
@@ -3201,7 +3173,7 @@ ClStdInputCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
   if (evaluate)
     args->setExpressionArg(2, "", &error_code);
   else {
-    value = ClParserValueMgrInst->createValue("");
+    ClParserValuePtr value = ClParserValueMgrInst->createValue("");
 
     if (! value.isValid())
       return;
@@ -3255,7 +3227,7 @@ ClStdPrintCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 
   CL_LANGUAGE_TRACE("ClStdPrintCommand");
 
-  const string &cargs = command->getArgs();
+  const std::string &cargs = command->getArgs();
 
   uint len = cargs.size();
 
@@ -3278,7 +3250,7 @@ ClStdPrintCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
   bool value_output = false;
 
   for (uint i = 1; i <= num_args; i++) {
-    string arg = args->getArg(i, &error_code);
+    std::string arg = args->getArg(i, &error_code);
 
     if (error_code != 0)
       goto done;
@@ -3288,7 +3260,7 @@ ClStdPrintCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 
       int j = 1;
 
-      string name = arg.substr(j);
+      std::string name = arg.substr(j);
 
       CStrUtil::stripSpaces(name);
 
@@ -3304,7 +3276,7 @@ ClStdPrintCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 
       if (! value->integerValue(&fp1)) {
         ClLanguageMgrInst->expressionError
-         (CLERR_INVALID_CONVERSION, "'print' file variable '%s'", name.c_str());
+         (ClErr::INVALID_CONVERSION, "'print' file variable '%s'", name.c_str());
         goto done;
       }
 
@@ -3321,10 +3293,10 @@ ClStdPrintCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 
     if      (! expr.exec(value)) {
       if (num_args == 1)
-        ClLanguageMgrInst->expressionError(CLERR_INVALID_EXPRESSION,
+        ClLanguageMgrInst->expressionError(ClErr::INVALID_EXPRESSION,
           "'print' expression '%s'", arg.c_str());
       else
-        ClLanguageMgrInst->expressionError(CLERR_INVALID_EXPRESSION,
+        ClLanguageMgrInst->expressionError(ClErr::INVALID_EXPRESSION,
           "'print' expression %d - '%s'", i, arg.c_str());
       goto done;
     }
@@ -3418,16 +3390,16 @@ ClStdFormatCommand(ClParserValuePtr *values, uint num_values, void *, int *error
     return ClParserValuePtr();
   }
 
-  string format_string;
+  std::string format_string;
 
   if (! values[0]->stringValue(format_string)) {
-    ClLanguageMgrInst->expressionError(CLERR_INVALID_CONVERSION, "'format' argument 1");
+    ClLanguageMgrInst->expressionError(ClErr::INVALID_CONVERSION, "'format' argument 1");
     return ClParserValuePtr();
   }
 
   uint value_num = 1;
 
-  string temp_string1 = "";
+  std::string temp_string1 = "";
 
   uint len = format_string.size();
 
@@ -3436,11 +3408,11 @@ ClStdFormatCommand(ClParserValuePtr *values, uint num_values, void *, int *error
   while (i < len) {
     switch (format_string[i]) {
       case '%': {
-        int    flags;
-        string temp_string2;
-        string value_format_string;
-        int    field_width, precision;
-        char   length_modifier, format_code;
+        int         flags;
+        std::string temp_string2;
+        std::string value_format_string;
+        int         field_width, precision;
+        char        length_modifier, format_code;
 
         if (! CStrUtil::readFormat(format_string, &i, value_format_string, &field_width,
                                    &precision, &length_modifier, &format_code, &flags)) {
@@ -3514,19 +3486,16 @@ ClStdFormatCommand(ClParserValuePtr *values, uint num_values, void *, int *error
               CStrUtil::sprintf(temp_string2, value_format_string.c_str(),
                                 field_width, precision, integer);
             else if (flags & CPRINTF_FIELD_WIDTH_AS_VALUE)
-              CStrUtil::sprintf(temp_string2, value_format_string.c_str(),
-                                field_width, integer);
+              CStrUtil::sprintf(temp_string2, value_format_string.c_str(), field_width, integer);
             else if (flags & CPRINTF_PRECISION_AS_VALUE)
-              CStrUtil::sprintf(temp_string2, value_format_string.c_str(),
-                                precision, integer);
+              CStrUtil::sprintf(temp_string2, value_format_string.c_str(), precision, integer);
             else
-              CStrUtil::sprintf(temp_string2, value_format_string.c_str(),
-                                integer);
+              CStrUtil::sprintf(temp_string2, value_format_string.c_str(), integer);
 
             break;
           }
           case 's': {
-            string str;
+            std::string str;
 
             if (! values[value_num]->stringValue(str)) {
               temp_string1 += value_format_string;
@@ -3544,8 +3513,7 @@ ClStdFormatCommand(ClParserValuePtr *values, uint num_values, void *, int *error
               CStrUtil::sprintf(temp_string2, value_format_string.c_str(),
                                 precision, str.c_str());
             else
-              CStrUtil::sprintf(temp_string2, value_format_string.c_str(),
-                                str.c_str());
+              CStrUtil::sprintf(temp_string2, value_format_string.c_str(), str.c_str());
 
             break;
           }
@@ -3639,14 +3607,14 @@ ClStdFormatCommand(ClParserValuePtr *values, uint num_values, void *, int *error
 static ClParserValuePtr
 ClStdScanCommand(ClParserValuePtr *values, uint num_values, void *, int *error_code)
 {
-  uint    i, len1, len2;
-  char   *addrs[20];
-  int     codes[20];
-  uint    num_addrs = 0;
-  uint    num_scanned;
-  string  source_string;
-  string  format_string;
-  string  format_string1;
+  uint        i, len1, len2;
+  char*       addrs[20];
+  int         codes[20];
+  uint        num_addrs = 0;
+  uint        num_scanned;
+  std::string source_string;
+  std::string format_string;
+  std::string format_string1;
 
   CL_LANGUAGE_TRACE("ClStdScanCommand");
 
@@ -3666,12 +3634,12 @@ ClStdScanCommand(ClParserValuePtr *values, uint num_values, void *, int *error_c
   /* Get Source and Format Strings */
 
   if (! values[0]->stringValue(source_string)) {
-    ClLanguageMgrInst->expressionError(CLERR_INVALID_CONVERSION, "'scan' argument 1");
+    ClLanguageMgrInst->expressionError(ClErr::INVALID_CONVERSION, "'scan' argument 1");
     goto fail;
   }
 
   if (! values[1]->stringValue(format_string)) {
-    ClLanguageMgrInst->expressionError(CLERR_INVALID_CONVERSION, "'scan' argument 2");
+    ClLanguageMgrInst->expressionError(ClErr::INVALID_CONVERSION, "'scan' argument 2");
     goto fail;
   }
 
@@ -3689,12 +3657,12 @@ ClStdScanCommand(ClParserValuePtr *values, uint num_values, void *, int *error_c
   while (i < len2) {
     switch (format_string[i]) {
       case '%': {
-        int    flags;
-        char   format_code;
-        string format_string2;
-        string format_string3;
-        char   length_modifier;
-        int    field_width, precision;
+        int         flags;
+        char        format_code;
+        std::string format_string2;
+        std::string format_string3;
+        char        length_modifier;
+        int         field_width, precision;
 
         bool ignore = false;
 
@@ -3798,8 +3766,7 @@ ClStdScanCommand(ClParserValuePtr *values, uint num_values, void *, int *error_c
 
   if (num_values - 2 != num_addrs) {
     ClLanguageMgrInst->syntaxError(
-      "invalid no. of args (%d) to scan into - need %d",
-      num_values - 2, num_addrs);
+      "invalid no. of args (%d) to scan into - need %d", num_values - 2, num_addrs);
     goto fail;
   }
 
@@ -3906,11 +3873,11 @@ static ClParserValuePtr
 ClStdExecCommand(ClParserValuePtr *values, uint, void *, int *error_code)
 {
   int                      i;
-  string                   line;
+  std::string              line;
   StringVectorT            lines;
-  string                   output;
+  std::string              output;
   uint                     dims[1];
-  string                   command;
+  std::string              command;
   uint                     num_dims;
   int                      num_lines;
   ClLanguageArgList        line_list;
@@ -3923,7 +3890,7 @@ ClStdExecCommand(ClParserValuePtr *values, uint, void *, int *error_code)
   ClParserValuePtr value;
 
   if (! values[0]->stringValue(command)) {
-    ClLanguageMgrInst->expressionError(CLERR_INVALID_CONVERSION, "'exec'");
+    ClLanguageMgrInst->expressionError(ClErr::INVALID_CONVERSION, "'exec'");
     goto fail;
   }
 
@@ -4010,7 +3977,7 @@ ClStdExecCommand(ClParserValuePtr *values, uint, void *, int *error_code)
 static ClParserValuePtr
 ClStdParseCommand(ClParserValuePtr *values, uint, void *, int *error_code)
 {
-  string command;
+  std::string command;
 
   CL_LANGUAGE_TRACE("ClStdParseCommand");
 
@@ -4019,19 +3986,96 @@ ClStdParseCommand(ClParserValuePtr *values, uint, void *, int *error_code)
   ClParserValuePtr value;
 
   if (! values[0]->stringValue(command)) {
-    ClLanguageMgrInst->expressionError(CLERR_INVALID_CONVERSION, "'parse'");
+    ClLanguageMgrInst->expressionError(ClErr::INVALID_CONVERSION, "'parse'");
     return ClParserValuePtr();
   }
 
   ClParserExpr expr(command);
 
   if (! expr.exec(value)) {
-    ClLanguageMgrInst->expressionError(CLERR_INVALID_EXPRESSION,
+    ClLanguageMgrInst->expressionError(ClErr::INVALID_EXPRESSION,
       "'parse' expression '%s'", command.c_str());
     return ClParserValuePtr();
   }
 
   return value;
+}
+
+/*------------------------------------------------------------------*
+ *
+ * ClStdSetCommand
+ *   Routine called when the 'setenv' command is entered.
+ *
+ *   This routine sets the value of the specified
+ *   environment variable. The environment variable
+ *   name is specified as a str in the first argument
+ *   and the str to which the environment is set
+ *   is specified as the second argument.
+ *
+ * CALL:
+ *   ClStdSetCommand(ClLanguageCommand *command);
+ *
+ * INPUT:
+ *   command : Structure containing details of the command
+ *           : and arguments supplied by the user.
+ *
+ * OUTPUT:
+ *   None
+ *
+ * RETURNS:
+ *   None
+ *
+ * NOTES:
+ *   None
+ *
+ *------------------------------------------------------------------*/
+
+static void
+ClStdSetCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
+{
+  CL_LANGUAGE_TRACE("ClStdSetCommand");
+
+  // Get set's Arguments
+  const std::string &cargs = command->getArgs();
+
+  CStrParse parse(cargs);
+
+  // Get Variable Name
+  std::string name;
+
+  if (! parse.readIdentifier(name)) {
+    ClLanguageMgrInst->syntaxError("'set' invalid variable name");
+    return;
+  }
+
+  // Skip '=' (TODO: required)
+  parse.skipSpace();
+
+  if (parse.isChar('=')) {
+    parse.skipChar();
+
+    parse.skipSpace();
+  }
+
+  // Get Value String
+  std::string valueStr;
+
+  parse.readNonSpace(valueStr);
+
+  // Evaluate Value
+
+  ClParserExpr expr(valueStr);
+
+  ClParserValuePtr value;
+
+  if (! expr.exec(value)) {
+    ClLanguageMgrInst->expressionError(ClErr::INVALID_EXPRESSION,
+      "'set' expression '%s'", valueStr.c_str());
+    return;
+  }
+
+  // Set Variable
+  ClParserInst->setVariableValue(name, value);
 }
 
 /*------------------------------------------------------------------*
@@ -4070,9 +4114,9 @@ ClStdParseCommand(ClParserValuePtr *values, uint, void *, int *error_code)
 static void
 ClStdGetEnvCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
 {
-  string env_name;
-  string env_value;
-  int    error_code;
+  std::string env_name;
+  std::string env_value;
+  int         error_code;
 
   CL_LANGUAGE_TRACE("ClStdGetEnvCommand");
 
@@ -4103,11 +4147,9 @@ ClStdGetEnvCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
  * ClStdSetEnvCommand
  *   Routine called when the 'setenv' command is entered.
  *
- *   This routine sets the value of the specified
- *   environment variable. The environment variable
- *   name is specified as a str in the first argument
- *   and the str to which the environment is set
- *   is specified as the second argument.
+ *   This routine sets the value of the specified environment variable.
+ *   The environment variable name is specified as a str in the first argument and
+ *   the str to which the environment is set is specified as the second argument.
  *
  * CALL:
  *   ClStdSetEnvCommand(ClLanguageCommand *command);
@@ -4130,10 +4172,6 @@ ClStdGetEnvCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
 static void
 ClStdSetEnvCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
 {
-  string env_name;
-  string env_value;
-  int    error_code;
-
   CL_LANGUAGE_TRACE("ClStdSetEnvCommand");
 
   /* Get SetEnv's Arguments */
@@ -4141,14 +4179,16 @@ ClStdSetEnvCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
   if (args->checkNumberOfArgs(2, 2) != 0)
     return;
 
+  int error_code;
+
   /* Get Environment Variable and Value */
 
-  env_name = args->getStringArg(1, &error_code);
+  std::string env_name = args->getStringArg(1, &error_code);
 
   if (error_code != 0)
     return;
 
-  env_value = args->getStringArg(2, &error_code);
+  std::string env_value = args->getStringArg(2, &error_code);
 
   if (error_code != 0)
     return;
@@ -4188,8 +4228,8 @@ ClStdSetEnvCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
 static void
 ClStdUnSetEnvCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
 {
-  string env_name;
-  int    error_code;
+  std::string env_name;
+  int         error_code;
 
   CL_LANGUAGE_TRACE("ClStdUnSetEnvCommand");
 
@@ -4213,13 +4253,13 @@ ClStdUnSetEnvCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
 
 /*------------------------------------------------------------------*
  *
- * ClStdSetCommand
- *   Routine called when the 'set' command is entered.
+ * ClStdConfigCommand
+ *   Routine called when the 'config' command is entered.
  *   This routine calls the set method for any specified
  *   module.
  *
  * CALL:
- *   ClStdSetCommand(ClLanguageCommand *command);
+ *   ClStdConfigCommand(ClLanguageCommand *command);
  *
  * INPUT:
  *   command : Structure containing details of the command
@@ -4237,11 +4277,11 @@ ClStdUnSetEnvCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
  *------------------------------------------------------------------*/
 
 static void
-ClStdSetCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
+ClStdConfigCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
 {
-  CL_LANGUAGE_TRACE("ClStdSetCommand");
+  CL_LANGUAGE_TRACE("ClStdConfigCommand");
 
-  const string &cargs = command->getArgs();
+  const std::string &cargs = command->getArgs();
 
   CStrParse parse(cargs);
 
@@ -4249,7 +4289,7 @@ ClStdSetCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
 
   /* Get Module Name */
 
-  string module;
+  std::string module;
 
   if (parse.isChar('@')) {
     parse.skipChar();
@@ -4265,7 +4305,7 @@ ClStdSetCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
 
   /* Get Option Name */
 
-  string option;
+  std::string option;
 
   parse.readNonSpace(option);
 
@@ -4275,7 +4315,7 @@ ClStdSetCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
 
   /* Get Additional Args */
 
-  string args1 = parse.getAt();
+  std::string args1 = parse.getAt();
 
   /*-------------------*/
 
@@ -4284,9 +4324,9 @@ ClStdSetCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
   bool flag = ClModuleMgrInst->execModuleSet(module, option, args1);
 
   if (! flag)
-    ClLanguageMgrInst->error("'set' failed for module '%s' "
-                              "option '%s' args '%s'", module.c_str(),
-                              option.c_str(), args1.c_str());
+    ClLanguageMgrInst->error("'config' failed for module '%s' "
+                             "option '%s' args '%s'", module.c_str(),
+                             option.c_str(), args1.c_str());
 }
 
 // Routine called when the 'rand' function is entered.
@@ -4303,7 +4343,7 @@ ClStdRandCommand(ClParserValuePtr *values, uint num_values, void *, int *error_c
   ClParserValuePtr value;
 
   if (num_values > 1) {
-    *error_code = CLERR_TOO_MANY_ARGUMENTS;
+    *error_code = int(ClErr::TOO_MANY_ARGUMENTS);
     return ClParserValuePtr();
   }
 
@@ -4311,7 +4351,7 @@ ClStdRandCommand(ClParserValuePtr *values, uint num_values, void *, int *error_c
     long seed;
 
     if (! values[0]->integerValue(&seed)) {
-      ClLanguageMgrInst->expressionError(CLERR_INVALID_CONVERSION, "'rand'");
+      ClLanguageMgrInst->expressionError(ClErr::INVALID_CONVERSION, "'rand'");
       return ClParserValuePtr();
     }
 
@@ -4339,7 +4379,7 @@ ClStdRRandCommand(ClParserValuePtr *values, uint num_values, void *, int *error_
   ClParserValuePtr value;
 
   if (num_values > 1) {
-    *error_code = CLERR_TOO_MANY_ARGUMENTS;
+    *error_code = int(ClErr::TOO_MANY_ARGUMENTS);
     return ClParserValuePtr();
   }
 
@@ -4347,7 +4387,7 @@ ClStdRRandCommand(ClParserValuePtr *values, uint num_values, void *, int *error_
     long seed;
 
     if (! values[0]->integerValue(&seed)) {
-      ClLanguageMgrInst->expressionError(CLERR_INVALID_CONVERSION, "'rrand'");
+      ClLanguageMgrInst->expressionError(ClErr::INVALID_CONVERSION, "'rrand'");
       return ClParserValuePtr();
     }
 
@@ -4404,22 +4444,20 @@ ClStdRRandCommand(ClParserValuePtr *values, uint num_values, void *, int *error_
 static ClParserValuePtr
 ClStdIsVarCommand(ClParserValuePtr *values, uint, void *, int *error_code)
 {
-  string name;
-
   CL_LANGUAGE_TRACE("ClStdIsVarCommand");
 
   *error_code = 0;
 
-  ClParserValuePtr value;
+  std::string name;
 
   if (! values[0]->stringValue(name)) {
-    ClLanguageMgrInst->expressionError(CLERR_INVALID_CONVERSION, "'is_var'");
+    ClLanguageMgrInst->expressionError(ClErr::INVALID_CONVERSION, "'is_var'");
     return ClParserValuePtr();
   }
 
   bool flag = ClParserInst->isVariable(name);
 
-  value = ClParserValueMgrInst->createValue((long) flag);
+  ClParserValuePtr value = ClParserValueMgrInst->createValue((long) flag);
 
   return value;
 }
@@ -4454,7 +4492,7 @@ ClStdIsVarCommand(ClParserValuePtr *values, uint, void *, int *error_code)
 static void
 ClStdUndefCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
 {
-  string          arg;
+  std::string     arg;
   ClLanguageFunc *function;
   ClLanguageProc *procedure;
   int             error_code;
@@ -4542,13 +4580,6 @@ ClStdUndefCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
 static void
 ClStdWhatisCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
 {
-  string                arg;
-  ClParserValuePtr      value;
-  bool                  end_name;
-  ClLanguageProc       *procedure;
-  int                   error_code;
-  ClLanguageCommandDef *command_def;
-
   CL_LANGUAGE_TRACE("ClStdWhatisCommand");
 
   /* Get Whatis's Arguments */
@@ -4561,12 +4592,16 @@ ClStdWhatisCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
   /* Output type of each Argument */
 
   for (uint i = 1; i <= num_args; i++) {
-    arg = args->getArg(i, &error_code);
+    int error_code;
+
+    std::string arg = args->getArg(i, &error_code);
 
     if (error_code != 0)
       return;
 
     //bool found_proc = false;
+
+    ClLanguageProc *procedure;
 
     if ((procedure = ClLanguageProcMgrInst->lookupProc(arg)) != 0) {
       ClLanguageMgrInst->output("Procedure ");
@@ -4578,7 +4613,9 @@ ClStdWhatisCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
 
     ClParserScopePtr scope;
 
-    command_def = ClLanguageMgrInst->getCommandDef(scope, arg, &end_name);
+    bool end_name;
+
+    ClLanguageCommandDef *command_def = ClLanguageMgrInst->getCommandDef(scope, arg, &end_name);
 
     if      (command_def != 0) {
       if (command_def->getEndName() != "") {
@@ -4591,34 +4628,34 @@ ClStdWhatisCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
         ClLanguageMgrInst->output("Command %s\n", arg.c_str());
     }
     else if (ClParserInst->isVariable(arg)) {
-      value = ClParserInst->getVariableValue(arg);
+      ClParserValuePtr value = ClParserInst->getVariableValue(arg);
 
       if      (value->isReal())
-        ClLanguageMgrInst->output("real ");
+        ClLanguageMgrInst->output("real: ");
       else if (value->isInteger())
-        ClLanguageMgrInst->output("int ");
+        ClLanguageMgrInst->output("int: ");
       else if (value->isString())
-        ClLanguageMgrInst->output("str ");
+        ClLanguageMgrInst->output("string: ");
       else if (value->isList())
-        ClLanguageMgrInst->output("list ");
+        ClLanguageMgrInst->output("list: ");
       else if (value->isDictionary())
-        ClLanguageMgrInst->output("dictionary ");
+        ClLanguageMgrInst->output("dictionary: ");
       else if (value->isStructure())
-        ClLanguageMgrInst->output("structure ");
+        ClLanguageMgrInst->output("structure: ");
       else if (value->isRealArray())
-        ClLanguageMgrInst->output("real array ");
+        ClLanguageMgrInst->output("real array: ");
       else if (value->isIntegerArray())
-        ClLanguageMgrInst->output("integer array ");
+        ClLanguageMgrInst->output("integer array: ");
       else if (value->isStringArray())
-        ClLanguageMgrInst->output("str array ");
+        ClLanguageMgrInst->output("str array: ");
       else if (value->isListArray())
-        ClLanguageMgrInst->output("list array ");
+        ClLanguageMgrInst->output("list array: ");
       else if (value->isDictionaryArray())
-        ClLanguageMgrInst->output("dictionary array ");
+        ClLanguageMgrInst->output("dictionary array: ");
       else if (value->isStructureArray())
-        ClLanguageMgrInst->output("structure array ");
+        ClLanguageMgrInst->output("structure array: ");
 
-      ClLanguageMgrInst->output("%s = ", arg.c_str());
+      ClLanguageMgrInst->output("%s=", arg.c_str());
 
       value->print();
 
@@ -4627,17 +4664,17 @@ ClStdWhatisCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
     else if (ClParserInst->isFunction(arg)) {
       ClParserFuncPtr function = ClParserInst->getFunction(arg);
 
-      ClLanguageMgrInst->output("Function ");
+      ClLanguageMgrInst->output("Function: ");
 
       function->print();
 
       ClLanguageMgrInst->output("\n");
     }
     else if (ClParserInst->isInternFn(arg)) {
-      ClLanguageMgrInst->output("Internal Function %s\n", arg.c_str());
+      ClLanguageMgrInst->output("Internal Function: %s\n", arg.c_str());
     }
     else if (ClParserInst->isUserFn(arg)) {
-      ClLanguageMgrInst->output("User Function %s\n", arg.c_str());
+      ClLanguageMgrInst->output("User Function: %s\n", arg.c_str());
     }
     else if (ClParserInst->isType(arg)) {
       ClParserTypePtr type = ClParserInst->getType(arg);
@@ -4647,8 +4684,10 @@ ClStdWhatisCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
     else {
       ClParserExpr expr(arg);
 
+      ClParserValuePtr value;
+
       if (! expr.exec(value)) {
-        ClLanguageMgrInst->output("Undefined %s\n", arg.c_str());
+        ClLanguageMgrInst->output("Undefined: %s\n", arg.c_str());
         continue;
       }
 
@@ -4657,7 +4696,7 @@ ClStdWhatisCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
       else if (value->isInteger())
         ClLanguageMgrInst->output("int");
       else if (value->isString())
-        ClLanguageMgrInst->output("str");
+        ClLanguageMgrInst->output("string");
       else if (value->isList())
         ClLanguageMgrInst->output("list");
       else if (value->isDictionary())
@@ -4732,7 +4771,7 @@ ClStdStatusCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
   uint num = args->getNumArgs();
 
   if (num == 1) {
-    if (args->getArgList(CL_ARG_TYPE_TEXT, &type, CL_ARG_TYPE_NONE) != 1)
+    if (args->getArgList(CLArgType::TEXT, &type, CLArgType::NONE) != 1)
       return;
   }
   else
@@ -4804,7 +4843,7 @@ ClStdHelpCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
 {
   CL_LANGUAGE_TRACE("ClStdHelpCommand");
 
-  const string &cargs = command->getArgs();
+  const std::string &cargs = command->getArgs();
 
   if (cargs == "") {
     ClLanguageMgrInst->output("Help available for :-\n\n");
@@ -4831,8 +4870,8 @@ ClStdHelpCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
 
   /* Get Subject and Args */
 
-  string file;
-  string subject;
+  std::string file;
+  std::string subject;
 
   CStrParse parse(cargs);
 
@@ -4850,7 +4889,7 @@ ClStdHelpCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
 
   parse.skipSpace();
 
-  string args1 = parse.getAt();
+  std::string args1 = parse.getAt();
 
   /*-------*/
 
@@ -4943,7 +4982,7 @@ ClStdExitCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
   long code = 0;
 
   if (num == 1) {
-    if (args->getArgList(CL_ARG_TYPE_INTEGER, &code, CL_ARG_TYPE_NONE) != 1)
+    if (args->getArgList(CLArgType::INTEGER, &code, CLArgType::NONE) != 1)
       return;
   }
 
@@ -4969,7 +5008,7 @@ ClStdDieCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
   long code = 0;
 
   if (num == 1) {
-    if (args->getArgList(CL_ARG_TYPE_INTEGER, &code, CL_ARG_TYPE_NONE) != 1)
+    if (args->getArgList(CLArgType::INTEGER, &code, CLArgType::NONE) != 1)
       return;
   }
 
@@ -4987,7 +5026,7 @@ ClStdHistoryCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
   if (args->checkNumberOfArgs(0, 0) != 0)
     return;
 
-  vector<CReadLineHistoryEntry> entries;
+  std::vector<CReadLineHistoryEntry> entries;
 
   ClLanguageMgrInst->getReadLine().getHistoryEntries(entries);
 

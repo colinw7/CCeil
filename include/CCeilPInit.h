@@ -7,14 +7,12 @@
 #include <CAngleType.h>
 #include <CCeilPValue.h>
 
-#define PARSER_MAX_STRING_LENGTH 1024
-
-enum ClParserNameType {
-  CL_PARSER_NAME_TYPE_EXTERNAL = 0,
-  CL_PARSER_NAME_TYPE_FUNCTION = 1,
-  CL_PARSER_NAME_TYPE_STRUCT   = 2,
-  CL_PARSER_NAME_TYPE_VARIABLE = 3,
-  CL_PARSER_NAME_TYPE_USERFN   = 4
+enum class ClParserNameType {
+  EXTERNAL = 0,
+  FUNCTION = 1,
+  STRUCT   = 2,
+  VARIABLE = 3,
+  USERFN   = 4
 };
 
 #define ClParserInst ClParser::getInstance()
@@ -192,7 +190,7 @@ class ClParser {
 #ifdef CL_PARSER_DEBUG
   void setDebug(bool flag) { trace_mgr_.setActive(flag); }
 #else
-  void setDebug(bool) { }
+  void setDebug(bool flag) { debug_ = flag; }
 #endif
 
 #ifdef CL_PARSER_DEBUG
@@ -205,7 +203,7 @@ class ClParser {
 #ifdef CL_PARSER_DEBUG
     return trace_mgr_.getActive();
 #else
-    return false;
+    return debug_;
 #endif
   }
 
@@ -345,13 +343,15 @@ class ClParser {
   void output(const char *format, ...);
   void output(const char *format, va_list *args);
 
+  void signalError(int *error_code, ClErr err) const;
+
   void error(const char *format, ...);
   void error(const char *format, va_list *args);
 
   const char *getErrorMessage(int error_code);
 
   std::string toString(long integer) const {
-    char text[256];
+    char *text = fmtBuffer();
 
     sprintf(text, integer_format_.c_str(), integer);
 
@@ -359,7 +359,7 @@ class ClParser {
   }
 
   std::string toString(double real) const {
-    char text[256];
+    char *text = fmtBuffer();
 
     sprintf(text, real_format_.c_str(), real);
 
@@ -367,7 +367,7 @@ class ClParser {
   }
 
   std::string toString(const char *str) {
-    char text[256];
+    char *text = fmtBuffer();
 
     sprintf(text, string_format_.c_str(), str);
 
@@ -375,32 +375,41 @@ class ClParser {
   }
 
  private:
-  CAngleType  angle_type_;
-  double      angle_to_radians_;
-  double      angle_to_degrees_;
-  double      radians_to_angle_;
-  double      degrees_to_angle_;
-  std::string real_format_;
-  std::string integer_format_;
-  std::string string_format_;
-  bool        math_fail_;
-  double      tolerance_;
-  bool        parse_as_reals_;
-  bool        dollar_prefix_;
+  static char *fmtBuffer() {
+    static char text[512];
+
+    return text;
+  }
+
+ private:
+  CAngleType  angle_type_       { CANGLE_TYPE_RADIANS };
+  double      angle_to_radians_ { 1.0 };
+  double      angle_to_degrees_ { 1.0 };
+  double      radians_to_angle_ { 1.0 };
+  double      degrees_to_angle_ { 1.0 };
+  std::string real_format_      { "%lf" };
+  std::string integer_format_   { "%ld" };
+  std::string string_format_    { "%s" };
+  bool        math_fail_        { false };
+  double      tolerance_        { 1E-6 };
+  bool        parse_as_reals_   { false };
+  bool        dollar_prefix_    { false };
 
 #ifdef CL_PARSER_DEBUG
   CRoutineTraceMgr trace_mgr_;
+#else
+  bool             debug_       { false};
 #endif
 
   int         init_depth_;
   FILE       *output_fp_;
   OutputProc  output_proc_;
-  void       *output_data_;
+  void       *output_data_         { nullptr };
 
   StrCmpProc  strcmp_;
   StrNCmpProc strncmp_;
 
-  ClParserVarMgr      varMgr_;
+  ClParserVarMgr*     varMgr_      { nullptr };
   ClParserFuncMgr     funcMgr_;
   ClParserInternFnMgr internFnMgr_;
   ClParserUserFnMgr   userFnMgr_;

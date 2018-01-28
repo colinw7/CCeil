@@ -1,6 +1,161 @@
 #include <CCeilL.h>
 
-using std::string;
+class ClLanguageArgParser {
+ public:
+  ClLanguageArgParser(const std::string &str) :
+   str_(str), pos_(0), len_(str_.size()) {
+    inBrackets_.resize(4);
+  }
+
+  int pos() const { return pos_; }
+  void setPos(int pos) { pos_ = pos; }
+
+  bool eof() const {
+    return (pos_ >= len_);
+  }
+
+  bool isSpace() const {
+    return isspace(str_[pos_]);
+  }
+
+  void skipSpaces() {
+    CStrUtil::skipSpace(str_, &pos_);
+  }
+
+  bool isChar(char c) const {
+    return (str_[pos_] == c);
+  }
+
+  bool isChars(const std::string &str) const {
+    int len = str.size();
+
+    if (pos_ + len >= len_)
+      return false;
+
+    for (int i = 0; i < len; ++i)
+      if (str_[pos_ + i] != str[i])
+        return false;
+
+    return true;
+  }
+
+  bool isComment() {
+    return CStrUtil::isCComment(str_, pos_);
+  }
+
+  void addDoubleQuotedString(bool strip) {
+    assert(str_[pos_] == '\"');
+
+    if (! strip)
+      addChar();
+    else
+      skipChar();
+
+    while (! eof() && ! isChar('\"')) {
+      if (isChar('\\')) {
+        addChar();
+
+        if (! eof())
+          addChar();
+      }
+      else
+        addChar();
+    }
+
+    if (! eof() && isChar('\"')) {
+      if (! strip)
+        addChar();
+      else
+        skipChar();
+    }
+    else {
+      if (! strip)
+        buffer_ += '\"';
+    }
+  }
+
+  void addSingleQuotedString(bool strip) {
+    assert(str_[pos_] == '\'');
+
+    if (! strip)
+      addChar();
+    else
+      skipChar();
+
+    while (! eof() && ! isChar('\'')) {
+      if (isChar('\\')) {
+        addChar();
+
+        if (! eof())
+          addChar();
+      }
+      else
+        addChar();
+    }
+
+    if (! eof() && isChar('\'')) {
+      if (! strip)
+        addChar();
+      else
+        skipChar();
+    }
+    else {
+      if (! strip)
+        buffer_ += '\'';
+    }
+  }
+
+  void addChar() {
+    buffer_ += str_[pos_++];
+  }
+
+  void skipChar() {
+    ++pos_;
+  }
+
+  void startBracket(int i) {
+    assert(i >= 1 && i <= 4);
+
+    ++inBrackets_[i - 1];
+  }
+
+  bool endBracket(int i) {
+    assert(i >= 1 && i <= 4);
+
+    --inBrackets_[i - 1];
+
+    return (inBrackets_[i - 1] >= 0);
+  }
+
+  bool inBrackets() const {
+    for (int i = 0; i < 4; ++i)
+      if (inBrackets_[i] > 0)
+        return true;
+
+    return false;
+  }
+
+  void addArg(ClLanguageArgList *arg_list) {
+    CStrUtil::stripSpaces(buffer_);
+
+    if (buffer_ != "") {
+      char *arg = strdup(buffer_.c_str());
+
+      arg_list->push_back(arg);
+
+      buffer_ = "";
+    }
+
+    skipSpaces();
+  }
+
+ private:
+  const std::string& str_;
+  int                pos_    { 0 };
+  int                len_    { 0 };
+  std::string        buffer_;
+  std::vector<int> inBrackets_;
+};
 
 // Initialise Environment for Processing the Arguments
 // supplied for an application defined command added
@@ -9,7 +164,7 @@ using std::string;
 // This routine is automatically called before the
 // application defined command's routine is called.
 //
-// Note: After this routines has been called the other argument
+// Note: After this routine has been called the other argument
 // processing calls can be used.
 //
 // The routine termArgs() should be called before exiting the routine.
@@ -31,7 +186,7 @@ void
 ClLanguageArgs::
 startArgs()
 {
-  if (arg_list_ != NULL)
+  if (arg_list_)
     arg_list_stack_.push_back(arg_list_);
 
   arg_list_ = new ClLanguageArgList;
@@ -73,9 +228,9 @@ termArgs()
     arg_list_stack_.pop_back();
   }
   else
-    arg_list_ = NULL;
+    arg_list_ = nullptr;
 
-  if (string_stack_ != NULL) {
+  if (string_stack_) {
     int num_strings = string_stack_->size();
 
     while (num_strings--) {
@@ -87,7 +242,7 @@ termArgs()
     }
   }
 
-  if (chars_stack_ != NULL) {
+  if (chars_stack_) {
     int num_chars = chars_stack_->size();
 
     while (num_chars--) {
@@ -99,7 +254,7 @@ termArgs()
     }
   }
 
-  if (real_array_stack_ != NULL) {
+  if (real_array_stack_) {
     int num_real_arrays = real_array_stack_->size();
 
     while (num_real_arrays--) {
@@ -112,7 +267,7 @@ termArgs()
     }
   }
 
-  if (float_array_stack_ != NULL) {
+  if (float_array_stack_) {
     int num_float_arrays = float_array_stack_->size();
 
     while (num_float_arrays--) {
@@ -125,7 +280,7 @@ termArgs()
     }
   }
 
-  if (integer_array_stack_ != NULL) {
+  if (integer_array_stack_) {
     int num_integer_arrays = integer_array_stack_->size();
 
     while (num_integer_arrays--) {
@@ -139,7 +294,7 @@ termArgs()
     }
   }
 
-  if (word_array_stack_ != NULL) {
+  if (word_array_stack_) {
     int num_word_arrays = word_array_stack_->size();
 
     while (num_word_arrays--) {
@@ -152,7 +307,7 @@ termArgs()
     }
   }
 
-  if (string_array_stack_ != NULL) {
+  if (string_array_stack_) {
     int num_string_arrays = string_array_stack_->size();
 
     while (num_string_arrays--) {
@@ -203,7 +358,7 @@ checkNumberOfArgs(int min, int max)
 
   uint num_args = getNumArgs();
 
-  const string &command_name = ClLanguageMgrInst->getCommandName();
+  const std::string &command_name = ClLanguageMgrInst->getCommandName();
 
   if      (min >= 0 && (int) num_args < min) {
     if      (min > max)
@@ -261,80 +416,80 @@ getNumArgs() const
  *   int num =
  *     getArgList(CLArgType type1, <type1_data>,
  *                CLArgType type2, <type2_data>,
- *                CL_ARG_TYPE_NONE);
+ *                CLArgType::NONE);
  *
  * INPUT:
  *   type  : Argument Type :-
- *         :   CL_ARG_TYPE_SKIP -
+ *         :   CLArgType::SKIP -
  *         :     Skip this argument, no next argument should be supplied.
- *         :   CL_ARG_TYPE_SKIP_N -
+ *         :   CLArgType::SKIP_N -
  *         :     Skip a number of arguments, the next argument is the number
  *         :     of arguments to skip (supplied as an integer).
- *         :   CL_ARG_TYPE_REAL -
+ *         :   CLArgType::REAL -
  *         :     Get the next argument as a real number, pointer to a double
  *         :     should be the next argument.
- *         :   CL_ARG_TYPE_INTEGER
+ *         :   CLArgType::INTEGER
  *         :     Get the next argument as an integer number, pointer to a long
  *         :     should be the next argument.
- *         :   CL_ARG_TYPE_WORD
+ *         :   CLArgType::WORD
  *         :     Get the next argument as an integer number, pointer to a int
  *         :     should be the next argument.
- *         :   CL_ARG_TYPE_STRING
+ *         :   CLArgType::STRING
  *         :     Get the next argument as a string, pointer to a char * should
  *         :     be the next argument.
- *         :   CL_ARG_TYPE_CHARS
+ *         :   CLArgType::CHARS
  *         :     Get the next argument as a character array, pointer to a char *
  *         :     and an int should be the next two arguments.
- *         :   CL_ARG_TYPE_TEXT
+ *         :   CLArgType::TEXT
  *         :     Get the next argument as a literal text, pointer to a char *
  *         :     should be the next argument.
- *         :   CL_ARG_TYPE_VALUE
+ *         :   CLArgType::VALUE
  *         :     Get the next argument as a parser value, pointer to a
  *         :     ClParserValuePtr * should be the next argument.
- *         :   CL_ARG_TYPE_REALS
+ *         :   CLArgType::REALS
  *         :     Get the next argument as a single dimension real array, pointer
  *         :     to a double * and int, should be the next two arguments.
- *         :   CL_ARG_TYPE_FLOATS
+ *         :   CLArgType::FLOATS
  *         :     Get the next argument as a single dimension real array, pointer
  *         :     to a float * and int, should be the next two arguments.
- *         :   CL_ARG_TYPE_INTEGERS
+ *         :   CLArgType::INTEGERS
  *         :     Get the next argument as a single dimension integer array, pointer
  *         :     to an long * and int, should be the next two arguments.
- *         :   CL_ARG_TYPE_WORDS
+ *         :   CLArgType::WORDS
  *         :     Get the next argument as a single dimension integer array, pointer
  *         :     to an int * and int, should be the next two arguments.
- *         :   CL_ARG_TYPE_STRINGS
+ *         :   CLArgType::STRINGS
  *         :     Get the next argument as a single dimension string array, pointer
  *         :     to a char ** and int, should be the next two arguments.
- *         :   CL_ARG_TYPE_REALARR
+ *         :   CLArgType::REALARR
  *         :     Get the next argument as a real array, pointer to a double *,
  *         :     int * and int, should be the next three arguments.
- *         :   CL_ARG_TYPE_FLTARR
+ *         :   CLArgType::FLTARR
  *         :     Get the next argument as a real array, pointer to a float *,
  *         :     int * and int, should be the next three arguments.
- *         :   CL_ARG_TYPE_INTARR
+ *         :   CLArgType::INTARR
  *         :     Get the next argument as an integer array, pointer to a long *,
  *         :     int * and int, should be the next three arguments.
- *         :   CL_ARG_TYPE_WORDARR
+ *         :   CLArgType::WORDARR
  *         :     Get the next argument as an integer array, pointer to an int *,
  *         :     int * and int, should be the next three arguments.
- *         :   CL_ARG_TYPE_STRARR
+ *         :   CLArgType::STRARR
  *         :     Get the next argument as a string array, pointer to a char **,
  *         :     int * and int, should be the next three arguments.
- *         :   CL_ARG_TYPE_STRMAT
+ *         :   CLArgType::STRMAT
  *         :     Get the next argument as a string matrix (an array of null terminated
  *         :     fixed length strings stored in a single char * array), pointer to a
  *         :     char * (string matrix), pointer to an int (number of strings) and an
  *         :     int (fixed string length), should be the next three arguments.
- *         :   CL_ARG_TYPE_CHRMAT
+ *         :   CLArgType::CHRMAT
  *         :     Get the next argument as a character matrix (an array of non-null terminated
  *         :     fixed length strings stored in a single char * array), pointer to a char *
  *         :     (character matrix), pointer to an int (number of strings) and an int (fixed
  *         :     string length), should be the next three arguments.
- *         :   CL_ARG_TYPE_TYPED
+ *         :   CLArgType::TYPED
  *         :     Get the next argument as a type which is constructed by an installed
  *         :     converter. The arguments are the type to convert from (one of the
- *         :     CL_ARG_TYPE_???? types), the type to convert to (specified when the
+ *         :     CLArgType::???? types), the type to convert to (specified when the
  *         :     converter was installed), the number of input arguments to be supplied
  *         :     to the converter followed by pointers to the output arguments.
  *
@@ -346,7 +501,7 @@ getNumArgs() const
  *
  * NOTES:
  *   The arguments required after the type argument are dependant on the value of the
- *   type argument. The list is terminated by a type of CL_ARG_TYPE_NONE.
+ *   type argument. The list is terminated by a type of CLArgType::NONE.
  *
  *   startArgs() must been called before using this routine.
  *
@@ -376,20 +531,20 @@ getNumArgs() const
  *   int                num_integer_array_dims;
  *
  *   num = getArgList
- *    (CL_ARG_TYPE_SKIP,
- *     CL_ARG_TYPE_SKIP_N , 3,
- *     CL_ARG_TYPE_REAL   , &real,
- *     CL_ARG_TYPE_INTEGER, &integer,
- *     CL_ARG_TYPE_WORD   , &word,
- *     CL_ARG_TYPE_STRING , &str,
- *     CL_ARG_TYPE_TEXT   , &text,
- *     CL_ARG_TYPE_VALUE  , &value,
- *     CL_ARG_TYPE_REALARR, &real_array, &real_array_dims, &num_real_array_dims,
- *     CL_ARG_TYPE_FLTARR , &float_array, &float_array_dims, &num_float_array_dims,
- *     CL_ARG_TYPE_INTARR , &integer_array, &integer_array_dims, &num_integer_array_dims,
- *     CL_ARG_TYPE_WORDARR, &word_array, &word_array_dims, &num_word_array_dims,
- *     CL_ARG_TYPE_STRARR , &string_array, &string_array_dims, &num_string_array_dims,
- *     CL_ARG_TYPE_NONE);
+ *    (CLArgType::SKIP,
+ *     CLArgType::SKIP_N , 3,
+ *     CLArgType::REAL   , &real,
+ *     CLArgType::INTEGER, &integer,
+ *     CLArgType::WORD   , &word,
+ *     CLArgType::STRING , &str,
+ *     CLArgType::TEXT   , &text,
+ *     CLArgType::VALUE  , &value,
+ *     CLArgType::REALARR, &real_array, &real_array_dims, &num_real_array_dims,
+ *     CLArgType::FLTARR , &float_array, &float_array_dims, &num_float_array_dims,
+ *     CLArgType::INTARR , &integer_array, &integer_array_dims, &num_integer_array_dims,
+ *     CLArgType::WORDARR, &word_array, &word_array_dims, &num_word_array_dims,
+ *     CLArgType::STRARR , &string_array, &string_array_dims, &num_string_array_dims,
+ *     CLArgType::NONE);
  *
  *   if (num != 15) error();
  *
@@ -445,55 +600,55 @@ getVArgList(CLArgType type, va_list *vargs)
 
   int error_code = 0;
 
-  while (type != CL_ARG_TYPE_NONE) {
-    if      (type == CL_ARG_TYPE_SKIP)
+  while (type != CLArgType::NONE) {
+    if      (type == CLArgType::SKIP)
       ;
-    else if (type == CL_ARG_TYPE_SKIP_N) {
+    else if (type == CLArgType::SKIP_N) {
       int integer = va_arg(*vargs, int);
 
       num += integer - 1;
     }
-    else if (type == CL_ARG_TYPE_REAL) {
+    else if (type == CLArgType::REAL) {
       double *real = va_arg(*vargs, double *);
 
       *real = getRealArg(num + 1, &error_code);
     }
-    else if (type == CL_ARG_TYPE_INTEGER) {
+    else if (type == CLArgType::INTEGER) {
       long *integer = va_arg(*vargs, long *);
 
       *integer = getIntegerArg(num + 1, &error_code);
     }
-    else if (type == CL_ARG_TYPE_WORD) {
+    else if (type == CLArgType::WORD) {
       int *integer = va_arg(*vargs, int *);
 
       *integer = getIntegerArg(num + 1, &error_code);
     }
-    else if (type == CL_ARG_TYPE_STRING) {
+    else if (type == CLArgType::STRING) {
       char **str = va_arg(*vargs, char **);
 
-      string str1 = getStringArg(num + 1, &error_code);
+      std::string str1 = getStringArg(num + 1, &error_code);
 
       *str = strdup(str1.c_str());
     }
-    else if (type == CL_ARG_TYPE_CHARS) {
+    else if (type == CLArgType::CHARS) {
       char **chars     = va_arg(*vargs, char **);
       int   *num_chars = va_arg(*vargs, int *);
 
       getCharArrayArg(num + 1, chars, num_chars, &error_code);
     }
-    else if (type == CL_ARG_TYPE_TEXT) {
+    else if (type == CLArgType::TEXT) {
       char **str = va_arg(*vargs, char **);
 
-      string arg = getArg(num + 1, &error_code);
+      std::string arg = getArg(num + 1, &error_code);
 
       *str = (char *) arg.c_str();
     }
-    else if (type == CL_ARG_TYPE_VALUE) {
+    else if (type == CLArgType::VALUE) {
       ClParserValuePtr *value = va_arg(*vargs, ClParserValuePtr *);
 
       *value = getValueArg(num + 1, &error_code);
     }
-    else if (type == CL_ARG_TYPE_REALS) {
+    else if (type == CLArgType::REALS) {
       double **reals     = va_arg(*vargs, double **);
       int     *num_reals = va_arg(*vargs, int *);
 
@@ -506,7 +661,7 @@ getVArgList(CLArgType type, va_list *vargs)
 
       *num_reals = num_reals1;
     }
-    else if (type == CL_ARG_TYPE_FLOATS) {
+    else if (type == CLArgType::FLOATS) {
       float **reals     = va_arg(*vargs, float **);
       int    *num_reals = va_arg(*vargs, int *);
 
@@ -519,7 +674,7 @@ getVArgList(CLArgType type, va_list *vargs)
 
       *num_reals = num_reals1;
     }
-    else if (type == CL_ARG_TYPE_INTEGERS) {
+    else if (type == CLArgType::INTEGERS) {
       uint *dims;
       uint  num_dims;
 
@@ -541,7 +696,7 @@ getVArgList(CLArgType type, va_list *vargs)
       else
         *num_integers = 0;
     }
-    else if (type == CL_ARG_TYPE_WORDS) {
+    else if (type == CLArgType::WORDS) {
       uint *dims;
       uint  num_dims;
 
@@ -563,7 +718,7 @@ getVArgList(CLArgType type, va_list *vargs)
       else
         *num_integers = 0;
     }
-    else if (type == CL_ARG_TYPE_STRINGS) {
+    else if (type == CLArgType::STRINGS) {
       uint *dims;
       uint  num_dims;
 
@@ -585,42 +740,42 @@ getVArgList(CLArgType type, va_list *vargs)
       else
         *num_strings = 0;
     }
-    else if (type == CL_ARG_TYPE_REALARR) {
+    else if (type == CLArgType::REALARR) {
       double **reals    = va_arg(*vargs, double **);
       uint   **dims     = va_arg(*vargs, uint **);
       uint    *num_dims = va_arg(*vargs, uint *);
 
       getRealArrayArg(num + 1, reals, dims, num_dims, &error_code);
     }
-    else if (type == CL_ARG_TYPE_FLTARR) {
+    else if (type == CLArgType::FLTARR) {
       float **reals    = va_arg(*vargs, float **);
       uint  **dims     = va_arg(*vargs, uint **);
       uint   *num_dims = va_arg(*vargs, uint *);
 
       getRealArrayArg(num + 1, reals, dims, num_dims, &error_code);
     }
-    else if (type == CL_ARG_TYPE_INTARR) {
+    else if (type == CLArgType::INTARR) {
       long **integers  = va_arg(*vargs, long **);
       uint **dims      = va_arg(*vargs, uint **);
       uint  *num_dims  = va_arg(*vargs, uint *);
 
       getIntegerArrayArg(num + 1, integers, dims, num_dims, &error_code);
     }
-    else if (type == CL_ARG_TYPE_WORDARR) {
+    else if (type == CLArgType::WORDARR) {
       int  **integers  = va_arg(*vargs, int **);
       uint **dims      = va_arg(*vargs, uint **);
       uint  *num_dims  = va_arg(*vargs, uint *);
 
       getIntegerArrayArg(num + 1, integers, dims, num_dims, &error_code);
     }
-    else if (type == CL_ARG_TYPE_STRARR) {
+    else if (type == CLArgType::STRARR) {
       char ***strings  = va_arg(*vargs, char ***);
       uint  **dims     = va_arg(*vargs, uint **);
       uint   *num_dims = va_arg(*vargs, uint *);
 
       getStringArrayArg(num + 1, strings, dims, num_dims, &error_code);
     }
-    else if (type == CL_ARG_TYPE_STRMAT) {
+    else if (type == CLArgType::STRMAT) {
       uint  *dims;
       char **strings;
       uint   num_dims;
@@ -635,13 +790,12 @@ getVArgList(CLArgType type, va_list *vargs)
         break;
 
       int flag = ClLanguageConverterMgrInst->convertStringArrayToStringMatrix
-                  (strings, dims, num_dims,
-                   matrix, num_matrix, matrix_size);
+                  (strings, dims, num_dims, matrix, num_matrix, matrix_size);
 
       if (! flag)
         error_code = -1;
     }
-    else if (type == CL_ARG_TYPE_CHRMAT) {
+    else if (type == CLArgType::CHRMAT) {
       uint  *dims;
       char **strings;
       uint   num_dims;
@@ -656,13 +810,12 @@ getVArgList(CLArgType type, va_list *vargs)
         break;
 
       int flag = ClLanguageConverterMgrInst->convertStringArrayToCharMatrix
-                  (strings, dims, num_dims,
-                   matrix, num_matrix, matrix_size);
+                  (strings, dims, num_dims, matrix, num_matrix, matrix_size);
 
       if (! flag)
         error_code = -1;
     }
-    else if (type == CL_ARG_TYPE_TYPED) {
+    else if (type == CLArgType::TYPED) {
       char *args[CL_MAX_CONVERT_ARGS];
 
       int   from_type = va_arg(*vargs, int);
@@ -676,7 +829,7 @@ getVArgList(CLArgType type, va_list *vargs)
           args[i] = arg;
       }
 
-      if (from_type == CL_ARG_TYPE_STRARR)
+      if (from_type == int(CLArgType::STRARR))
         ClLanguageConverterMgrInst->getTypedStringArrayArg(this, num + 1,
           to_type, CL_MAX_CONVERT_ARGS,
           args[ 0], args[ 1], args[ 2], args[ 3], args[ 4],
@@ -709,10 +862,10 @@ getVArgList(CLArgType type, va_list *vargs)
  *
  * CALL:
  *   int num =
- *     getStringArgList(const string &str,
+ *     getStringArgList(const std::string &str,
  *                      CLArgType type1, <type1_data>,
  *                      CLArgType type2, <type2_data>,
- *                      CL_ARG_TYPE_NONE);
+ *                      CLArgType::NONE);
  *
  * INPUT:
  *   str  : String from which the returned values are parsed.
@@ -733,7 +886,7 @@ getVArgList(CLArgType type, va_list *vargs)
 
 int
 ClLanguageArgs::
-getStringArgList(const string &str, CLArgType type, ...)
+getStringArgList(const std::string &str, CLArgType type, ...)
 {
   va_list vargs;
 
@@ -767,10 +920,10 @@ getRealArg(int n, int *error_code)
     return real;
 
   if (! value->realValue(&real)) {
-    const string &command_name = ClLanguageMgrInst->getCommandName();
+    const std::string &command_name = ClLanguageMgrInst->getCommandName();
 
     ClLanguageMgrInst->expressionError
-      (CLERR_INVALID_CONVERSION, "'%s' argument %d", command_name.c_str(), n);
+      (ClErr::INVALID_CONVERSION, "'%s' argument %d", command_name.c_str(), n);
     *error_code = 3;
 
     return real;
@@ -797,10 +950,10 @@ getIntegerArg(int n, int *error_code)
     return integer;
 
   if (! value->integerValue(&integer)) {
-    const string &command_name = ClLanguageMgrInst->getCommandName();
+    const std::string &command_name = ClLanguageMgrInst->getCommandName();
 
     ClLanguageMgrInst->expressionError
-      (CLERR_INVALID_CONVERSION, "'%s' argument %d", command_name.c_str(), n);
+      (ClErr::INVALID_CONVERSION, "'%s' argument %d", command_name.c_str(), n);
 
     *error_code = 3;
 
@@ -814,13 +967,13 @@ getIntegerArg(int n, int *error_code)
 //
 // Note: startArgs() must been called before using this routine.
 
-string
+std::string
 ClLanguageArgs::
 getStringArg(int n, int *error_code)
 {
   *error_code = 0;
 
-  string str;
+  std::string str;
 
   ClParserValuePtr value = getValueArg(n, error_code);
 
@@ -828,10 +981,10 @@ getStringArg(int n, int *error_code)
     return str;
 
   if (! value->stringValue(str)) {
-    const string &command_name = ClLanguageMgrInst->getCommandName();
+    const std::string &command_name = ClLanguageMgrInst->getCommandName();
 
     ClLanguageMgrInst->expressionError
-      (CLERR_INVALID_CONVERSION, "'%s' argument %d", command_name.c_str(), n);
+      (ClErr::INVALID_CONVERSION, "'%s' argument %d", command_name.c_str(), n);
 
     *error_code = 3;
 
@@ -849,7 +1002,7 @@ void
 ClLanguageArgs::
 getCharArrayArg(int n, char **chars, int *num_chars, int *error_code)
 {
-  *chars      = NULL;
+  *chars      = nullptr;
   *num_chars  = 0;
   *error_code = 0;
 
@@ -859,12 +1012,12 @@ getCharArrayArg(int n, char **chars, int *num_chars, int *error_code)
     return;
 
   if (! value->stringValue(chars, num_chars)) {
-    const string &command_name = ClLanguageMgrInst->getCommandName();
+    const std::string &command_name = ClLanguageMgrInst->getCommandName();
 
     ClLanguageMgrInst->expressionError
-      (CLERR_INVALID_CONVERSION, "'%s' argument %d", command_name.c_str(), n);
+      (ClErr::INVALID_CONVERSION, "'%s' argument %d", command_name.c_str(), n);
 
-    *chars      = NULL;
+    *chars      = nullptr;
     *num_chars  = 0;
     *error_code = 3;
 
@@ -936,8 +1089,8 @@ void
 ClLanguageArgs::
 getRealArrayArg(int n, double **reals, uint **dims, uint *num_dims, int *error_code)
 {
-  *reals      = NULL;
-  *dims       = NULL;
+  *reals      = nullptr;
+  *dims       = nullptr;
   *num_dims   = 0;
   *error_code = 0;
 
@@ -947,10 +1100,10 @@ getRealArrayArg(int n, double **reals, uint **dims, uint *num_dims, int *error_c
     return;
 
   if (! value->realArrayValue(reals, dims, num_dims)) {
-    const string &command_name = ClLanguageMgrInst->getCommandName();
+    const std::string &command_name = ClLanguageMgrInst->getCommandName();
 
     ClLanguageMgrInst->expressionError
-      (CLERR_INVALID_CONVERSION, "'%s' argument %d", command_name.c_str(), n);
+      (ClErr::INVALID_CONVERSION, "'%s' argument %d", command_name.c_str(), n);
     *error_code = 3;
 
     return;
@@ -967,8 +1120,8 @@ void
 ClLanguageArgs::
 getRealArrayArg(int n, float **reals, uint **dims, uint *num_dims, int *error_code)
 {
-  *reals      = NULL;
-  *dims       = NULL;
+  *reals      = nullptr;
+  *dims       = nullptr;
   *num_dims   = 0;
   *error_code = 0;
 
@@ -978,10 +1131,10 @@ getRealArrayArg(int n, float **reals, uint **dims, uint *num_dims, int *error_co
     return;
 
   if (! value->realArrayValue(reals, dims, num_dims)) {
-    const string &command_name = ClLanguageMgrInst->getCommandName();
+    const std::string &command_name = ClLanguageMgrInst->getCommandName();
 
     ClLanguageMgrInst->expressionError
-      (CLERR_INVALID_CONVERSION, "'%s' argument %d", command_name.c_str(), n);
+      (ClErr::INVALID_CONVERSION, "'%s' argument %d", command_name.c_str(), n);
 
     *error_code = 3;
 
@@ -999,8 +1152,8 @@ void
 ClLanguageArgs::
 getIntegerArrayArg(int n, long **integers, uint **dims, uint *num_dims, int *error_code)
 {
-  *integers   = NULL;
-  *dims       = NULL;
+  *integers   = nullptr;
+  *dims       = nullptr;
   *num_dims   = 0;
   *error_code = 0;
 
@@ -1010,10 +1163,10 @@ getIntegerArrayArg(int n, long **integers, uint **dims, uint *num_dims, int *err
     return;
 
   if (! value->integerArrayValue(integers, dims, num_dims)) {
-    const string &command_name = ClLanguageMgrInst->getCommandName();
+    const std::string &command_name = ClLanguageMgrInst->getCommandName();
 
     ClLanguageMgrInst->expressionError
-      (CLERR_INVALID_CONVERSION, "'%s' argument %d", command_name.c_str(), n);
+      (ClErr::INVALID_CONVERSION, "'%s' argument %d", command_name.c_str(), n);
 
     *error_code = 3;
 
@@ -1031,8 +1184,8 @@ void
 ClLanguageArgs::
 getIntegerArrayArg(int n, int **integers, uint **dims, uint *num_dims, int *error_code)
 {
-  *integers   = NULL;
-  *dims       = NULL;
+  *integers   = nullptr;
+  *dims       = nullptr;
   *num_dims   = 0;
   *error_code = 0;
 
@@ -1042,10 +1195,10 @@ getIntegerArrayArg(int n, int **integers, uint **dims, uint *num_dims, int *erro
     return;
 
   if (! value->integerArrayValue(integers, dims, num_dims)) {
-    const string &command_name = ClLanguageMgrInst->getCommandName();
+    const std::string &command_name = ClLanguageMgrInst->getCommandName();
 
     ClLanguageMgrInst->expressionError
-      (CLERR_INVALID_CONVERSION, "'%s' argument %d", command_name.c_str(), n);
+      (ClErr::INVALID_CONVERSION, "'%s' argument %d", command_name.c_str(), n);
 
     *error_code = 3;
 
@@ -1063,8 +1216,8 @@ void
 ClLanguageArgs::
 getStringArrayArg(int n, char ***strings, uint **dims, uint *num_dims, int *error_code)
 {
-  *strings    = NULL;
-  *dims       = NULL;
+  *strings    = nullptr;
+  *dims       = nullptr;
   *num_dims   = 0;
   *error_code = 0;
 
@@ -1074,10 +1227,10 @@ getStringArrayArg(int n, char ***strings, uint **dims, uint *num_dims, int *erro
     return;
 
   if (! value->stringArrayValue(strings, dims, num_dims)) {
-    const string &command_name = ClLanguageMgrInst->getCommandName();
+    const std::string &command_name = ClLanguageMgrInst->getCommandName();
 
     ClLanguageMgrInst->expressionError
-      (CLERR_INVALID_CONVERSION, "'%s' argument %d", command_name.c_str(), n);
+      (ClErr::INVALID_CONVERSION, "'%s' argument %d", command_name.c_str(), n);
 
     *error_code = 3;
 
@@ -1100,7 +1253,7 @@ getValueArg(int n, int *error_code)
 
   *error_code = 0;
 
-  string arg = getArg(n, &error_code1);
+  std::string arg = getArg(n, &error_code1);
 
   if (error_code1 != 0) {
     *error_code = 1;
@@ -1111,10 +1264,10 @@ getValueArg(int n, int *error_code)
   ClParserExpr expr(arg);
 
   if (! expr.exec(value)) {
-    const string &command_name = ClLanguageMgrInst->getCommandName();
+    const std::string &command_name = ClLanguageMgrInst->getCommandName();
 
-    ClLanguageMgrInst->expressionError(CLERR_INVALID_EXPRESSION, "'%s' argument %d - '%s'",
-                                        command_name.c_str(), n, arg.c_str());
+    ClLanguageMgrInst->expressionError(ClErr::INVALID_EXPRESSION, "'%s' argument %d - '%s'",
+                                       command_name.c_str(), n, arg.c_str());
 
     *error_code = 2;
 
@@ -1122,10 +1275,10 @@ getValueArg(int n, int *error_code)
   }
 
   if (! value.isValid()) {
-    const string &command_name = ClLanguageMgrInst->getCommandName();
+    const std::string &command_name = ClLanguageMgrInst->getCommandName();
 
     ClLanguageMgrInst->syntaxError("undefined '%s' argument %d - '%s'",
-                                    command_name.c_str(), n, arg.c_str());
+                                   command_name.c_str(), n, arg.c_str());
 
     *error_code = 2;
 
@@ -1135,12 +1288,11 @@ getValueArg(int n, int *error_code)
   return value;
 }
 
-
 // Get the Nth argument supplied by the user as a variable argument.
 //
 // Note: startArgs() must been called before using this routine.
 
-string
+std::string
 ClLanguageArgs::
 getVariableArg(int n, int *error_code)
 {
@@ -1148,7 +1300,7 @@ getVariableArg(int n, int *error_code)
 
   *error_code = 0;
 
-  string arg = getArg(n, &error_code1);
+  std::string arg = getArg(n, &error_code1);
 
   if (error_code1 != 0) {
     *error_code = 1;
@@ -1157,7 +1309,7 @@ getVariableArg(int n, int *error_code)
   }
 
   if (! ClParserInst->isValidAssignString(arg)) {
-    const string &command_name = ClLanguageMgrInst->getCommandName();
+    const std::string &command_name = ClLanguageMgrInst->getCommandName();
 
     ClLanguageMgrInst->syntaxError
       ("'%s' argument %d (invalid return argument '%s')", command_name.c_str(), n, arg.c_str());
@@ -1174,13 +1326,13 @@ getVariableArg(int n, int *error_code)
 //
 // Note: startArgs() must been called before using this routine.
 
-string
+std::string
 ClLanguageArgs::
 getArg(int n, int *error_code)
 {
   *error_code = 0;
 
-  string arg;
+  std::string arg;
 
   uint num_args = getNumArgs();
 
@@ -1192,7 +1344,7 @@ getArg(int n, int *error_code)
   return arg;
 }
 
-const string &
+const std::string &
 ClLanguageArgs::
 getIArg(int i) const
 {
@@ -1207,110 +1359,78 @@ getIArg(int i) const
  * CALL:
  *   int num = setArgList(CLArgType type1, <type1_data>,
  *                        CLArgType type2, <type2_data>,
- *                        CL_ARG_TYPE_NONE);
+ *                        CLArgType::NONE);
  *
  * INPUT:
  *   type  : Argument Type :-
- *         :   CL_ARG_TYPE_SKIP -
- *         :     Skip this argument, num next argument
- *         :     should be supplied.
- *         :   CL_ARG_TYPE_SKIP_N -
- *         :     Skip a number of arguments, the next
- *         :     argument is the number of arguments to
+ *         :   CLArgType::SKIP -
+ *         :     Skip this argument, num next argument should be supplied.
+ *         :   CLArgType::SKIP_N -
+ *         :     Skip a number of arguments, the next argument is the number of arguments to
  *         :     skip (supplied as an integer).
- *         :   CL_ARG_TYPE_REAL -
- *         :     Set the next argument to a real number,
- *         :     double should be the next argument.
- *         :   CL_ARG_TYPE_INTEGER
- *         :     Set the next argument to an integer number,
- *         :     long should be the next argument.
- *         :   CL_ARG_TYPE_WORD
- *         :     Set the next argument to an integer number,
- *         :     int should be the next argument.
- *         :   CL_ARG_TYPE_STRING
- *         :     Set the next argument to a string,
- *         :     char * should be the next argument.
- *         :   CL_ARG_TYPE_CHARS
- *         :     Set the next argument to a character
- *         :     array, char * and int should be the next
+ *         :   CLArgType::REAL -
+ *         :     Set the next argument to a real number, double should be the next argument.
+ *         :   CLArgType::INTEGER
+ *         :     Set the next argument to an integer number, long should be the next argument.
+ *         :   CLArgType::WORD
+ *         :     Set the next argument to an integer number, int should be the next argument.
+ *         :   CLArgType::STRING
+ *         :     Set the next argument to a string, char * should be the next argument.
+ *         :   CLArgType::CHARS
+ *         :     Set the next argument to a character array, char * and int should be the next
  *         :     two arguments.
- *         :   CL_ARG_TYPE_VALUE
- *         :     Set the next argument to a parser value,
- *         :     pointer to a ClParserValuePtr should be
+ *         :   CLArgType::VALUE
+ *         :     Set the next argument to a parser value, pointer to a ClParserValuePtr should be
  *         :     the next argument.
- *         :   CL_ARG_TYPE_EXPR
- *         :     Set the next argument to the result of
- *         :     evaluating an expression, char * should
+ *         :   CLArgType::EXPR
+ *         :     Set the next argument to the result of evaluating an expression, char * should
  *         :     be the next argument.
- *         :   CL_ARG_TYPE_REALS
- *         :     Set the next argument to a single
- *         :     dimension real array, pointer to a
- *         :     double * and int, should be the next
- *         :     two arguments.
- *         :   CL_ARG_TYPE_FLOATS
- *         :     Set the next argument to a single
- *         :     dimension real array, pointer to a
- *         :     float * and int, should be the next
- *         :     two arguments.
- *         :   CL_ARG_TYPE_INTEGERS
- *         :     Set the next argument to a single
- *         :     dimension integer array, pointer to an
- *         :     long * and int, should be the next
- *         :     two arguments.
- *         :   CL_ARG_TYPE_WORDS
- *         :     Set the next argument to a single
- *         :     dimension integer array, pointer to an
- *         :     int * and int, should be the next
- *         :     two arguments.
- *         :   CL_ARG_TYPE_STRINGS
- *         :     Set the next argument to a single
- *         :     dimension string array, pointer to a
- *         :     char ** and int, should be the next
- *         :     two arguments.
- *         :   CL_ARG_TYPE_REALARR
- *         :     Set the next argument to a real array,
- *         :     a double *, int * and int should be the
+ *         :   CLArgType::REALS
+ *         :     Set the next argument to a single dimension real array, pointer to a
+ *         :     double * and int, should be the next two arguments.
+ *         :   CLArgType::FLOATS
+ *         :     Set the next argument to a single dimension real array, pointer to a
+ *         :     float * and int, should be the next two arguments.
+ *         :   CLArgType::INTEGERS
+ *         :     Set the next argument to a single dimension integer array, pointer to an
+ *         :     long * and int, should be the next two arguments.
+ *         :   CLArgType::WORDS
+ *         :     Set the next argument to a single dimension integer array, pointer to an
+ *         :     int * and int, should be the next two arguments.
+ *         :   CLArgType::STRINGS
+ *         :     Set the next argument to a single dimension string array, pointer to a
+ *         :     char ** and int, should be the next two arguments.
+ *         :   CLArgType::REALARR
+ *         :     Set the next argument to a real array, a double *, int * and int should be the
  *         :     next three arguments.
- *         :   CL_ARG_TYPE_FLTARR
- *         :     Set the next argument to a real array,
- *         :     a float *, int * and int should be the
+ *         :   CLArgType::FLTARR
+ *         :     Set the next argument to a real array, a float *, int * and int should be the
  *         :     next three arguments.
- *         :   CL_ARG_TYPE_INTARR
- *         :     Set the next argument to an integer array,
- *         :     a long *, int * and int should be the
+ *         :   CLArgType::INTARR
+ *         :     Set the next argument to an integer array, a long *, int * and int should be the
  *         :     next three arguments.
- *         :   CL_ARG_TYPE_WORDARR
- *         :     Set the next argument to an integer array,
- *         :     an int *, int * and int should be the
+ *         :   CLArgType::WORDARR
+ *         :     Set the next argument to an integer array, an int *, int * and int should be the
  *         :     next three arguments.
- *         :   CL_ARG_TYPE_STRARR
- *         :     Set the next argument to a string array,
- *         :     a char **, int * and int should be the
+ *         :   CLArgType::STRARR
+ *         :     Set the next argument to a string array, a char **, int * and int should be the
  *         :     next three arguments.
- *         :   CL_ARG_TYPE_STRMAT
- *         :     Set the next argument to a string matrix
- *         :     (an array of null terminated fixed length
- *         :     strings stored in a single char * array),
- *         :     a char * (string matrix), an int (number of
- *         :     strings) and an int (fixed string length),
+ *         :   CLArgType::STRMAT
+ *         :     Set the next argument to a string matrix (an array of null terminated fixed
+ *         :     length strings stored in a single char * array), a char * (string matrix),
+ *         :     an int (number of strings) and an int (fixed string length),
  *         :     should be the next three arguments.
- *         :   CL_ARG_TYPE_CHRMAT
- *         :     Set the next argument to a character
- *         :     matrix (an array of non-null terminated
- *         :     fixed length strings stored in a single
- *         ;     char * array), a char * (character matrix),
- *         :     an int (number of strings) and an int (fixed
- *         :     string length), should be the next three
- *         :     arguments.
- *         :   CL_ARG_TYPE_TYPED
- *         :     Set the next argument to a type which
- *         :     is constructed by an installed converter.
- *         :     The arguments are the type to convert
- *         :     from (specified when the converter was
- *         :     installed), the type to convert to (one of
- *         :     the CL_ARG_TYPE_???? types), the number of
- *         :     input arguments to be supplied to the
- *         :     converter followed by the input arguments.
+ *         :   CLArgType::CHRMAT
+ *         :     Set the next argument to a character matrix (an array of non-null terminated
+ *         :     fixed length strings stored in a single char * array), a char * (character
+ *         :     matrix), an int (number of strings) and an int (fixed string length),
+ *         :     should be the next three arguments.
+ *         :   CLArgType::TYPED
+ *         :     Set the next argument to a type which is constructed by an installed converter.
+ *         :     The arguments are the type to convert from (specified when the converter was
+ *         :     installed), the type to convert to (one of the CLArgType::???? types),
+ *         :     the number of input arguments to be supplied to the converter followed
+ *         :     by the input arguments.
  *
  * OUTPUT:
  *     None
@@ -1322,7 +1442,7 @@ getIArg(int i) const
  * NOTES:
  *   The arguments required after the type argument are
  *   dependant on the value of the type argument. The
- *   list is terminated by a type of CL_ARG_TYPE_NONE.
+ *   list is terminated by a type of CLArgType::NONE.
  *
  *   startArgs() must been called before using this routine.
  *
@@ -1352,20 +1472,20 @@ getIArg(int i) const
  *   int                num_integer_array_dims;
  *
  *   int num = setArgList
- *    (CL_ARG_TYPE_SKIP,
- *     CL_ARG_TYPE_SKIP_N , 3,
- *     CL_ARG_TYPE_REAL   , real,
- *     CL_ARG_TYPE_INTEGER, integer,
- *     CL_ARG_TYPE_WORD   , word,
- *     CL_ARG_TYPE_STRING , str,
- *     CL_ARG_TYPE_VALUE  , value,
- *     CL_ARG_TYPE_EXPR   , expr,
- *     CL_ARG_TYPE_REALARR, real_array, real_array_dims, num_real_array_dims,
- *     CL_ARG_TYPE_FLTARR , float_array, float_array_dims, num_float_array_dims,
- *     CL_ARG_TYPE_INTARR , integer_array, integer_array_dims, num_integer_array_dims,
- *     CL_ARG_TYPE_WORDARR, word_array, word_array_dims, num_word_array_dims,
- *     CL_ARG_TYPE_STRARR , string_array, string_array_dims, num_string_array_dims,
- *     CL_ARG_TYPE_NONE);
+ *    (CLArgType::SKIP,
+ *     CLArgType::SKIP_N , 3,
+ *     CLArgType::REAL   , real,
+ *     CLArgType::INTEGER, integer,
+ *     CLArgType::WORD   , word,
+ *     CLArgType::STRING , str,
+ *     CLArgType::VALUE  , value,
+ *     CLArgType::EXPR   , expr,
+ *     CLArgType::REALARR, real_array, real_array_dims, num_real_array_dims,
+ *     CLArgType::FLTARR , float_array, float_array_dims, num_float_array_dims,
+ *     CLArgType::INTARR , integer_array, integer_array_dims, num_integer_array_dims,
+ *     CLArgType::WORDARR, word_array, word_array_dims, num_word_array_dims,
+ *     CLArgType::STRARR , string_array, string_array_dims, num_string_array_dims,
+ *     CLArgType::NONE);
  *
  *   if (num != 15) error();
  *
@@ -1395,51 +1515,51 @@ setVArgList(CLArgType type, va_list *vargs)
 
   int error_code = 0;
 
-  while (type != CL_ARG_TYPE_NONE) {
-    if      (type == CL_ARG_TYPE_SKIP)
+  while (type != CLArgType::NONE) {
+    if      (type == CLArgType::SKIP)
       ;
-    else if (type == CL_ARG_TYPE_SKIP_N) {
+    else if (type == CLArgType::SKIP_N) {
       int integer = va_arg(*vargs, int);
 
       num += integer - 1;
     }
-    else if (type == CL_ARG_TYPE_REAL) {
+    else if (type == CLArgType::REAL) {
       double real = va_arg(*vargs, double);
 
       setRealArg(num + 1, real, &error_code);
     }
-    else if (type == CL_ARG_TYPE_INTEGER) {
+    else if (type == CLArgType::INTEGER) {
       long integer = va_arg(*vargs, long);
 
       setIntegerArg(num + 1, integer, &error_code);
     }
-    else if (type == CL_ARG_TYPE_WORD) {
+    else if (type == CLArgType::WORD) {
       int integer = va_arg(*vargs, int);
 
       setIntegerArg(num + 1, integer, &error_code);
     }
-    else if (type == CL_ARG_TYPE_STRING) {
+    else if (type == CLArgType::STRING) {
       char *str = va_arg(*vargs, char *);
 
       setStringArg(num + 1, str, &error_code);
     }
-    else if (type == CL_ARG_TYPE_CHARS) {
+    else if (type == CLArgType::CHARS) {
       char *chars     = va_arg(*vargs, char *);
       int   num_chars = va_arg(*vargs, int);
 
       setCharArrayArg(num + 1, chars, num_chars, &error_code);
     }
-    else if (type == CL_ARG_TYPE_VALUE) {
+    else if (type == CLArgType::VALUE) {
       ClParserValuePtr *value = va_arg(*vargs, ClParserValuePtr *);
 
       setValueArg(num + 1, *value, &error_code);
     }
-    else if (type == CL_ARG_TYPE_EXPR) {
+    else if (type == CLArgType::EXPR) {
       char *expr = va_arg(*vargs, char *);
 
       setExpressionArg(num + 1, expr, &error_code);
     }
-    else if (type == CL_ARG_TYPE_REALS) {
+    else if (type == CLArgType::REALS) {
       uint dims[1];
 
       double *reals     = va_arg(*vargs, double *);
@@ -1449,7 +1569,7 @@ setVArgList(CLArgType type, va_list *vargs)
 
       setRealArrayArg(num + 1, reals, dims, 1, &error_code);
     }
-    else if (type == CL_ARG_TYPE_FLOATS) {
+    else if (type == CLArgType::FLOATS) {
       uint dims[1];
 
       float *reals     = va_arg(*vargs, float *);
@@ -1459,7 +1579,7 @@ setVArgList(CLArgType type, va_list *vargs)
 
       setRealArrayArg(num + 1, reals, dims, 1, &error_code);
     }
-    else if (type == CL_ARG_TYPE_INTEGERS) {
+    else if (type == CLArgType::INTEGERS) {
       uint dims[1];
 
       long *integers     = va_arg(*vargs, long *);
@@ -1469,7 +1589,7 @@ setVArgList(CLArgType type, va_list *vargs)
 
       setIntegerArrayArg(num + 1, integers, dims, 1, &error_code);
     }
-    else if (type == CL_ARG_TYPE_WORDS) {
+    else if (type == CLArgType::WORDS) {
       uint dims[1];
 
       int *integers     = va_arg(*vargs, int *);
@@ -1479,7 +1599,7 @@ setVArgList(CLArgType type, va_list *vargs)
 
       setIntegerArrayArg(num + 1, integers, dims, 1, &error_code);
     }
-    else if (type == CL_ARG_TYPE_STRINGS) {
+    else if (type == CLArgType::STRINGS) {
       uint dims[1];
 
       char **strings     = va_arg(*vargs, char **);
@@ -1489,42 +1609,42 @@ setVArgList(CLArgType type, va_list *vargs)
 
       setStringArrayArg(num + 1, strings, dims, 1, &error_code);
     }
-    else if (type == CL_ARG_TYPE_REALARR) {
+    else if (type == CLArgType::REALARR) {
       double *reals    = va_arg(*vargs, double *);
       uint   *dims     = va_arg(*vargs, uint *);
       uint    num_dims = va_arg(*vargs, uint);
 
       setRealArrayArg(num + 1, reals, dims, num_dims, &error_code);
     }
-    else if (type == CL_ARG_TYPE_FLTARR) {
+    else if (type == CLArgType::FLTARR) {
       float *reals    = va_arg(*vargs, float *);
       uint  *dims     = va_arg(*vargs, uint *);
       uint   num_dims = va_arg(*vargs, uint);
 
       setRealArrayArg(num + 1, reals, dims, num_dims, &error_code);
     }
-    else if (type == CL_ARG_TYPE_INTARR) {
+    else if (type == CLArgType::INTARR) {
       long *integers = va_arg(*vargs, long *);
       uint *dims     = va_arg(*vargs, uint *);
       uint  num_dims = va_arg(*vargs, uint);
 
       setIntegerArrayArg(num + 1, integers, dims, num_dims, &error_code);
     }
-    else if (type == CL_ARG_TYPE_WORDARR) {
+    else if (type == CLArgType::WORDARR) {
       int  *integers = va_arg(*vargs, int *);
       uint *dims     = va_arg(*vargs, uint *);
       uint  num_dims = va_arg(*vargs, uint);
 
       setIntegerArrayArg(num + 1, integers, dims, num_dims, &error_code);
     }
-    else if (type == CL_ARG_TYPE_STRARR) {
+    else if (type == CLArgType::STRARR) {
       char **strings  = va_arg(*vargs, char **);
       uint  *dims     = va_arg(*vargs, uint *);
       uint   num_dims = va_arg(*vargs, uint);
 
       setStringArrayArg(num + 1, strings, dims, num_dims, &error_code);
     }
-    else if (type == CL_ARG_TYPE_STRMAT) {
+    else if (type == CLArgType::STRMAT) {
       uint  *dims;
       char **strings;
       uint   num_dims;
@@ -1534,8 +1654,7 @@ setVArgList(CLArgType type, va_list *vargs)
       int   matrix_size = va_arg(*vargs, int);
 
       int flag = ClLanguageConverterMgrInst->convertStringMatrixToStringArray
-                  (&strings, &dims, &num_dims,
-                   matrix, num_matrix, matrix_size);
+                  (&strings, &dims, &num_dims, matrix, num_matrix, matrix_size);
 
       if (! flag) {
         error_code = -1;
@@ -1544,7 +1663,7 @@ setVArgList(CLArgType type, va_list *vargs)
 
       setStringArrayArg(num + 1, strings, dims, num_dims, &error_code);
     }
-    else if (type == CL_ARG_TYPE_CHRMAT) {
+    else if (type == CLArgType::CHRMAT) {
       uint  *dims;
       uint   num_dims;
       char **strings;
@@ -1554,8 +1673,7 @@ setVArgList(CLArgType type, va_list *vargs)
       int   matrix_size = va_arg(*vargs, int);
 
       int flag = ClLanguageConverterMgrInst->convertCharMatrixToStringArray
-                  (&strings, &dims, &num_dims,
-                   matrix, num_matrix, matrix_size);
+                  (&strings, &dims, &num_dims, matrix, num_matrix, matrix_size);
 
       if (! flag) {
         error_code = -1;
@@ -1564,7 +1682,7 @@ setVArgList(CLArgType type, va_list *vargs)
 
       setStringArrayArg(num + 1, strings, dims, num_dims, &error_code);
     }
-    else if (type == CL_ARG_TYPE_TYPED) {
+    else if (type == CLArgType::TYPED) {
       char *arg;
       char *args[CL_MAX_CONVERT_ARGS];
 
@@ -1579,7 +1697,7 @@ setVArgList(CLArgType type, va_list *vargs)
           args[i] = arg;
       }
 
-      if (to_type == CL_ARG_TYPE_STRARR)
+      if (to_type == int(CLArgType::STRARR))
         ClLanguageConverterMgrInst->setTypedStringArrayArg(this, num + 1,
           from_type, CL_MAX_CONVERT_ARGS,
           args[ 0], args[ 1], args[ 2], args[ 3], args[ 4],
@@ -1606,7 +1724,7 @@ setVArgList(CLArgType type, va_list *vargs)
 
 void
 ClLanguageArgs::
-setArgs(const string &str)
+setArgs(const std::string &str)
 {
   stringToArgList(str, arg_list_);
 }
@@ -1615,15 +1733,14 @@ void
 ClLanguageArgs::
 setArgs(ClLanguageCommand *command)
 {
-  if (command != NULL)
+  if (command)
     getCommandArgList(command, arg_list_);
 }
 
 /*------------------------------------------------------------------*
  *
  * setRealArg
- *   Set the Nth argument supplied by the user to a real
- *   number.
+ *   Set the Nth argument supplied by the user to a real number.
  *
  * CALL:
  *   setRealArg(int n, double real, int &error_code);
@@ -1649,7 +1766,7 @@ setRealArg(int n, double real, int *error_code)
 {
   *error_code = 0;
 
-  string arg = getVariableArg(n, error_code);
+  std::string arg = getVariableArg(n, error_code);
 
   if (*error_code != 0)
     return;
@@ -1661,7 +1778,7 @@ setRealArg(int n, double real, int *error_code)
   ClParserInst->assignValue(arg, value, &error_code1);
 
   if (error_code1 != 0) {
-    const string &command_name = ClLanguageMgrInst->getCommandName();
+    const std::string &command_name = ClLanguageMgrInst->getCommandName();
 
     ClLanguageMgrInst->expressionError(error_code1, "'%s' argument %d - '%s'",
                                        command_name.c_str(), n, arg.c_str());
@@ -1706,7 +1823,7 @@ setIntegerArg(int n, long integer, int *error_code)
 
   *error_code = 0;
 
-  string arg = getVariableArg(n, error_code);
+  std::string arg = getVariableArg(n, error_code);
 
   if (*error_code != 0)
     return;
@@ -1721,7 +1838,7 @@ setIntegerArg(int n, long integer, int *error_code)
   ClParserInst->assignValue(arg, value, &error_code1);
 
   if (error_code1 != 0) {
-    const string &command_name = ClLanguageMgrInst->getCommandName();
+    const std::string &command_name = ClLanguageMgrInst->getCommandName();
 
     ClLanguageMgrInst->expressionError(error_code1, "'%s' argument %d - '%s'",
                                        command_name.c_str(), n, arg.c_str());
@@ -1738,7 +1855,7 @@ setIntegerArg(int n, long integer, int *error_code)
  *   Set the Nth argument supplied by the user to a string.
  *
  * CALL:
- *   setStringArg(int n, const string &str, int &error_code);
+ *   setStringArg(int n, const std::string &str, int &error_code);
  *
  * INPUT:
  *   n          : The number of the argument to be set.
@@ -1757,13 +1874,13 @@ setIntegerArg(int n, long integer, int *error_code)
 
 void
 ClLanguageArgs::
-setStringArg(int n, const string &str, int *error_code)
+setStringArg(int n, const std::string &str, int *error_code)
 {
   ClParserValuePtr value;
 
   *error_code = 0;
 
-  string arg = getVariableArg(n, error_code);
+  std::string arg = getVariableArg(n, error_code);
 
   if (*error_code != 0)
     return;
@@ -1778,7 +1895,7 @@ setStringArg(int n, const string &str, int *error_code)
   ClParserInst->assignValue(arg, value, &error_code1);
 
   if (error_code1 != 0) {
-    const string &command_name = ClLanguageMgrInst->getCommandName();
+    const std::string &command_name = ClLanguageMgrInst->getCommandName();
 
     ClLanguageMgrInst->expressionError(error_code1, "'%s' argument %d - '%s'",
                                        command_name.c_str(), n, arg.c_str());
@@ -1826,7 +1943,7 @@ setCharArrayArg(int n, char *chars, int num_chars, int *error_code)
 
   *error_code = 0;
 
-  string arg = getVariableArg(n, error_code);
+  std::string arg = getVariableArg(n, error_code);
 
   if (*error_code != 0)
     return;
@@ -1841,7 +1958,7 @@ setCharArrayArg(int n, char *chars, int num_chars, int *error_code)
   ClParserInst->assignValue(arg, value, &error_code1);
 
   if (error_code1 != 0) {
-    const string &command_name = ClLanguageMgrInst->getCommandName();
+    const std::string &command_name = ClLanguageMgrInst->getCommandName();
 
     ClLanguageMgrInst->expressionError(error_code1, "'%s' argument %d - '%s'",
                                        command_name.c_str(), n, arg.c_str());
@@ -1892,7 +2009,7 @@ setRealArrayArg(int n, double *reals, uint *dims, uint num_dims, int *error_code
 
   *error_code = 0;
 
-  string arg = getVariableArg(n, error_code);
+  std::string arg = getVariableArg(n, error_code);
 
   if (*error_code != 0)
     return;
@@ -1907,7 +2024,7 @@ setRealArrayArg(int n, double *reals, uint *dims, uint num_dims, int *error_code
   ClParserInst->assignValue(arg, value, &error_code1);
 
   if (error_code1 != 0) {
-    const string &command_name = ClLanguageMgrInst->getCommandName();
+    const std::string &command_name = ClLanguageMgrInst->getCommandName();
 
     ClLanguageMgrInst->expressionError(error_code1, "'%s' argument %d - '%s'",
                                        command_name.c_str(), n, arg.c_str());
@@ -1958,7 +2075,7 @@ setRealArrayArg(int n, float *reals, uint *dims, uint num_dims, int *error_code)
 
   *error_code = 0;
 
-  string arg = getVariableArg(n, error_code);
+  std::string arg = getVariableArg(n, error_code);
 
   if (*error_code != 0)
     return;
@@ -1973,7 +2090,7 @@ setRealArrayArg(int n, float *reals, uint *dims, uint num_dims, int *error_code)
   ClParserInst->assignValue(arg, value, &error_code1);
 
   if (error_code1 != 0) {
-    const string &command_name = ClLanguageMgrInst->getCommandName();
+    const std::string &command_name = ClLanguageMgrInst->getCommandName();
 
     ClLanguageMgrInst->expressionError(error_code1, "'%s' argument %d - '%s'",
                                        command_name.c_str(), n, arg.c_str());
@@ -1995,7 +2112,7 @@ setIntegerArrayArg(int n, long *integers, uint *dims, uint num_dims, int *error_
 {
   *error_code = 0;
 
-  string arg = getVariableArg(n, error_code);
+  std::string arg = getVariableArg(n, error_code);
 
   if (*error_code != 0)
     return;
@@ -2011,10 +2128,10 @@ setIntegerArrayArg(int n, long *integers, uint *dims, uint num_dims, int *error_
   ClParserInst->assignValue(arg, value, &error_code1);
 
   if (error_code1 != 0) {
-    const string &command_name = ClLanguageMgrInst->getCommandName();
+    const std::string &command_name = ClLanguageMgrInst->getCommandName();
 
     ClLanguageMgrInst->expressionError(error_code1, "'%s' argument %d - '%s'",
-                                        command_name.c_str(), n, arg.c_str());
+                                       command_name.c_str(), n, arg.c_str());
 
     *error_code = 3;
 
@@ -2062,7 +2179,7 @@ setIntegerArrayArg(int n, int *integers, uint *dims, uint num_dims, int *error_c
 
   *error_code = 0;
 
-  string arg = getVariableArg(n, error_code);
+  std::string arg = getVariableArg(n, error_code);
 
   if (*error_code != 0)
     return;
@@ -2077,7 +2194,7 @@ setIntegerArrayArg(int n, int *integers, uint *dims, uint num_dims, int *error_c
   ClParserInst->assignValue(arg, value, &error_code1);
 
   if (error_code1 != 0) {
-    const string &command_name = ClLanguageMgrInst->getCommandName();
+    const std::string &command_name = ClLanguageMgrInst->getCommandName();
 
     ClLanguageMgrInst->expressionError(error_code1, "'%s' argument %d - '%s'",
                                        command_name.c_str(), n, arg.c_str());
@@ -2091,8 +2208,7 @@ setIntegerArrayArg(int n, int *integers, uint *dims, uint num_dims, int *error_c
 /*------------------------------------------------------------------*
  *
  * setStringArrayArg
- *   Set the Nth argument supplied by the user to a
- *   string array.
+ *   Set the Nth argument supplied by the user to a string array.
  *
  * CALL:
  *   setStringArrayArg(n, strings, dims, num_dims, &error_code);
@@ -2128,7 +2244,7 @@ setStringArrayArg(int n, char **strings, uint *dims, uint num_dims, int *error_c
 
   *error_code = 0;
 
-  string arg = getVariableArg(n, error_code);
+  std::string arg = getVariableArg(n, error_code);
 
   if (*error_code != 0)
     return;
@@ -2144,7 +2260,7 @@ setStringArrayArg(int n, char **strings, uint *dims, uint num_dims, int *error_c
   ClParserInst->assignValue(arg, value, &error_code1);
 
   if (error_code1 != 0) {
-    const string &command_name = ClLanguageMgrInst->getCommandName();
+    const std::string &command_name = ClLanguageMgrInst->getCommandName();
 
     ClLanguageMgrInst->expressionError(error_code1, "'%s' argument %d - '%s'",
                                        command_name.c_str(), n, arg.c_str());
@@ -2181,13 +2297,13 @@ setStringArrayArg(int n, char **strings, uint *dims, uint num_dims, int *error_c
 
 void
 ClLanguageArgs::
-setExpressionArg(int n, const string &expression, int *error_code)
+setExpressionArg(int n, const std::string &expression, int *error_code)
 {
   ClParserValuePtr value;
 
   *error_code = 0;
 
-  string arg = getVariableArg(n, error_code);
+  std::string arg = getVariableArg(n, error_code);
 
   if (*error_code != 0)
     return;
@@ -2195,10 +2311,10 @@ setExpressionArg(int n, const string &expression, int *error_code)
   ClParserExpr expr(expression);
 
   if (! expr.exec(value)) {
-    const string &command_name = ClLanguageMgrInst->getCommandName();
+    const std::string &command_name = ClLanguageMgrInst->getCommandName();
 
-    ClLanguageMgrInst->expressionError(CLERR_INVALID_EXPRESSION, "'%s' argument %d - '%s'",
-                                        command_name.c_str(), n, arg.c_str());
+    ClLanguageMgrInst->expressionError(ClErr::INVALID_EXPRESSION, "'%s' argument %d - '%s'",
+                                       command_name.c_str(), n, arg.c_str());
 
     *error_code = 3;
 
@@ -2206,10 +2322,10 @@ setExpressionArg(int n, const string &expression, int *error_code)
   }
 
   if (! value.isValid()) {
-    const string &command_name = ClLanguageMgrInst->getCommandName();
+    const std::string &command_name = ClLanguageMgrInst->getCommandName();
 
     ClLanguageMgrInst->syntaxError("undefined '%s' argument %d - '%s'",
-                                    command_name.c_str(), n, arg.c_str());
+                                   command_name.c_str(), n, arg.c_str());
 
     *error_code = 3;
 
@@ -2221,7 +2337,7 @@ setExpressionArg(int n, const string &expression, int *error_code)
   ClParserInst->assignValue(arg, value, &error_code1);
 
   if (error_code1 != 0) {
-    const string &command_name = ClLanguageMgrInst->getCommandName();
+    const std::string &command_name = ClLanguageMgrInst->getCommandName();
 
     ClLanguageMgrInst->expressionError(error_code1, "'%s' argument %d - '%s'",
                                        command_name.c_str(), n, arg.c_str());
@@ -2261,7 +2377,7 @@ setValueArg(int n, const ClParserValuePtr &value, int *error_code)
 {
   *error_code = 0;
 
-  string arg = getVariableArg(n, error_code);
+  std::string arg = getVariableArg(n, error_code);
 
   if (*error_code != 0)
     return;
@@ -2271,10 +2387,10 @@ setValueArg(int n, const ClParserValuePtr &value, int *error_code)
   ClParserInst->assignValue(arg, value, &error_code1);
 
   if (error_code1 != 0) {
-    const string &command_name = ClLanguageMgrInst->getCommandName();
+    const std::string &command_name = ClLanguageMgrInst->getCommandName();
 
     ClLanguageMgrInst->expressionError(error_code1, "'%s' argument %d - '%s'",
-                                        command_name.c_str(), n, arg.c_str());
+                                       command_name.c_str(), n, arg.c_str());
 
     *error_code = 3;
 
@@ -2285,8 +2401,7 @@ setValueArg(int n, const ClParserValuePtr &value, int *error_code)
 /*------------------------------------------------------------------*
  *
  * getCommandArgValues
- *   Convert all the arguments supplied with a command
- *   to values.
+ *   Convert all the arguments supplied with a command to values.
  *
  * CALL:
  *   int flag = getCommandArgValues
@@ -2335,12 +2450,12 @@ getCommandArgValues(ClLanguageCommand *command, ClParserValuePtr **values, int *
       (*values)[i] = ClParserValuePtr();
   }
   else
-    *values = NULL;
+    *values = nullptr;
 
   /* Evaluate each Argument */
 
   for (int i = 1; i <= *num_values; i++) {
-    string arg = getArg(i, &error_code);
+    std::string arg = getArg(i, &error_code);
 
     if (error_code != 0)
       goto GetCommandValues_1;
@@ -2348,20 +2463,19 @@ getCommandArgValues(ClLanguageCommand *command, ClParserValuePtr **values, int *
     ClParserExpr expr(arg);
 
     if (! expr.exec((*values)[i - 1])) {
-      const string &command_name = ClLanguageMgrInst->getCommandName();
+      const std::string &command_name = ClLanguageMgrInst->getCommandName();
 
-      ClLanguageMgrInst->expressionError(CLERR_INVALID_EXPRESSION,
-                                          "'%s' argument %d - '%s'",
-                                          command_name.c_str(), i, arg.c_str());
+      ClLanguageMgrInst->expressionError(ClErr::INVALID_EXPRESSION, "'%s' argument %d - '%s'",
+                                         command_name.c_str(), i, arg.c_str());
 
       goto GetCommandValues_1;
     }
 
     if (! (*values)[i - 1].isValid()) {
-      const string &command_name = ClLanguageMgrInst->getCommandName();
+      const std::string &command_name = ClLanguageMgrInst->getCommandName();
 
       ClLanguageMgrInst->syntaxError("undefined '%s' argument %d - '%s'",
-                                      command_name.c_str(), i, arg.c_str());
+                                     command_name.c_str(), i, arg.c_str());
 
       goto GetCommandValues_1;
     }
@@ -2376,7 +2490,7 @@ getCommandArgValues(ClLanguageCommand *command, ClParserValuePtr **values, int *
  GetCommandValues_1:
   delete [] *values;
 
-  *values    = NULL;
+  *values    = nullptr;
   *num_values = 0;
 
  GetCommandValues_2:
@@ -2388,8 +2502,7 @@ getCommandArgValues(ClLanguageCommand *command, ClParserValuePtr **values, int *
 /*------------------------------------------------------------------*
  *
  * getCommandArgList
- *   Convert the string supplied after a command to a list
- *   of argument strings.
+ *   Convert the string supplied after a command to a list of argument strings.
  *
  *   The arguments are in the form <arg1>,<arg2>,...,<arg3>
  *
@@ -2413,7 +2526,7 @@ void
 ClLanguageArgs::
 getCommandArgList(ClLanguageCommand *command, ClLanguageArgList *arg_list)
 {
-  if (command != NULL)
+  if (command)
     stringToArgList(command->getArgs(), arg_list);
 }
 
@@ -2422,188 +2535,157 @@ getCommandArgList(ClLanguageCommand *command, ClLanguageArgList *arg_list)
  * stringToArgList
  *   Convert a string to a list of argument strings.
  *
- *   The arguments are in the form <arg1>,<arg2>,...,<arg3>
+ *   The arguments are in the form:
+ *     Comma Separated :
+ *       <arg1> , <arg2> , ... , <arg3>
+ *     Space Separated :
+ *       <arg1> <arg2> ... <arg3>
  *
  * CALL:
- *   stringToArgList(const string &str, ClLanguageArgList *arg_list);
+ *   stringToArgList(const std::string &str, ClLanguageArgList *arg_list);
  *
  * INPUT:
- *   str      : String to convert.
+ *   str       : String to convert.
  *
- *   arg_list : List to add the arguments to (already created)
+ *   arg_list  : List to add the arguments to (already created)
+ *
+ *   separator : Separator char (defaults to ','
  *
  * OUTPUT:
- *   arg_list : List with argument strings added.
+ *   arg_list  : List with argument strings added.
  *
  *------------------------------------------------------------------*/
 
-void
+bool
 ClLanguageArgs::
-stringToArgList(const string &str, ClLanguageArgList *arg_list)
+stringToArgList(const std::string &str, ClLanguageArgList *arg_list)
 {
   arg_list->clear();
 
-  int in_brackets1 = 0;
-  int in_brackets2 = 0;
-  int in_brackets3 = 0;
-  int in_brackets4 = 0;
+  ClLanguageArgParser parser(str);
 
-  int len = str.size();
+  parser.skipSpaces();
 
-  int i = 0;
-
-  CStrUtil::skipSpace(str, &i);
-
-  string args_temp_string = "";
-
-  while (i < len) {
-    if      (str[i] == '\"') {
-      args_temp_string += str[i++];
-
-      while (i < len && str[i] != '\"') {
-        if (str[i] == '\\') {
-          args_temp_string += str[i++];
-
-          if (i < len)
-            args_temp_string += str[i++];
-        }
-        else
-          args_temp_string += str[i++];
-      }
-
-      if (i < len && str[i] == '\"')
-        args_temp_string += str[i++];
-      else
-        args_temp_string += '\"';
+  while (! parser.eof()) {
+    // parse double quoted string
+    if      (parser.isChar('\"')) {
+      parser.addDoubleQuotedString(isStripQuotes());
     }
-    else if (str[i] == '\'') {
-      args_temp_string += str[i++];
-
-      while (i < len && str[i] != '\'') {
-        if (str[i] == '\\') {
-          args_temp_string += str[i++];
-
-          if (i < len)
-            args_temp_string += str[i++];
-        }
-        else
-          args_temp_string += str[i++];
-      }
-
-      if (i < len && str[i] == '\'')
-        args_temp_string += str[i++];
-      else
-        args_temp_string += '\'';
+    // parse single quoted string
+    else if (parser.isChar('\'')) {
+      parser.addSingleQuotedString(isStripQuotes());
     }
-    else if (str[i] == '(') {
-      in_brackets1++;
+    // start parse ( ... ) expression
+    else if (parser.isChar('(')) {
+      parser.startBracket(1);
 
-      args_temp_string += str[i++];
+      parser.addChar();
     }
-    else if (str[i] == ')') {
-      in_brackets1--;
+    // end parse ( .. ) expression
+    else if (parser.isChar(')')) {
+      if (! parser.endBracket(1))
+        return false;
 
-      args_temp_string += str[i++];
+      parser.addChar();
     }
-    else if (str[i] == '[') {
-      in_brackets2++;
+    // start parse [ .. ] expression
+    else if (parser.isChar('[')) {
+      parser.startBracket(2);
 
-      args_temp_string += str[i++];
+      parser.addChar();
     }
-    else if (str[i] == ']') {
-      in_brackets2--;
+    // end parse [ ... ] expression
+    else if (parser.isChar(']')) {
+      if (! parser.endBracket(2))
+        return false;
 
-      args_temp_string += str[i++];
+      parser.addChar();
     }
-    else if (i < len - 1 && str[i] == '{' && str[i + 1] == '{') {
-      in_brackets3++;
+    // start parse {{ ... }} expression
+    else if (parser.isChars("{{")) {
+      parser.startBracket(3);
 
-      args_temp_string += str[i++];
-      args_temp_string += str[i++];
+      parser.addChar();
+      parser.addChar();
     }
-    else if (i < len - 1 && str[i] == '}' && str[i + 1] == '}') {
-      in_brackets3--;
+    // end parse {{ ... }} expression
+    else if (parser.isChars("}}")) {
+      if (! parser.endBracket(3))
+        return false;
 
-      args_temp_string += str[i++];
-      args_temp_string += str[i++];
+      parser.addChar();
+      parser.addChar();
     }
-    else if (str[i] == '{') {
-      in_brackets4++;
+    // start parse { ... } expression
+    else if (parser.isChar('{')) {
+      parser.startBracket(4);
 
-      args_temp_string += str[i++];
+      parser.addChar();
     }
-    else if (str[i] == '}') {
-      in_brackets4--;
+    // end parse { ... } expression
+    else if (parser.isChar('}')) {
+      if (! parser.endBracket(4))
+        return false;
 
-      args_temp_string += str[i++];
+      parser.addChar();
     }
-    else if (! space_separated_ && str[i] == ',') {
-      if (in_brackets1 == 0 && in_brackets2 == 0 &&
-          in_brackets3 == 0 && in_brackets4 == 0) {
-        i++;
-
-        if (args_temp_string != "") {
-          CStrUtil::stripSpaces(args_temp_string);
-
-          char *arg = strdup(args_temp_string.c_str());
-
-          arg_list->push_back(arg);
-        }
-
-        args_temp_string = "";
-      }
-      else
-        args_temp_string += str[i++];
-    }
-    else if (str[i] == ';') {
-      if (in_brackets1 == 0 && in_brackets2 == 0 &&
-          in_brackets3 == 0 && in_brackets4 == 0)
+    // handle semi-colon (line separator)
+    else if (parser.isChar(';')) {
+      // if not in brackets end parse
+      if (! parser.inBrackets())
         break;
 
-      args_temp_string += str[i++];
+      parser.addChar();
     }
-    else if (CStrUtil::isCComment(str, i)) {
-      if (in_brackets1 == 0 && in_brackets2 == 0 &&
-          in_brackets3 == 0 && in_brackets4 == 0)
+    // handle comment (terminates)
+    else if (parser.isComment()) {
+      if (! parser.inBrackets()) // TODO: skip comment
         break;
 
-      args_temp_string += str[i++];
-      args_temp_string += str[i++];
+      parser.addChar();
+      parser.addChar();
     }
-    else if (space_separated_ && isspace(str[i])) {
-      if (in_brackets1 == 0 && in_brackets2 == 0 &&
-          in_brackets3 == 0 && in_brackets4 == 0) {
-        i++;
+    else if (! isSpaceSeparated()) {
+      // handle comma separator
+      if (parser.isChar(',')) {
+        // if not in brackets add arg to list
+        if (! parser.inBrackets()) {
+          parser.skipChar();
 
-        if (args_temp_string != "") {
-          CStrUtil::stripSpaces(args_temp_string);
-
-          char *arg = strdup(args_temp_string.c_str());
-
-          arg_list->push_back(arg);
+          parser.addArg(arg_list);
         }
-
-        args_temp_string = "";
+        else
+          parser.addChar();
       }
-      else
-        args_temp_string += str[i++];
+      else {
+        parser.addChar();
+      }
     }
-    else
-      args_temp_string += str[i++];
+    else {
+      // handle space separator
+      if (parser.isSpace()) {
+        if (! parser.inBrackets()) {
+          parser.skipSpaces();
+
+          parser.addArg(arg_list);
+        }
+        else
+          parser.addChar();
+      }
+      else {
+        parser.addChar();
+      }
+    }
   }
 
-  if (args_temp_string != "") {
-    CStrUtil::stripSpaces(args_temp_string);
+  parser.addArg(arg_list);
 
-    char *arg = strdup(args_temp_string.c_str());
-
-    arg_list->push_back(arg);
-  }
+  return true;
 }
 
 bool
 ClLanguageArgs::
-readArgList(const string &str, int *pos, int end_char, string &text)
+readArgList(const std::string &str, int *pos, int end_char, std::string &text)
 {
   int pos1 = *pos;
 
@@ -2628,144 +2710,123 @@ readArgList(const string &str, int *pos, int end_char, string &text)
  *
  * CALL:
  *   bool flag =
- *     skipArgList(const string &str, int &pos, int end_char);
+ *     skipArgList(const std::string &str, int &pos, int end_char);
  *
  * INPUT:
  *   str      : String containing argument list.
  *
- *   pos      : Position in the string where the
- *            : argument list starts.
+ *   pos      : Position in the string where the argument list starts.
  *
- *   end_char : Character which terminates the
- *            : argument list.
+ *   end_char : Character which terminates the argument list.
  *
  * OUTPUT:
- *   pos      : Position in the string where the
- *            : argument list ends.
+ *   pos      : Position in the string where the argument list ends.
  *
  *------------------------------------------------------------------*/
 
 bool
 ClLanguageArgs::
-skipArgList(const string &str, int *pos, int end_char)
+skipArgList(const std::string &str, int *pos, int end_char, bool stripQuotes)
 {
   bool flag = false;
 
-  int in_brackets1 = 0;
-  int in_brackets2 = 0;
-  int in_brackets3 = 0;
-  int in_brackets4 = 0;
+  ClLanguageArgParser parser(str);
 
-  int len = str.size();
+  parser.setPos(*pos);
 
-  while (*pos < len) {
-    if (str[*pos] == end_char &&
-        in_brackets1 == 0 && in_brackets2 == 0 &&
-        in_brackets3 == 0 && in_brackets4 == 0) {
+  while (! parser.eof()) {
+    if (parser.isChar(end_char) && ! parser.inBrackets()) {
       flag = true;
-
-      goto SkipArgList_1;
+      break;
     }
 
-    if      (str[*pos] == '\"') {
-      (*pos)++;
-
-      while (*pos < len && str[*pos] != '\"') {
-        if (str[*pos] == '\\') {
-          (*pos)++;
-
-          if (*pos < len)
-            (*pos)++;
-        }
-        else
-          (*pos)++;
-      }
-
-      if (*pos < len && str[*pos] == '\"')
-        (*pos)++;
+    // skip double quoted string
+    if      (parser.isChar('\"')) {
+      parser.addDoubleQuotedString(stripQuotes);
     }
-    else if (str[*pos] == '\'') {
-      (*pos)++;
-
-      while (*pos < len && str[*pos] != '\'') {
-        if (str[*pos] == '\\') {
-          (*pos)++;
-
-          if (*pos < len)
-            (*pos)++;
-        }
-        else
-          (*pos)++;
-      }
-
-      if (*pos < len && str[*pos] == '\'')
-        (*pos)++;
+    // skip single quoted string
+    else if (parser.isChar('\'')) {
+      parser.addSingleQuotedString(stripQuotes);
     }
-    else if (str[*pos] == '(') {
-      in_brackets1++;
+    // start parse ( ... ) expression
+    else if (parser.isChar('(')) {
+      parser.startBracket(1);
 
-      (*pos)++;
+      parser.skipChar();
     }
-    else if (str[*pos] == ')') {
-      in_brackets1--;
-
-      (*pos)++;
-    }
-    else if (str[*pos] == '[') {
-      in_brackets2++;
-
-      (*pos)++;
-    }
-    else if (str[*pos] == ']') {
-      in_brackets2--;
-
-      (*pos)++;
-    }
-    else if (*pos < len - 1 && str[*pos] == '{' && str[*pos + 1] == '{') {
-      in_brackets3++;
-
-      (*pos)++;
-      (*pos)++;
-    }
-    else if (*pos < len - 1 && str[*pos] == '}' && str[*pos + 1] == '}') {
-      in_brackets3--;
-
-      (*pos)++;
-      (*pos)++;
-    }
-    else if (str[*pos] == '{') {
-      in_brackets4++;
-
-      (*pos)++;
-    }
-    else if (str[*pos] == '}') {
-      in_brackets4--;
-
-      (*pos)++;
-    }
-    else if (str[*pos] == ';') {
-      if (in_brackets1 == 0 && in_brackets2 == 0 &&
-          in_brackets3 == 0 && in_brackets4 == 0)
+    // end parse ( ... ) expression
+    else if (parser.isChar(')')) {
+      if (! parser.endBracket(1))
         break;
 
-      (*pos)++;
+      parser.skipChar();
     }
-    else if (CStrUtil::isCComment(str, *pos)) {
-      if (in_brackets1 == 0 && in_brackets2 == 0 &&
-          in_brackets3 == 0 && in_brackets4 == 0)
+    // start parse [ ... ] expression
+    else if (parser.isChar('[')) {
+      parser.startBracket(2);
+
+      parser.skipChar();
+    }
+    // end parse [ ... ] expression
+    else if (parser.isChar(']')) {
+      if (! parser.endBracket(2))
         break;
 
-      (*pos)++;
-      (*pos)++;
+      parser.skipChar();
+    }
+    // start parse {{ ... }} expression
+    else if (parser.isChars("{{")) {
+      parser.startBracket(3);
+
+      parser.skipChar();
+      parser.skipChar();
+    }
+    // end parse {{ ... }} expression
+    else if (parser.isChars("}}")) {
+      if (! parser.endBracket(3))
+        break;
+
+      parser.skipChar();
+      parser.skipChar();
+    }
+    // start parse { ... } expression
+    else if (parser.isChar('{')) {
+      parser.startBracket(4);
+
+      parser.skipChar();
+    }
+    // end parse { ... } expression
+    else if (parser.isChar('}')) {
+      if (! parser.endBracket(4))
+        break;
+
+      parser.skipChar();
+    }
+   // handle semi-colon (line separator)
+    else if (parser.isChar(';')) {
+      // if not in brackets end parse
+      if (! parser.inBrackets())
+        break;
+
+      parser.skipChar();
+    }
+    // handle comment (terminates)
+    else if (parser.isComment()) {
+      if (! parser.inBrackets()) // TODO: skip comment
+        break;
+
+      parser.skipChar();
+      parser.skipChar();
     }
     else
-      (*pos)++;
+      parser.skipChar();
   }
 
-  if (end_char == '\0' && *pos >= len)
+  if (end_char == '\0' && parser.eof())
     flag = true;
 
- SkipArgList_1:
+  *pos = parser.pos();
+
   return flag;
 }
 
@@ -2775,7 +2836,7 @@ skipArgList(const string &str, int *pos, int end_char)
  *   Replace a character in an argument list.
  *
  * CALL:
- *   replaceCharsInArgList(string &str, int c1, int c2);
+ *   replaceCharsInArgList(std::string &str, int c1, int c2);
  *
  * INPUT:
  *   str : String containing argument list.
@@ -2795,7 +2856,7 @@ skipArgList(const string &str, int *pos, int end_char)
 
 void
 ClLanguageArgs::
-replaceCharsInArgList(string &str, int c1, int c2)
+replaceCharsInArgList(std::string &str, int c1, int c2)
 {
   int len = str.size();
 
@@ -2849,7 +2910,7 @@ void
 ClLanguageArgs::
 stackChars(char **chars)
 {
-  if (chars_stack_ == NULL)
+  if (! chars_stack_)
     chars_stack_ = new CharsStack;
 
   chars_stack_->push_back(chars);
@@ -2864,7 +2925,7 @@ stackRealArray(double *reals, uint *dims)
   real_array[0] = (void *) reals;
   real_array[1] = (void *) dims;
 
-  if (real_array_stack_ == NULL)
+  if (! real_array_stack_)
     real_array_stack_ = new RealArrayStack;
 
   real_array_stack_->push_back(real_array);
@@ -2879,7 +2940,7 @@ stackRealArray(float *reals, uint *dims)
   real_array[0] = (void *) reals;
   real_array[1] = (void *) dims;
 
-  if (float_array_stack_ == NULL)
+  if (! float_array_stack_)
     float_array_stack_ = new FloatArrayStack;
 
   float_array_stack_->push_back(real_array);
@@ -2894,7 +2955,7 @@ stackIntegerArray(long *integers, uint *dims)
   integer_array[0] = (void *) integers;
   integer_array[1] = (void *) dims;
 
-  if (integer_array_stack_ == NULL)
+  if (! integer_array_stack_)
     integer_array_stack_ = new IntegerArrayStack;
 
   integer_array_stack_->push_back(integer_array);
@@ -2909,7 +2970,7 @@ stackIntegerArray(int *integers, uint *dims)
   integer_array[0] = (void *) integers;
   integer_array[1] = (void *) dims;
 
-  if (word_array_stack_ == NULL)
+  if (! word_array_stack_)
     word_array_stack_ = new WordArrayStack;
 
   word_array_stack_->push_back(integer_array);
@@ -2924,7 +2985,7 @@ stackStringArray(char **strs, uint *dims)
   string_array[0] = (void *) strs;
   string_array[1] = (void *) dims;
 
-  if (string_array_stack_ == NULL)
+  if (! string_array_stack_)
     string_array_stack_ = new StringArrayStack;
 
   string_array_stack_->push_back(string_array);

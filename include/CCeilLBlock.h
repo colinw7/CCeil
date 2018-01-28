@@ -22,19 +22,11 @@ enum ClBlockType {
 #define ClLanguageBlockDataMgrInst ClLanguageBlockDataMgr::getInstance()
 
 class ClLanguageBlockData {
- private:
-  typedef std::vector<ClLanguageBlockData *> BlockDataStack;
-
-  ClBlockType         type_;
-  std::string         name_;
-  ClLanguageCommand **commands_;
-  int                 num_commands_;
-
  public:
   ClLanguageBlockData();
 
   ClLanguageBlockData(ClBlockType type, const std::string &name,
-                      ClLanguageCommand **commands=NULL, int num_commands=0);
+                      ClLanguageCommand **commands=nullptr, int num_commands=0);
 
   ClLanguageBlockData(const ClLanguageBlockData &block_data);
 
@@ -59,15 +51,19 @@ class ClLanguageBlockData {
   int checkControlFlags(int *pos);
 
   int checkInterrupt();
-};
 
-class ClLanguageBlockDataMgr {
  private:
   typedef std::vector<ClLanguageBlockData *> BlockDataStack;
 
-  BlockDataStack      block_data_stack_;
-  ClLanguageBlockData current_block_data_;
+  ClBlockType         type_         { CL_BLOCK_TYPE_NORMAL_BLOCK };
+  std::string         name_;
+  ClLanguageCommand **commands_     { nullptr };
+  int                 num_commands_ { 0 };
+};
 
+//---
+
+class ClLanguageBlockDataMgr {
  public:
   static ClLanguageBlockDataMgr *getInstance() {
     static ClLanguageBlockDataMgr *instance;
@@ -87,6 +83,12 @@ class ClLanguageBlockDataMgr {
 
  private:
   ClLanguageBlockDataMgr() { }
+
+ private:
+  typedef std::vector<ClLanguageBlockData *> BlockDataStack;
+
+  BlockDataStack      block_data_stack_;
+  ClLanguageBlockData current_block_data_;
 };
 
 #endif

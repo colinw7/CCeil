@@ -1,7 +1,5 @@
 #include <CCeilPOpP.h>
 
-using std::ostream;
-
 ClParserOperatorMgr *
 ClParserOperatorMgr::
 getInstance()
@@ -29,9 +27,8 @@ bool
 ClParserOperatorMgr::
 initOperatorMap()
 {
-  for (uint i = 0; parser_operators[i] != NULL; ++i)
-    operator_map_[parser_operators[i]->type] =
-      new ClParserOperator(*parser_operators[i]);
+  for (uint i = 0; parser_operators[i]; ++i)
+    operator_map_[parser_operators[i]->type] = new ClParserOperator(*parser_operators[i]);
 
   return true;
 }
@@ -88,11 +85,13 @@ checkUnstack(ClParserOperatorPtr last_operator) const
   if (last_operator.isValid() &&
       (last_operator->data_.precedence > data_.precedence ||
        (last_operator->data_.precedence == data_.precedence &&
-        data_.associativity == CL_PARSER_OP_ASSOCIATE_L_TO_R)))
+        data_.associativity == CLParserOperatorAssociate::L_TO_R)))
     unstack = true;
 
   return unstack;
 }
+
+//------
 
 void
 ClParserOperator::
@@ -103,9 +102,9 @@ print() const
 
 void
 ClParserOperator::
-print(ostream &os) const
+print(std::ostream &os) const
 {
-  CStrUtil::fprintf(os, " %s ", data_.token.c_str());
+  os << " " << data_.token << " ";
 }
 
 void

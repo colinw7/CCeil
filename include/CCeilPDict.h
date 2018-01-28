@@ -72,11 +72,9 @@ struct ClParserStringKeyValue : public ClParserKeyValueBase {
   }
 };
 
-class ClParserKey {
- private:
-  ClParserValueType     type_;
-  ClParserKeyValueBase *value_;
+//---
 
+class ClParserKey {
  public:
   explicit ClParserKey(long integer=0);
   explicit ClParserKey(const std::string &str);
@@ -88,12 +86,20 @@ class ClParserKey {
 
   bool operator==(const ClParserKey &key) const;
 
+  std::string asString() const;
+
   void print() const;
   void print(std::ostream &os) const;
   void debugPrint() const;
 
   ClParserValuePtr getAsValue() const;
+
+ private:
+  ClParserValueType     type_;
+  ClParserKeyValueBase *value_;
 };
+
+//---
 
 struct ClParserKeyValue {
   ClParserKey      key;
@@ -197,6 +203,10 @@ class ClParserDict : public ClParserObj {
   const ClParserKey &integerToKey(long integer) const;
   const ClParserKey &stringToKey(const std::string &str) const;
 
+  //------
+
+  std::string asString() const;
+
   void print() const;
   void print(std::ostream &os) const;
   void debugPrint() const;
@@ -237,40 +247,44 @@ class ClParserDict : public ClParserObj {
 
   // Internal Fns
 
-  ClParserValuePtr abs() const;
-  ClParserValuePtr ceil() const;
-  ClParserValuePtr floor() const;
-  ClParserValuePtr sign() const;
-  ClParserValuePtr sqr() const;
-  ClParserValuePtr sqrt() const;
-  ClParserValuePtr cos() const;
-  ClParserValuePtr sin() const;
-  ClParserValuePtr tan() const;
-  ClParserValuePtr acos() const;
-  ClParserValuePtr asin() const;
-  ClParserValuePtr atan() const;
-  ClParserValuePtr atan(double real) const;
-  ClParserValuePtr exp() const;
-  ClParserValuePtr log() const;
-  ClParserValuePtr log10() const;
-  ClParserValuePtr cosh() const;
-  ClParserValuePtr sinh() const;
-  ClParserValuePtr tanh() const;
-  ClParserValuePtr toChar() const;
-  ClParserValuePtr toInt() const;
-  ClParserValuePtr toReal() const;
+  ClParserValuePtr abs     () const;
+  ClParserValuePtr ceil    () const;
+  ClParserValuePtr floor   () const;
+  ClParserValuePtr sign    () const;
+  ClParserValuePtr sqr     () const;
+  ClParserValuePtr sqrt    () const;
+  ClParserValuePtr cos     () const;
+  ClParserValuePtr sin     () const;
+  ClParserValuePtr tan     () const;
+  ClParserValuePtr acos    () const;
+  ClParserValuePtr asin    () const;
+  ClParserValuePtr atan    () const;
+  ClParserValuePtr atan    (double real) const;
+  ClParserValuePtr exp     () const;
+  ClParserValuePtr log     () const;
+  ClParserValuePtr log10   () const;
+  ClParserValuePtr cosh    () const;
+  ClParserValuePtr sinh    () const;
+  ClParserValuePtr tanh    () const;
+  ClParserValuePtr toChar  () const;
+  ClParserValuePtr toInt   () const;
+  ClParserValuePtr toReal  () const;
   ClParserValuePtr toString() const;
-  ClParserValuePtr isNan() const;
-  ClParserValuePtr toLower() const;
-  ClParserValuePtr toUpper() const;
-  ClParserValuePtr min() const;
-  ClParserValuePtr max() const;
-  ClParserValuePtr sum() const;
-  ClParserValuePtr dim() const;
-  ClParserValuePtr len() const;
-  ClParserValuePtr index(const ClParserObj &obj) const;
+  ClParserValuePtr isNan   () const;
+  ClParserValuePtr toLower () const;
+  ClParserValuePtr toUpper () const;
+  ClParserValuePtr min     () const;
+  ClParserValuePtr max     () const;
+  ClParserValuePtr sum     () const;
+  ClParserValuePtr dim     () const;
+  ClParserValuePtr len     () const;
+
+  ClParserValuePtr index (const ClParserObj &obj) const;
   ClParserValuePtr rindex(const ClParserObj &obj) const;
+
   ClParserValuePtr sort(ClParserSortDirection direction) const;
+
+  ClParserValuePtr doAssert() const;
 
   //------
 

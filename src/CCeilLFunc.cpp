@@ -1,15 +1,13 @@
 #include <CCeilLI.h>
 
-using std::string;
-
 ClLanguageFunc *
 ClLanguageFuncMgr::
-createFunc(const string &name, const FuncArgList &args, const ClLanguageCommandList &command_list)
+createFunc(const std::string &name, const FuncArgList &args,
+           const ClLanguageCommandList &command_list)
 {
   ClLanguageFunc *function = lookupFunc(name);
 
-  if (function != NULL)
-    delete function;
+  delete function;
 
   function = new ClLanguageFunc(name, args, command_list);
 
@@ -20,11 +18,11 @@ createFunc(const string &name, const FuncArgList &args, const ClLanguageCommandL
 
 void
 ClLanguageFuncMgr::
-deleteFunc(const string &name)
+deleteFunc(const std::string &name)
 {
   ClLanguageFunc *function = lookupFunc(name);
 
-  if (function == NULL)
+  if (function)
     return;
 
   function_map_.erase(name);
@@ -34,9 +32,9 @@ deleteFunc(const string &name)
 
 ClLanguageFunc *
 ClLanguageFuncMgr::
-lookupFunc(const string &name) const
+lookupFunc(const std::string &name) const
 {
-  ClLanguageFunc *function = NULL;
+  ClLanguageFunc *function = nullptr;
 
   FuncMap::const_iterator p = function_map_.find(name);
 
@@ -73,7 +71,7 @@ deleteFuncs()
 //-----------------
 
 ClLanguageFunc::
-ClLanguageFunc(const string &name, const ArgList &args,
+ClLanguageFunc(const std::string &name, const ArgList &args,
                const ClLanguageCommandList &command_list) :
  name_(name), args_(args), command_list_(command_list)
 {

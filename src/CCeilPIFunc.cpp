@@ -1,8 +1,5 @@
 #include <CCeilPIFuncP.h>
 
-using std::string;
-using std::ostream;
-
 ClParserInternFnMgr::
 ClParserInternFnMgr()
 {
@@ -16,14 +13,14 @@ ClParserInternFnMgr::
 
 bool
 ClParserInternFnMgr::
-isInternFn(const string &name) const
+isInternFn(const std::string &name) const
 {
   return getInternFn(name).isValid();
 }
 
 ClParserInternFnPtr
 ClParserInternFnMgr::
-getInternFn(const string &name) const
+getInternFn(const std::string &name) const
 {
   InternFnMap::const_iterator p = internfn_map_.find(name);
 
@@ -37,7 +34,7 @@ void
 ClParserInternFnMgr::
 addInternFns()
 {
-  for (uint i = 0; i < PARSER_NO_INTERN_FNS; ++i) {
+  for (uint i = 0; parser_internfn[i].type != CLParserInternFnType::NONE; ++i) {
     ClParserInternFn *internfn = new ClParserInternFn(parser_internfn[i]);
 
     internfn_map_[parser_internfn[i].name] = internfn;
@@ -47,16 +44,15 @@ addInternFns()
 //-----------------------------
 
 ClParserInternFn::
-ClParserInternFn(CLParserInternFnType type, const string &name,
+ClParserInternFn(CLParserInternFnType type, const std::string &name,
                  uint num_args, ClParserArg *args, bool composite) :
- type_(type), name_(name), num_args_(num_args), args_(args), composite_(composite)
+ data_(type, name, num_args, args, composite)
 {
 }
 
 ClParserInternFn::
 ClParserInternFn(const ClParserInternFnData &data) :
- type_(data.type), name_(data.name), num_args_(data.num_args),
- args_(data.args), composite_(data.composite)
+ data_(data)
 {
 }
 
@@ -64,26 +60,28 @@ ClParserInternFn *
 ClParserInternFn::
 dup() const
 {
-  return new ClParserInternFn(type_, name_, num_args_, args_, composite_);
+  return new ClParserInternFn(data_);
 }
+
+//------
 
 void
 ClParserInternFn::
 print() const
 {
-  ClParserInst->output(" %s ", name_.c_str());
+  ClParserInst->output(" %s ", getName().c_str());
 }
 
 void
 ClParserInternFn::
-print(ostream &os) const
+print(std::ostream &os) const
 {
-  CStrUtil::fprintf(os, " %s ", name_.c_str());
+  os << " " << getName() << " ";
 }
 
 void
 ClParserInternFn::
 debugPrint() const
 {
-  fprintf(stderr, " %s ", name_.c_str());
+  fprintf(stderr, " %s ", getName().c_str());
 }

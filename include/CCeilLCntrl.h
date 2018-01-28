@@ -10,32 +10,32 @@
 class ClLanguageInputFile {
  public:
   ClLanguageInputFile();
+ ~ClLanguageInputFile();
 
-  ClLanguageInputFile(const ClLanguageInputFile &file) :
-   name_(file.name_), fp_(file.fp_), line_num_(file.line_num_) {
-  }
-
-  ClLanguageInputFile &operator=(const ClLanguageInputFile &file) {
-    name_     = file.name_;
-    fp_       = file.fp_;
-    line_num_ = file.line_num_;
-
-    return *this;
-  }
-
-  FILE              *getFp() const { return fp_; }
   const std::string &getName() const { return name_; }
-  int                getLineNum() const { return line_num_; }
-
   bool setName(const std::string &name);
+
+  CFile *getFile() const { return file_; }
+
+  FILE *getFp() const { return fp_; }
   void setFp(FILE *fp);
+
+  int getLineNum() const { return line_num_; }
   void setLineNum(int line_num) { line_num_ = line_num; }
 
   bool readLine(std::string &line);
 
  private:
+  void reset();
+
+ private:
+  ClLanguageInputFile(const ClLanguageInputFile &file);
+  ClLanguageInputFile &operator=(const ClLanguageInputFile &file);
+
+ private:
   std::string  name_;
-  FILE        *fp_ { nullptr };
+  CFile*       file_     { nullptr };
+  FILE        *fp_       { nullptr };
   int          line_num_ { 0 };
 };
 
@@ -135,7 +135,7 @@ class ClLanguageMgr {
 
   bool readLine();
 
-  bool runCommand(const std::string &command_string);
+  bool runCommand(const std::string &commandString);
 
   ClLanguageCommand *processLine(const std::string &line);
 
@@ -158,23 +158,23 @@ class ClLanguageMgr {
 
   void setArgv(int argc, char **argv);
 
-  void setExitFlag(bool exit_flag) { exit_flag_ = exit_flag; }
-  bool getExitFlag() const { return exit_flag_; }
+  void setExitFlag(bool exitFlag) { exitFlag_ = exitFlag; }
+  bool getExitFlag() const { return exitFlag_; }
 
-  void setExitCode(int exit_code) { exit_code_ = exit_code; }
-  int  getExitCode() const { return exit_code_; }
+  void setExitCode(int exitCode) { exitCode_ = exitCode; }
+  int  getExitCode() const { return exitCode_; }
 
-  void setInterruptFlag(bool intr_flag) { intr_flag_ = intr_flag; }
-  bool getInterruptFlag() const { return intr_flag_; }
+  void setInterruptFlag(bool intrFlag) { intrFlag_ = intrFlag; }
+  bool getInterruptFlag() const { return intrFlag_; }
 
-  void setBreakFlag(bool break_flag) { break_flag_ = break_flag; }
-  bool getBreakFlag() const { return break_flag_; }
+  void setBreakFlag(bool breakFlag) { breakFlag_ = breakFlag; }
+  bool getBreakFlag() const { return breakFlag_; }
 
-  void setContinueFlag(bool continue_flag) { continue_flag_ = continue_flag; }
-  bool getContinueFlag() const { return continue_flag_; }
+  void setContinueFlag(bool continueFlag) { continueFlag_ = continueFlag; }
+  bool getContinueFlag() const { return continueFlag_; }
 
-  void setReturnFlag(bool return_flag) { return_flag_ = return_flag; }
-  bool getReturnFlag() const { return return_flag_; }
+  void setReturnFlag(bool returnFlag) { returnFlag_ = returnFlag; }
+  bool getReturnFlag() const { return returnFlag_; }
 
   void setHelpProc(ClLanguageHelpProc help_proc) { help_proc_ = help_proc; }
   ClLanguageHelpProc getHelpProc() const { return help_proc_; }
@@ -190,8 +190,8 @@ class ClLanguageMgr {
   void resetDepth() { depth_ = 0; }
   int  getDepth() const { return depth_; }
 
-  void setInputFile(const ClLanguageInputFile &file) { input_file_ = file; }
-  ClLanguageInputFile &getInputFile() { return input_file_; }
+  void setInputFile(ClLanguageInputFile *file) { inputFile_ = file; }
+  ClLanguageInputFile *getInputFile() { return inputFile_; }
 
 #ifdef CEIL_READLINE
   CReadLine &getReadLine() { return readline_; }
@@ -217,12 +217,12 @@ class ClLanguageMgr {
   uint nextIdent() { return ident_++; }
 
   uint defineBlockCommand(const std::string &name, const std::string &end_name,
-                          ClBlockType type, ClLanguageCmdProc proc, void *data=NULL);
+                          ClBlockType type, ClLanguageCmdProc proc, void *data=nullptr);
 
-  uint defineCommand(const std::string &name, ClLanguageCmdProc proc, void *data=NULL);
+  uint defineCommand(const std::string &name, ClLanguageCmdProc proc, void *data=nullptr);
 
   uint defineCommand(ClParserScopePtr scope, const std::string &name,
-                     ClLanguageCmdProc proc, void *data=NULL);
+                     ClLanguageCmdProc proc, void *data=nullptr);
 
   void addCommandDef(ClLanguageCommandDef *command_def);
   void addCommandDef(ClParserScopePtr scope, ClLanguageCommandDef *command_def);
@@ -280,6 +280,7 @@ class ClLanguageMgr {
   void voutput(const char *format, va_list *vargs);
 
   void error(const char *format, ...);
+  void expressionError(ClErr error_code, const char *format, ...);
   void expressionError(int error_code, const char *format, ...);
   void syntaxError(const char *format, ...);
 
@@ -308,41 +309,41 @@ class ClLanguageMgr {
  private:
   typedef std::map<std::string, ClLanguageCommandDef *> CommandDefMap;
 
-  int                     argc_ { 0 };
-  char                  **argv_ { nullptr };
-  bool                    exit_flag_ { false };
-  int                     exit_code_ { 0 };
-  bool                    intr_flag_ { false };
-  bool                    break_flag_ { false };
-  bool                    continue_flag_ { false };
-  bool                    return_flag_ { false };
-  ClLanguageHelpProc      help_proc_ { nullptr };
+  int                     argc_              { 0 };
+  char                  **argv_              { nullptr };
+  bool                    exitFlag_          { false };
+  int                     exitCode_          { 0 };
+  bool                    intrFlag_          { false };
+  bool                    breakFlag_         { false };
+  bool                    continueFlag_      { false };
+  bool                    returnFlag_        { false };
+  ClLanguageHelpProc      help_proc_         { nullptr };
   std::string             command_name_;
-  int                     command_line_num_ { 0 };
-  int                     depth_ { 0 };
-  ClLanguageInputFile     input_file_;
+  int                     command_line_num_  { 0 };
+  int                     depth_             { 0 };
+  ClLanguageInputFile*    inputFile_         { nullptr };
 #ifdef CEIL_READLINE
   CReadLine               readline_;
 #endif
   ClLanguageGoto          goto_;
-  FILE                   *output_fp_ { nullptr };
+  FILE                   *output_fp_         { nullptr };
   std::string             run_file_;
-  bool                    exit_after_run_ { false };
-  bool                    echo_commands_ { false };
+  bool                    exit_after_run_    { false };
+  bool                    echo_commands_     { false };
   uint                    ident_ { 1 };
   CommandDefMap           command_def_list1_;
   CommandDefMap           command_def_list2_;
-  ClLanguageCommand      *block_command_ { nullptr };
+  ClLanguageCommand      *block_command_     { nullptr };
   ClLanguageCommandList   block_command_stack_;
-  bool                    first_line_ { true };
+  bool                    first_line_        { true };
   std::string             prompt_;
-  bool                    ignore_pos_proc_ { false };
+  bool                    ignore_pos_proc_   { false };
   std::string             line_;
   int                     line_len_ { 0 };
   std::string             line_buffer_;
   ClParserValuePtr        last_value_;
-  bool                    abort_signal_ { false };
-  CCeilLErrorMgr*         errorMgr_ { nullptr };
+  bool                    abort_signal_      { false };
+  CCeilLErrorMgr*         errorMgr_          { nullptr };
   CommandTermProc         command_term_proc_ { nullptr };
   void                   *command_term_data_ { nullptr };
 };

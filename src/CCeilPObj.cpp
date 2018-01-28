@@ -6,7 +6,7 @@ operator()(const ClParserObj &obj1, const ClParserObj &obj2)
 {
   int cmp = obj1.cmp(obj2);
 
-  if (direction_ == CL_SORT_DESCENDING)
+  if (direction_ == ClParserSortDirection::DESCENDING)
     cmp = -cmp;
 
   return (cmp < 0);
@@ -18,7 +18,7 @@ operator()(const ClParserObj *obj1, const ClParserObj *obj2)
 {
   int cmp = obj1->cmp(*obj2);
 
-  if (direction_ == CL_SORT_DESCENDING)
+  if (direction_ == ClParserSortDirection::DESCENDING)
     cmp = -cmp;
 
   return (cmp < 0);
@@ -30,7 +30,7 @@ operator()(const ClParserIntegerPtr &obj1, const ClParserIntegerPtr &obj2)
 {
   int cmp = obj1->cmp(*obj2.get());
 
-  if (direction_ == CL_SORT_DESCENDING)
+  if (direction_ == ClParserSortDirection::DESCENDING)
     cmp = -cmp;
 
   return (cmp < 0);

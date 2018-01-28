@@ -1,8 +1,6 @@
 #include <CCeilL.h>
 #include <COSSignal.h>
 
-using std::string;
-
 static void
 ClLanguageSignalHandler(int sig)
 {
@@ -15,21 +13,21 @@ void
 ClSignalMgr::
 init()
 {
-  signal_command_map_[SIGSYNTAX] = NULL;
-  signal_command_map_[SIGEXPR  ] = NULL;
-  signal_command_map_[SIGINT   ] = NULL;
+  signal_command_map_[SIGSYNTAX] = nullptr;
+  signal_command_map_[SIGEXPR  ] = nullptr;
+  signal_command_map_[SIGINT   ] = nullptr;
 #ifdef SIGQUIT
-  signal_command_map_[SIGQUIT  ] = NULL;
+  signal_command_map_[SIGQUIT  ] = nullptr;
 #endif
-  signal_command_map_[SIGABRT  ] = NULL;
-  signal_command_map_[SIGTERM  ] = NULL;
+  signal_command_map_[SIGABRT  ] = nullptr;
+  signal_command_map_[SIGTERM  ] = nullptr;
 #ifdef SIGALRM
-  signal_command_map_[SIGALRM  ] = NULL;
+  signal_command_map_[SIGALRM  ] = nullptr;
 #endif
 #ifdef SIGCHLD
-  signal_command_map_[SIGCHLD  ] = NULL;
+  signal_command_map_[SIGCHLD  ] = nullptr;
 #endif
-  signal_command_map_[SIGSEGV  ] = NULL;
+  signal_command_map_[SIGSEGV  ] = nullptr;
 }
 
 void
@@ -46,10 +44,10 @@ void
 ClSignalMgr::
 termSignalProcs()
 {
-  setSignalProc("interrupt", NULL);
-  setSignalProc("quit"     , NULL);
-  setSignalProc("abort"    , NULL);
-  setSignalProc("terminate", NULL);
+  setSignalProc("interrupt", nullptr);
+  setSignalProc("quit"     , nullptr);
+  setSignalProc("abort"    , nullptr);
+  setSignalProc("terminate", nullptr);
 }
 
 /*------------------------------------------------------------------*
@@ -60,7 +58,7 @@ termSignalProcs()
  *
  * CALL:
  *   bool flag =
- *     setSignalCommand(const string &name, const string &command);
+ *     setSignalCommand(const std::string &name, const std::string &command);
  *
  * INPUT:
  *   name    : Signal Name
@@ -74,7 +72,7 @@ termSignalProcs()
 
 bool
 ClSignalMgr::
-setSignalCommand(const string &name, const string &command)
+setSignalCommand(const std::string &name, const std::string &command)
 {
   int type = signalNameToType(name);
 
@@ -83,14 +81,14 @@ setSignalCommand(const string &name, const string &command)
 
   ClSignalCommand *signal_command = getSignalCommand(type);
 
-  if (signal_command == NULL)
+  if (! signal_command)
     return false;
 
   if (command != "") {
     if (isUnixSignal(type)) {
       ClSignalHandler proc = (ClSignalHandler) ClLanguageSignalHandler;
 
-      if (signal_command->proc == NULL)
+      if (! signal_command->proc)
         signal_command->old_proc = COSSignal::getSignalHandler(type);
 
         COSSignal::addSignalHandler(type, proc);
@@ -102,13 +100,13 @@ setSignalCommand(const string &name, const string &command)
   }
   else {
     if (isUnixSignal(type)) {
-      if (signal_command->old_proc != NULL)
+      if (signal_command->old_proc)
         COSSignal::addSignalHandler(type, signal_command->old_proc);
       else
         COSSignal::defaultSignal(type);
 
-      signal_command->proc     = NULL;
-      signal_command->old_proc = NULL;
+      signal_command->proc     = nullptr;
+      signal_command->old_proc = nullptr;
     }
 
     signal_command->command = "";
@@ -125,7 +123,7 @@ setSignalCommand(const string &name, const string &command)
  *
  * CALL:
  *   bool flag =
- *     raiseSignal(const string &name, const string &data);
+ *     raiseSignal(const std::string &name, const std::string &data);
  *
  * INPUT:
  *   name : Signal Name
@@ -139,7 +137,7 @@ setSignalCommand(const string &name, const string &command)
 
 bool
 ClSignalMgr::
-raiseSignal(const string &name, const string &data)
+raiseSignal(const std::string &name, const std::string &data)
 {
   int type = signalNameToType(name);
 
@@ -153,10 +151,9 @@ raiseSignal(const string &name, const string &data)
 
     ClLanguageArgs *args = new ClLanguageArgs;
 
-    args->startArgs(NULL);
+    args->startArgs(nullptr);
 
-    if (args->getStringArgList(data, CL_ARG_TYPE_STRING, &message,
-                               CL_ARG_TYPE_NONE) != 1)
+    if (args->getStringArgList(data, CLArgType::STRING, &message, CLArgType::NONE) != 1)
       return false;
 
     ClLanguageMgrInst->syntaxError(message);
@@ -170,10 +167,9 @@ raiseSignal(const string &name, const string &data)
 
     ClLanguageArgs *args = new ClLanguageArgs;
 
-    args->startArgs(NULL);
+    args->startArgs(nullptr);
 
-    if (args->getStringArgList(data, CL_ARG_TYPE_STRING, &message,
-                               CL_ARG_TYPE_NONE) != 1)
+    if (args->getStringArgList(data, CLArgType::STRING, &message, CLArgType::NONE) != 1)
       return false;
 
     ClLanguageMgrInst->expressionError(-1, message);
@@ -195,7 +191,7 @@ raiseSignal(const string &name, const string &data)
  *
  * CALL:
  *   bool flag =
- *     setSignalProc(const string &name, ClSignalHandler proc);
+ *     setSignalProc(const std::string &name, ClSignalHandler proc);
  *
  * INPUT:
  *   name : Signal Name
@@ -215,7 +211,7 @@ raiseSignal(const string &name, const string &data)
 
 bool
 ClSignalMgr::
-setSignalProc(const string &name, ClSignalHandler proc)
+setSignalProc(const std::string &name, ClSignalHandler proc)
 {
   int type = signalNameToType(name);
 
@@ -224,10 +220,10 @@ setSignalProc(const string &name, ClSignalHandler proc)
 
   ClSignalCommand *signal_command = getSignalCommand(type);
 
-  if (signal_command == NULL)
+  if (! signal_command)
     return false;
 
-  if (proc != NULL) {
+  if (proc) {
     if (isUnixSignal(type)) {
       signal_command->old_proc = COSSignal::getSignalHandler(type);
 
@@ -238,14 +234,14 @@ setSignalProc(const string &name, ClSignalHandler proc)
   }
   else {
     if (isUnixSignal(type)) {
-      if (signal_command->old_proc != NULL)
+      if (signal_command->old_proc)
         COSSignal::addSignalHandler(type, signal_command->old_proc);
       else
         COSSignal::defaultSignal(type);
     }
 
-    signal_command->proc     = NULL;
-    signal_command->old_proc = NULL;
+    signal_command->proc     = nullptr;
+    signal_command->old_proc = nullptr;
 
     signal_command->command = "";
   }
@@ -282,7 +278,7 @@ checkSignalCommand(int type)
 {
   ClSignalCommand *signal_command = getSignalCommand(type);
 
-  if (signal_command == NULL)
+  if (! signal_command)
     return false;
 
   return (signal_command->command != "");
@@ -316,7 +312,7 @@ executeSignalCommand(int type)
 {
   ClSignalCommand *signal_command = getSignalCommand(type);
 
-  if (signal_command == NULL)
+  if (! signal_command)
     return false;
 
   if (signal_command->command != "")
@@ -354,7 +350,7 @@ handleSignal(int sig)
 {
   ClSignalCommand *signal_command = getSignalCommand(sig);
 
-  if (signal_command != NULL && signal_command->command != "")
+  if (signal_command && signal_command->command != "")
     ClLanguageMgrInst->runCommand(signal_command->command);
   else {
     if (sig == SIGINT  || sig == SIGQUIT ||
@@ -384,7 +380,7 @@ handleSignal(int sig)
  *
  * RETURNS:
  *   signal_command : Signal Command Structure
- *                  : (NULL if none).
+ *                  : (null if none).
  *
  * NOTES:
  *   None
@@ -400,7 +396,7 @@ getSignalCommand(int type) const
   if (p != signal_command_map_.end())
     return (*p).second;
 
-  return NULL;
+  return nullptr;
 }
 
 /*------------------------------------------------------------------*
@@ -409,7 +405,7 @@ getSignalCommand(int type) const
  *   Get the Type of the specified Signal Name.
  *
  * CALL:
- *   int type = signalNameToType(comst string &name);
+ *   int type = signalNameToType(comst std::string &name);
  *
  * INPUT:
  *   name : Signal Name
@@ -427,7 +423,7 @@ getSignalCommand(int type) const
 
 int
 ClSignalMgr::
-signalNameToType(const string &name) const
+signalNameToType(const std::string &name) const
 {
   if      (CStrUtil::casecmp(name, "syntax") == 0)
     return SIGSYNTAX;
@@ -443,7 +439,7 @@ signalNameToType(const string &name) const
  *   Get the Name of the specified Signal Type.
  *
  * CALL:
- *   string name =
+ *   std::string name =
  *     signalTypeToName(int type);
  *
  * INPUT:
@@ -460,7 +456,7 @@ signalNameToType(const string &name) const
  *
  *------------------------------------------------------------------*/
 
-string
+std::string
 ClSignalMgr::
 signalTypeToName(int type) const
 {

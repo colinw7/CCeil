@@ -1,10 +1,8 @@
 #include <CCeilL.h>
 
-using std::string;
-
 ClLanguageLabelData *
 ClLanguageLabelDataMgr::
-createLabelData(const string &name)
+createLabelData(const std::string &name)
 {
   ClLanguageLabelData *label_data = new ClLanguageLabelData(name);
 
@@ -45,9 +43,9 @@ clearCurrentLabelDatas()
 
 ClLanguageLabelData *
 ClLanguageLabelDataMgr::
-getCurrentLabelData(const string &name) const
+getCurrentLabelData(const std::string &name) const
 {
-  ClLanguageLabelData *label_data = NULL;
+  ClLanguageLabelData *label_data = nullptr;
 
   LabelDataMap::const_iterator p = current_label_list_.find(name);
 
@@ -74,7 +72,7 @@ removeCurrentLabelData(ClLanguageLabelData *label_data)
 //---------------
 
 ClLanguageLabelData::
-ClLanguageLabelData(const string &name) :
+ClLanguageLabelData(const std::string &name) :
  name_(name)
 {
   depth_ = ClLanguageMgrInst->getDepth();

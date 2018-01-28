@@ -1,16 +1,13 @@
 #include <CCeilLI.h>
 
-using std::string;
-
 ClLanguageProc *
 ClLanguageProcMgr::
-createProc(const string &name, const ProcArgList &args,
+createProc(const std::string &name, const ProcArgList &args,
            const ClLanguageCommandList &command_list)
 {
   ClLanguageProc *proc = lookupProc(name);
 
-  if (proc != NULL)
-    delete proc;
+  delete proc;
 
   proc = new ClLanguageProc(name, args, command_list);
 
@@ -21,11 +18,11 @@ createProc(const string &name, const ProcArgList &args,
 
 void
 ClLanguageProcMgr::
-deleteProc(const string &name)
+deleteProc(const std::string &name)
 {
   ClLanguageProc *proc = lookupProc(name);
 
-  if (proc == NULL)
+  if (proc)
     return;
 
   proc_map_.erase(name);
@@ -35,9 +32,9 @@ deleteProc(const string &name)
 
 ClLanguageProc *
 ClLanguageProcMgr::
-lookupProc(const string &name) const
+lookupProc(const std::string &name) const
 {
-  ClLanguageProc *procedure = NULL;
+  ClLanguageProc *procedure = nullptr;
 
   ProcMap::const_iterator p = proc_map_.find(name);
 
@@ -74,7 +71,7 @@ deleteProcs()
 //-----------------
 
 ClLanguageProc::
-ClLanguageProc(const string &name, const ArgList &args,
+ClLanguageProc(const std::string &name, const ArgList &args,
                const ClLanguageCommandList &command_list) :
  name_(name), args_(args), command_list_(command_list), ref_count_(0)
 {

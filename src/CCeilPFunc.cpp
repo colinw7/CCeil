@@ -2,9 +2,6 @@
 
 #include <algorithm>
 
-using std::string;
-using std::ostream;
-
 ClParserFuncMgr::
 ClParserFuncMgr()
 {
@@ -17,13 +14,13 @@ ClParserFuncMgr::
 
 bool
 ClParserFuncMgr::
-createFunc(const string &name, int *error_code)
+createFunc(const std::string &name, int *error_code)
 {
   *error_code = 0;
 
   if (! ClParserFunc::isValidName(name) ||
-      ! ClParserInst->isValidNewName(CL_PARSER_NAME_TYPE_FUNCTION, name)) {
-    *error_code = CLERR_INVALID_FUNCTION_NAME;
+      ! ClParserInst->isValidNewName(ClParserNameType::FUNCTION, name)) {
+    *error_code = int(ClErr::INVALID_FUNCTION_NAME);
     return false;
   }
 
@@ -36,7 +33,8 @@ createFunc(const string &name, int *error_code)
 
 bool
 ClParserFuncMgr::
-createFunc(const string &function_string, const string &expression_string, int *error_code)
+createFunc(const std::string &function_string, const std::string &expression_string,
+           int *error_code)
 {
   *error_code = 0;
 
@@ -48,16 +46,16 @@ createFunc(const string &function_string, const string &expression_string, int *
 
   if (i >= len ||
       (! isalpha(function_string[i]) && function_string[i] != '_')) {
-    *error_code = CLERR_MISSING_FUNCTION_NAME;
+    *error_code = int(ClErr::MISSING_FUNCTION_NAME);
     return false;
   }
 
-  string function_name = readFunctionName(function_string, &i);
+  std::string function_name = readFunctionName(function_string, &i);
 
   CStrUtil::skipSpace(function_string, &i);
 
   if (i >= len || function_string[i] != '(') {
-    *error_code = CLERR_MISSING_OPEN_ROUND_BRACKET;
+    *error_code = int(ClErr::MISSING_OPEN_ROUND_BRACKET);
     return false;
   }
 
@@ -71,16 +69,15 @@ createFunc(const string &function_string, const string &expression_string, int *
   CStrUtil::skipSpace(function_string, &i);
 
   if (i < len) {
-    *error_code = CLERR_EXTRA_FUNCTION_CHARS;
+    *error_code = int(ClErr::EXTRA_FUNCTION_CHARS);
     return false;
   }
 
   //------
 
   if (! ClParserFunc::isValidName(function_name) ||
-      ! ClParserInst->isValidNewName(CL_PARSER_NAME_TYPE_FUNCTION,
-                                     function_name)) {
-    *error_code = CLERR_INVALID_FUNCTION_NAME;
+      ! ClParserInst->isValidNewName(ClParserNameType::FUNCTION, function_name)) {
+    *error_code = int(ClErr::INVALID_FUNCTION_NAME);
     return false;
   }
 
@@ -125,11 +122,11 @@ createFunc(const string &function_string, const string &expression_string, int *
   return true;
 }
 
-string
+std::string
 ClParserFuncMgr::
-readFunctionName(const string &str, uint *i)
+readFunctionName(const std::string &str, uint *i)
 {
-  string function_name;
+  std::string function_name;
 
   uint i1 = *i;
 
@@ -143,7 +140,7 @@ readFunctionName(const string &str, uint *i)
 
 ClParserFuncMgr::FuncArgList
 ClParserFuncMgr::
-readFunctionArgList(const string &str, uint *i, int *error_code)
+readFunctionArgList(const std::string &str, uint *i, int *error_code)
 {
   CL_PARSER_TRACE("readFunctionArgList")
 
@@ -158,14 +155,14 @@ readFunctionArgList(const string &str, uint *i, int *error_code)
 
     if (str[*i] != '\0' &&
         (isalpha(str[*i]) || str[*i] == '_')) {
-      string variable_name = readFunctionVariableName(str, i);
+      std::string variable_name = readFunctionVariableName(str, i);
 
       FuncArgList::iterator p =
         std::find_if(variable_name_list.begin(), variable_name_list.end(),
                      std::bind1st(std::equal_to<std::string>(), variable_name));
 
       if (p != variable_name_list.end()) {
-        *error_code = CLERR_MULTIPLE_DEF_FN_VARIABLE;
+        *error_code = int(ClErr::MULTIPLE_DEF_FN_VARIABLE);
 
         goto readFunctionArgList_1;
       }
@@ -173,7 +170,7 @@ readFunctionArgList(const string &str, uint *i, int *error_code)
       variable_name_list.push_back(variable_name);
     }
     else {
-      *error_code = CLERR_INVALID_CHARACTER;
+      *error_code = int(ClErr::INVALID_CHARACTER);
 
       goto readFunctionArgList_1;
     }
@@ -187,7 +184,7 @@ readFunctionArgList(const string &str, uint *i, int *error_code)
       in_brackets = false;
     }
     else {
-      *error_code = CLERR_INVALID_CHARACTER;
+      *error_code = int(ClErr::INVALID_CHARACTER);
 
       goto readFunctionArgList_1;
     }
@@ -200,13 +197,13 @@ readFunctionArgList(const string &str, uint *i, int *error_code)
   return variable_name_list;
 }
 
-string
+std::string
 ClParserFuncMgr::
-readFunctionVariableName(const string &str, uint *i)
+readFunctionVariableName(const std::string &str, uint *i)
 {
   CL_PARSER_TRACE("readFunctionVariableName")
 
-  string variable_name;
+  std::string variable_name;
 
   uint i1 = *i;
 
@@ -228,7 +225,7 @@ markFunctionArgs(ClParserFunc *func, ClParserStackNode *stack_node)
     uint num_args = func->getNumArgs();
 
     for (uint i = 0; i < num_args; ++i) {
-      const string &arg = func->getArg(i);
+      const std::string &arg = func->getArg(i);
 
       if (identifier->getName() == arg)
         identifier->setArgument();
@@ -245,14 +242,14 @@ addFunction(ClParserFunc *func)
 
 bool
 ClParserFuncMgr::
-isFunction(const string &name) const
+isFunction(const std::string &name) const
 {
   return getFunction(name).isValid();
 }
 
 ClParserFuncPtr
 ClParserFuncMgr::
-getFunction(const string &name) const
+getFunction(const std::string &name) const
 {
   FuncMap::const_iterator p = function_list_.find(name);
 
@@ -264,7 +261,7 @@ getFunction(const string &name) const
 
 void
 ClParserFuncMgr::
-removeFunction(const string &name)
+removeFunction(const std::string &name)
 {
   FuncMap::const_iterator p = function_list_.find(name);
 
@@ -295,7 +292,7 @@ printAllFunctions() const
 //-----------------------
 
 ClParserFunc::
-ClParserFunc(const string &name) :
+ClParserFunc(const std::string &name) :
  name_(name)
 {
 }
@@ -311,6 +308,8 @@ dup() const
 {
   return new ClParserFunc(name_);
 }
+
+//------
 
 void
 ClParserFunc::
@@ -336,17 +335,17 @@ print() const
 
 void
 ClParserFunc::
-print(ostream &os) const
+print(std::ostream &os) const
 {
-  CStrUtil::fprintf(os, "%s(", name_.c_str());
+  os << name_ << "(";
 
   uint num_args = args_.size();
 
   if (num_args > 0) {
-    CStrUtil::fprintf(os, "%s", args_[0].c_str());
+    os << args_[0];
 
     for (uint i = 1; i < num_args; i++)
-      CStrUtil::fprintf(os, ",%s", args_[i].c_str());
+      os << "," << args_[i];
   }
 
   os << ") = ";
@@ -382,7 +381,7 @@ debugPrint() const
 
 bool
 ClParserFunc::
-isValidName(const string &name)
+isValidName(const std::string &name)
 {
   return CStrUtil::isIdentifier(name);
 }

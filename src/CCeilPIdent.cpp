@@ -1,8 +1,5 @@
 #include <CCeilPI.h>
 
-using std::string;
-using std::ostream;
-
 ClParserIdentifierMgr *
 ClParserIdentifierMgr::
 getInstance()
@@ -17,7 +14,7 @@ getInstance()
 
 ClParserIdentifierPtr
 ClParserIdentifierMgr::
-createIdentifier(const string &name)
+createIdentifier(const std::string &name)
 {
   ClParserIdentifier *identifier = new ClParserIdentifier(name);
 
@@ -45,6 +42,8 @@ getScope() const
   return scope;
 }
 
+//------
+
 void
 ClParserIdentifier::
 print() const
@@ -54,9 +53,9 @@ print() const
 
 void
 ClParserIdentifier::
-print(ostream &os) const
+print(std::ostream &os) const
 {
-  CStrUtil::fprintf(os, "%s", name_.c_str());
+  os << name_;
 }
 
 void

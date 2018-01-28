@@ -5,11 +5,9 @@
 #include <CArgs.h>
 #include <CFile.h>
 
-using std::string;
-
 struct ClLanguageRunFileData {
   ClLanguageCommandList command_list;
-  ClLanguageInputFile   save_input_file;
+  ClLanguageInputFile*  saveInputFile { nullptr };
 };
 
 ClLanguageMgr *
@@ -37,6 +35,10 @@ ClLanguageMgr::
     free(argv_[i]);
 
   delete [] argv_;
+
+  delete errorMgr_;
+
+  delete inputFile_;
 }
 
 void
@@ -46,12 +48,12 @@ initVars()
   argc_ = 0;
   argv_ = nullptr;
 
-  exit_flag_     = false;
-  exit_code_     = 0;
-  intr_flag_     = false;
-  break_flag_    = false;
-  continue_flag_ = false;
-  return_flag_   = false;
+  exitFlag_     = false;
+  exitCode_     = 0;
+  intrFlag_     = false;
+  breakFlag_    = false;
+  continueFlag_ = false;
+  returnFlag_   = false;
 
   help_proc_ = nullptr;
 
@@ -82,6 +84,8 @@ initVars()
   command_term_data_ = nullptr;
 
   errorMgr_ = new CCeilLErrorMgr;
+
+  inputFile_ = new ClLanguageInputFile;
 }
 
 /*------------------------------------------------------------------*
@@ -201,7 +205,7 @@ init(int *argc, char **argv)
   if (getRunFile() != "")
     setExitAfterRun(true);
 
-  string prompt = ">";
+  std::string prompt = ">";
 
   if (cargs.isStringArgSet("-prompt"))
     prompt = cargs.getStringArg("-prompt");
@@ -210,7 +214,7 @@ init(int *argc, char **argv)
   bool isExit = cargs.getBooleanArg("-exit");
 
   if (isExp) {
-    string exp = cargs.getStringArg("-exp");
+    std::string exp = cargs.getStringArg("-exp");
 
     ClParserExpr expr(exp);
 
@@ -218,7 +222,7 @@ init(int *argc, char **argv)
 
     if      (! expr.exec(value))
       ClLanguageMgrInst->expressionError
-       (CLERR_INVALID_EXPRESSION, "'-exp' expression '%s'", exp.c_str());
+       (ClErr::INVALID_EXPRESSION, "'-exp' expression '%s'", exp.c_str());
     else if (! value.isValid())
       ClLanguageMgrInst->syntaxError
        ("undefined '-exp' expression '%s'", exp.c_str());
@@ -231,8 +235,8 @@ init(int *argc, char **argv)
 
 #if 0
   if (cargs.isStringArgSet("-var")) {
-    string name  = cargs.getStringArg("-var");
-    string value = "";
+    std::string name  = cargs.getStringArg("-var");
+    std::string value = "";
 
     ClParserInst->createVar(name, value);
   }
@@ -305,7 +309,7 @@ void
 ClLanguageMgr::
 reinit()
 {
-  string prompt = getPrompt();
+  std::string prompt = getPrompt();
 
   /* Delete all Variables, Functions and Procedures */
 
@@ -366,25 +370,20 @@ term()
 /*------------------------------------------------------------------*
  *
  * promptLoop
- *   Start the Command Line Interface which allows
- *   the user to enter any of the define Language
- *   commands. This routine will return when the
- *   Command Line Interface is terminated either
- *   because the specfied run file has been executed
+ *   Start the Command Line Interface which allows the user to enter any of the
+ *   define Language commands. This routine will return when the Command Line
+ *   Interface is terminated either because the specfied run file has been executed
  *   or the user has entered the 'exit' command.
  *
  * CALL:
  *   promptLoop();
  *
  * NOTES:
- *   When this routine is called the application
- *   effectively reliquishes control to CL. All
- *   required customisation must be done before this
- *   routine is entered.
+ *   When this routine is called the application effectively reliquishes control to CL.
+ *   All required customisation must be done before this routine is entered.
  *
- *   If the application requires more command by command
- *   control it should use runCommand() and provide its
- *   own user interface.
+ *   If the application requires more command by command control it should use
+ *   runCommand() and provide its own user interface.
  *
  *------------------------------------------------------------------*/
 
@@ -486,7 +485,7 @@ startup()
  *   Run the commands in the specified file.
  *
  * CALL:
- *   runFile(const string &file_name);
+ *   runFile(const std::string &file_name);
  *
  * INPUT:
  *   file_name : The name of the file containing the commands to be run.
@@ -495,13 +494,13 @@ startup()
 
 void
 ClLanguageMgr::
-runFile(const string &file_name)
+runFile(const std::string &file_name)
 {
   bool input_terminated;
 
   /*------------*/
 
-  string prompt;
+  std::string prompt;
 
   if (file_name == "")
     prompt = getPrompt();
@@ -512,21 +511,23 @@ runFile(const string &file_name)
 
   ClLanguageRunFileData *run_file = new ClLanguageRunFileData;
 
-  run_file->save_input_file = getInputFile();
+  run_file->saveInputFile = getInputFile();
 
   /*------------*/
 
   /* Open File for Read and Set the Input File Pointer */
 
-  ClLanguageInputFile &input_file = getInputFile();
+  setInputFile(new ClLanguageInputFile);
+
+  ClLanguageInputFile *inputFile = getInputFile();
 
   if (file_name != "") {
-    if (! input_file.setName(file_name)) {
+    if (! inputFile->setName(file_name)) {
       goto runFile_1;
     }
   }
   else
-    input_file.setFp(stdin);
+    inputFile->setFp(stdin);
 
   /*------------*/
 
@@ -590,7 +591,7 @@ runFile(const string &file_name)
     if (checkAbort()) {
       ClLanguageMgrInst->error("** Interrupt ** run of file '%s' abandoned", file_name.c_str());
 
-      getInputFile().setFp(stdin);
+      getInputFile()->setFp(stdin);
 
       input_terminated = true;
     }
@@ -624,7 +625,9 @@ runFile(const string &file_name)
 
   /* Restore Details of any Current File */
 
-  setInputFile(run_file->save_input_file);
+  delete inputFile_;
+
+  setInputFile(run_file->saveInputFile);
 
   /* Clean Up */
 
@@ -657,27 +660,27 @@ bool
 ClLanguageMgr::
 readLine()
 {
-  string line;
-  bool   more;
-  int    length;
-
 #ifndef CEIL_READLINE
-  if (getLineBuffer() == "" && getInputFile().getFp() == stdin)
+  if (getLineBuffer() == "" && getInputFile()->getFp() == stdin)
     outputPrompt();
 #endif
 
   setLine("");
 
-  ClLanguageInputFile &input_file = getInputFile();
+  ClLanguageInputFile *inputFile = getInputFile();
+
+  bool more = false;
 
   do {
+    std::string line;
+
     if (getLineBuffer() != "")
       line = getLineBuffer();
     else {
-      if (input_file.getFp() != stdin) {
-        if (! input_file.readLine(line)) {
-          if (input_file.getFp() != stdin)
-            input_file.setFp(stdin);
+      if (inputFile->getFp() != stdin) {
+        if (! inputFile->readLine(line)) {
+          if (inputFile->getFp() != stdin)
+            inputFile->setFp(stdin);
           else
             setExitFlag(true);
 
@@ -686,7 +689,7 @@ readLine()
       }
       else {
 #ifdef CEIL_READLINE
-        string temp_prompt = "";
+        std::string temp_prompt = "";
 
         if (getLine() == "") {
           for (int j = 0; j < getDepth(); j++)
@@ -700,15 +703,15 @@ readLine()
 
         line = getReadLine().readLine();
 #else
-        if (! input_file.readLine(line))
+        if (! inputFile->readLine(line))
           return false;
 #endif
       }
     }
 
-    input_file.setLineNum(input_file.getLineNum() + 1);
+    inputFile->setLineNum(inputFile->getLineNum() + 1);
 
-    length = line.size();
+    int length = line.size();
 
     if (length > 0 && line[length - 1] == '\\') {
       line = line.substr(0, length - 1);
@@ -740,35 +743,33 @@ readLine()
 /*------------------------------------------------------------------*
  *
  * runCommand
- *   This routine executes the command specified in the
- *   supplied str. This routine performs exactly the
- *   same operation as when each line is entered at the
- *   Command Line Prompt provided by promptLoop().
+ *   This routine executes the command specified in the supplied str. This
+ *   routine performs exactly the same operation as when each line is entered
+ *   at the Command Line Prompt provided by promptLoop().
  *
  * CALL:
- *   bool exit_flag =
- *     runCommand(const string &command_string);
+ *   bool exitFlag = runCommand(const std::string &commandString);
  *
  * INPUT:
- *   command_string : The command to be executed.
+ *   commandString : The command to be executed.
  *
  * RETURNS:
- *   exit_flag      : This flag indicates whether exit
- *                  : has been entered indicating that
- *                  : the Command Interface should be
- *                  : terminated.
+ *   exitFlag      : This flag indicates whether exit
+ *                 : has been entered indicating that
+ *                 : the Command Interface should be
+ *                 : terminated.
  *
  *------------------------------------------------------------------*/
 
 bool
 ClLanguageMgr::
-runCommand(const string &command_string)
+runCommand(const std::string &commandString)
 {
   setExitFlag(false);
 
-  string command_string1 = CStrUtil::stripSpaces(command_string);
+  std::string commandString1 = CStrUtil::stripSpaces(commandString);
 
-  ClLanguageCommand *command = processLine(command_string1);
+  ClLanguageCommand *command = processLine(commandString1);
 
   if (command != nullptr) {
     processCommand(command);
@@ -787,7 +788,7 @@ runCommand(const string &command_string)
  *
  * CALL:
  *   ClLanguageCommand *command =
- *     processLine(const string &line);
+ *     processLine(const std::string &line);
  *
  * INPUT:
  *   line    : Line entered by the user.
@@ -799,16 +800,16 @@ runCommand(const string &command_string)
 
 ClLanguageCommand *
 ClLanguageMgr::
-processLine(const string &line)
+processLine(const std::string &line)
 {
   int                   i;
-  string                args;
-  string                line1;
+  std::string           args;
+  std::string           line1;
   ClParserScopePtr      scope;
-  ClLanguageProc       *procedure;
+  ClLanguageProc*       procedure;
   bool                  is_end_name;
-  ClLanguageCommandDef *command_def;
-  string                command_name;
+  ClLanguageCommandDef* command_def;
+  std::string           command_name;
 
   ClLanguageCommand *command = nullptr;
 
@@ -933,7 +934,7 @@ processLine(const string &line)
   /* Extract possible Command Name */
 
   if (parse.readIdentifier(command_name)) {
-    string        str;
+    std::string   str;
     StringVectorT scopes;
 
     while (parse.isString("::")) {
@@ -1291,15 +1292,15 @@ processCommand(ClLanguageCommand *command)
     else if (command->isSystem()) {
       ClLanguageSystemCommand *scommand = (ClLanguageSystemCommand *) command;
 
-      string                   ostr;
+      std::string              ostr;
       COSProcess::CommandState command_state;
 
-      string args = scommand->getArgs();
+      std::string args = scommand->getArgs();
 
       int len = args.size();
 
       if      (len > 0 && args[0] == '$') {
-        string exp = args.substr(1);
+        std::string exp = args.substr(1);
 
         ClParserExpr expr(exp);
 
@@ -1307,28 +1308,27 @@ processCommand(ClLanguageCommand *command)
 
         if      (! expr.exec(value)) {
           ClLanguageMgrInst->expressionError
-           (CLERR_INVALID_EXPRESSION, "'$' expression '%s'", exp.c_str());
+           (ClErr::INVALID_EXPRESSION, "'$' expression '%s'", exp.c_str());
           goto processCommand_1;
         }
 
         if (! value.isValid()) {
-          ClLanguageMgrInst->syntaxError
-           ("undefined '$' expression '%s'", exp.c_str());
+          ClLanguageMgrInst->syntaxError("undefined '$' expression '%s'", exp.c_str());
           goto processCommand_1;
         }
 
-        string command_string;
+        std::string commandString;
 
-        if (! value->stringValue(command_string)) {
+        if (! value->stringValue(commandString)) {
           ClLanguageMgrInst->expressionError
-           (CLERR_INVALID_EXPRESSION, "'$' expression '%s'", exp.c_str());
+           (ClErr::INVALID_EXPRESSION, "'$' expression '%s'", exp.c_str());
           goto processCommand_1;
         }
 
-        COSProcess::executeCommand(command_string, ostr, &command_state);
+        COSProcess::executeCommand(commandString, ostr, &command_state);
       }
       else if (len > 1 && args[0] == '\\' && args[1] == '$') {
-        string expr = args.substr(1);
+        std::string expr = args.substr(1);
 
         COSProcess::executeCommand(expr, ostr, &command_state);
       }
@@ -1354,26 +1354,25 @@ processCommand(ClLanguageCommand *command)
       ClLanguageLanguageCommand *lcommand =
         (ClLanguageLanguageCommand *) command;
 
-      string str;
+      std::string str;
 
-      const string &args = lcommand->getArgs();
+      const std::string &args = lcommand->getArgs();
 
       ClParserExpr expr(args);
 
       ClParserValuePtr value;
 
       if (! expr.exec(value)) {
-        ClLanguageMgrInst->expressionError(CLERR_INVALID_EXPRESSION, "'$' expression '%s'",
-                                           args.c_str());
+        ClLanguageMgrInst->
+          expressionError(ClErr::INVALID_EXPRESSION, "'$' expression '%s'", args.c_str());
         goto processCommand_1;
       }
 
       if (! value->stringValue(str))
-        error_code = CLERR_INVALID_CONVERSION;
+        error_code = int(ClErr::INVALID_CONVERSION);
 
       if (error_code != 0) {
-        ClLanguageMgrInst->expressionError
-         (error_code, "'$' expression '%s'", args.c_str());
+        ClLanguageMgrInst->expressionError(error_code, "'$' expression '%s'", args.c_str());
         goto processCommand_1;
       }
 
@@ -1472,7 +1471,7 @@ runProcedure(ClLanguageProc *procedure, ClLanguageArgs *args)
   /* Evaluate each Argument */
 
   for (uint i = 0; i < num_args; i++) {
-    string arg = args->getArg(i + 1, &error_code);
+    std::string arg = args->getArg(i + 1, &error_code);
 
     if (error_code != 0)
       goto runProcedure_1;
@@ -1497,7 +1496,7 @@ runProcedure(ClLanguageProc *procedure, ClLanguageArgs *args)
 
       if (! expr.exec(values[i])) {
         ClLanguageMgrInst->expressionError
-         (CLERR_INVALID_EXPRESSION, "procedure '%s' argument %d - '%s'",
+         (ClErr::INVALID_EXPRESSION, "procedure '%s' argument %d - '%s'",
           procedure->getName().c_str(), i + 1, arg.c_str());
         goto runProcedure_1;
       }
@@ -1561,7 +1560,7 @@ runProcedure(ClLanguageProc *procedure, ClLanguageArgs *args)
     const ClLanguageProcArg &parg = procedure->getArg(i);
 
     if (parg.isReturned()) {
-      string arg = args->getArg(i + 1, &error_code);
+      std::string arg = args->getArg(i + 1, &error_code);
 
       if (error_code != 0)
         goto runProcedure_1;
@@ -1601,23 +1600,18 @@ runProcedure(ClLanguageProc *procedure, ClLanguageArgs *args)
  *     runFunction(ClParserValuePtr *values, int num_values, void *data, int &error_code);
  *
  * INPUT:
- *   values     : The array of values supplied
- *              : when the function was called.
+ *   values     : The array of values supplied when the function was called.
  *
- *   num_values  : The number of values supplied
- *              : when the function was called.
+ *   num_values : The number of values supplied when the function was called.
  *
- *   data       : The optional data specified
- *              : when the function was specified.
+ *   data       : The optional data specified when the function was specified.
  *
  * OUTPUT:
  *   error_code : Error Code to indicate whether
  *              : the function was successful.
- *              :  <0 : Function failed (function
- *              :     : specific error code).
+ *              :  <0 : Function failed (function specific error code).
  *              :  =0 : Function successful.
- *              :  >0 : Function failed (CL
- *              :     : specific error code).
+ *              :  >0 : Function failed (CL specific error code).
  *
  * RETURNS:
  *   value      : The value of the function.
@@ -1750,7 +1744,7 @@ processExpression(ClLanguageCommand *, ClLanguageArgs *args)
   uint num_args = args->getNumArgs();
 
   for (uint i = 1; i <= num_args; i++) {
-    string arg = args->getArg(i, &error_code);
+    std::string arg = args->getArg(i, &error_code);
 
     if (error_code != 0)
       return;
@@ -1762,10 +1756,10 @@ processExpression(ClLanguageCommand *, ClLanguageArgs *args)
     if (! expr.exec(value)) {
       if (num_args == 1)
         ClLanguageMgrInst->expressionError
-         (CLERR_INVALID_EXPRESSION, "argument '%s'", arg.c_str());
+         (ClErr::INVALID_EXPRESSION, "argument '%s'", arg.c_str());
       else
         ClLanguageMgrInst->expressionError
-         (CLERR_INVALID_EXPRESSION, "argument %d - '%s'", i, arg.c_str());
+         (ClErr::INVALID_EXPRESSION, "argument %d - '%s'", i, arg.c_str());
       return;
     }
 
@@ -1971,7 +1965,7 @@ checkAbort()
  * CALL:
  *   int ind =
  *     getLabelIndex
- *       (const string label, ClLanguageCommand **commands, int num_commands);
+ *       (const std::string label, ClLanguageCommand **commands, int num_commands);
  *
  * INPUT:
  *   label         : The label name to search for.
@@ -1995,7 +1989,7 @@ checkAbort()
 
 int
 ClLanguageMgr::
-getLabelIndex(const string &label, ClLanguageCommand **commands, int num_commands)
+getLabelIndex(const std::string &label, ClLanguageCommand **commands, int num_commands)
 {
   int ind = -1;
 
@@ -2164,8 +2158,7 @@ getOutputProc() const
  *   Interface to be altered.
  *
  * CALL:
- *   string old_prompt =
- *     setPrompt(const string &prompt);
+ *   std::string old_prompt = setPrompt(const string &prompt);
  *
  * INPUT:
  *   prompt     : The new prompt str to use
@@ -2188,7 +2181,7 @@ getOutputProc() const
  *   Get the name of the command currently being processed.
  *
  * CALL:
- *   const string &name = getCommandName();
+ *   const std::string &name = getCommandName();
  *
  * INPUT:
  *   None
@@ -2265,7 +2258,7 @@ getOutputProc() const
  * CALL:
  *   int ident =
  *     defineBlockCommand
- *       (const string &name, const string &end_name, ClBlockType type,
+ *       (const std::string &name, const std::string &end_name, ClBlockType type,
  *        ClLanguageCmdProc function, char *dats);
  *
  * INPUT:
@@ -2323,7 +2316,7 @@ getOutputProc() const
 
 uint
 ClLanguageMgr::
-defineBlockCommand(const string &name, const string &end_name, ClBlockType type,
+defineBlockCommand(const std::string &name, const std::string &end_name, ClBlockType type,
                    ClLanguageCmdProc function, void *data)
 {
   ClLanguageCommandDef *command_def =
@@ -2337,13 +2330,13 @@ defineBlockCommand(const string &name, const string &end_name, ClBlockType type,
 /*------------------------------------------------------------------*
  *
  * defineBlockCommand
- *   Define a new command identified by the supplied name
- *   str. When a command starting with the specified
- *   name is entered the supplied function is called.
+ *   Define a new command identified by the supplied name str.
+ *   When a command starting with the specified name is entered the supplied
+ *   function is called.
  *
  * CALL:
  *   int ident =
- *     defineBlockCommand(const string &name, ClLanguageCmdProc function, void *data);
+ *     defineBlockCommand(const std::string &name, ClLanguageCmdProc function, void *data);
  *
  * INPUT:
  *   name     : The command name.
@@ -2366,20 +2359,17 @@ defineBlockCommand(const string &name, const string &end_name, ClBlockType type,
  *
  *     <name> <str>
  *
- *   CL provides a large number of routines to help the
- *   application convert the str into the required
- *   arguments in a consistent manner. The application is
- *   not restricted to these routines and may parse the
- *   str itself if required.
+ *   CL provides a large number of routines to help the application convert the str
+ *   into the required arguments in a consistent manner. The application is not restricted
+ *   to these routines and may parse the str itself if required.
  *
  *------------------------------------------------------------------*/
 
 uint
 ClLanguageMgr::
-defineCommand(const string &name, ClLanguageCmdProc function, void *data)
+defineCommand(const std::string &name, ClLanguageCmdProc function, void *data)
 {
-  ClLanguageCommandDef *command_def =
-    new ClLanguageCommandDef(name, function, data);
+  ClLanguageCommandDef *command_def = new ClLanguageCommandDef(name, function, data);
 
   addCommandDef(command_def);
 
@@ -2388,10 +2378,10 @@ defineCommand(const string &name, ClLanguageCmdProc function, void *data)
 
 uint
 ClLanguageMgr::
-defineCommand(ClParserScopePtr scope, const string &name, ClLanguageCmdProc function, void *data)
+defineCommand(ClParserScopePtr scope, const std::string &name,
+              ClLanguageCmdProc function, void *data)
 {
-  ClLanguageCommandDef *command_def =
-    new ClLanguageCommandDef(scope, name, function, data);
+  ClLanguageCommandDef *command_def = new ClLanguageCommandDef(scope, name, function, data);
 
   addCommandDef(scope, command_def);
 
@@ -2417,12 +2407,12 @@ addCommandDef(ClParserScopePtr scope, ClLanguageCommandDef *command_def)
   if (old_command_def != nullptr)
     removeCommandDef(scope, old_command_def);
 
-  string scopeName;
+  std::string scopeName;
 
   if (scope.isValid())
     scopeName = scope->getFullName() + "::";
 
-  string key1 = scopeName + command_def->getName();
+  std::string key1 = scopeName + command_def->getName();
 
   command_def_list1_[key1] = command_def;
 
@@ -2433,7 +2423,7 @@ addCommandDef(ClParserScopePtr scope, ClLanguageCommandDef *command_def)
     if (old_command_def != nullptr)
       removeCommandDef(scope, old_command_def);
 
-    string key2 = scopeName + command_def->getEndName();
+    std::string key2 = scopeName + command_def->getEndName();
 
     command_def_list2_[key2] = command_def;
   }
@@ -2447,7 +2437,7 @@ addCommandDef(ClParserScopePtr scope, ClLanguageCommandDef *command_def)
  *
  * CALL:
  *   ClLanguageCommandDef *command_def =
- *     getCommandDef(ClParserScopePtr scope, const string &name, bool &is_end_name);
+ *     getCommandDef(ClParserScopePtr scope, const std::string &name, bool &is_end_name);
  *
  * INPUT:
  *   name        : Name of the command for which the structure
@@ -2468,16 +2458,16 @@ addCommandDef(ClParserScopePtr scope, ClLanguageCommandDef *command_def)
 
 ClLanguageCommandDef *
 ClLanguageMgr::
-getCommandDef(ClParserScopePtr scope, const string &name, bool *is_end_name)
+getCommandDef(ClParserScopePtr scope, const std::string &name, bool *is_end_name)
 {
   *is_end_name = false;
 
-  string scopeName;
+  std::string scopeName;
 
   if (scope.isValid())
     scopeName = scope->getFullName() + "::";
 
-  string key = scopeName + name;
+  std::string key = scopeName + name;
 
   CommandDefMap::const_iterator p = command_def_list1_.find(key);
 
@@ -2515,17 +2505,17 @@ removeCommandDef(ClParserScopePtr scope, ClLanguageCommandDef *command_def)
 {
   assert(command_def != nullptr);
 
-  string scopeName;
+  std::string scopeName;
 
   if (scope.isValid())
     scopeName = scope->getFullName() + "::";
 
-  string key1 = scopeName + command_def->getName();
+  std::string key1 = scopeName + command_def->getName();
 
   command_def_list1_.erase(key1);
 
   if (command_def->getEndName() != "") {
-    string key2 = scopeName + command_def->getEndName();
+    std::string key2 = scopeName + command_def->getEndName();
 
     command_def_list2_.erase(key2);
   }
@@ -2619,10 +2609,9 @@ clearBlockCommandStack(bool report_error)
 {
   if (block_command_ != nullptr) {
     if (report_error) {
-      string command_name = block_command_->toName();
+      std::string command_name = block_command_->toName();
 
-      ClLanguageMgrInst->syntaxError
-        ("unterminated '%s' block", command_name.c_str());
+      ClLanguageMgrInst->syntaxError("unterminated '%s' block", command_name.c_str());
     }
 
     delete block_command_;
@@ -2638,10 +2627,9 @@ clearBlockCommandStack(bool report_error)
     block_command_stack_.pop_back();
 
     if (report_error) {
-      string command_name = command->toName();
+      std::string command_name = command->toName();
 
-      ClLanguageMgrInst->syntaxError
-        ("unterminated '%s' block", command_name.c_str());
+      ClLanguageMgrInst->syntaxError("unterminated '%s' block", command_name.c_str());
     }
 
     delete command;
@@ -2799,7 +2787,7 @@ commandListToArray(const ClLanguageCommandList &command_list,
  *   help routine when an unrecognised subject is entered.
  *
  * CALL:
- *   printCommands(const string &subject);
+ *   printCommands(const std::string &subject);
  *
  * INPUT:
  *   subject : The subject on which the user wishes
@@ -2819,9 +2807,9 @@ commandListToArray(const ClLanguageCommandList &command_list,
 
 void
 ClLanguageMgr::
-printCommands(const string &subject)
+printCommands(const std::string &subject)
 {
-  string args = "";
+  std::string args = "";
 
   /* Display Module Help (if any) */
 
@@ -2925,7 +2913,7 @@ voutput(const char *format, va_list *vargs)
   ClParser::OutputProc output_proc = ClParserInst->getOutputProc();
 
   if (output_proc != nullptr) {
-    string str;
+    std::string str;
 
     CStrUtil::vsprintf(str, format, vargs);
 
@@ -2949,6 +2937,19 @@ error(const char *format, ...)
   va_start(vargs, format);
 
   errorMgr_->error(format, &vargs);
+
+  va_end(vargs);
+}
+
+void
+ClLanguageMgr::
+expressionError(ClErr error_code, const char *format, ...)
+{
+  va_list vargs;
+
+  va_start(vargs, format);
+
+  errorMgr_->expressionError(int(error_code), format, &vargs);
 
   va_end(vargs);
 }
@@ -2982,7 +2983,7 @@ syntaxError(const char *format, ...)
 //-----------------------
 
 ClLanguageCommandDef::
-ClLanguageCommandDef(const string &name, const string &end_name, ClBlockType type,
+ClLanguageCommandDef(const std::string &name, const std::string &end_name, ClBlockType type,
                      ClLanguageCmdProc function, void *data) :
  name_(name), end_name_(end_name), type_(type), function_(function), data_(data)
 {
@@ -2993,15 +2994,15 @@ ClLanguageCommandDef(const string &name, const string &end_name, ClBlockType typ
 }
 
 ClLanguageCommandDef::
-ClLanguageCommandDef(const string &name, ClLanguageCmdProc function, void *data) :
+ClLanguageCommandDef(const std::string &name, ClLanguageCmdProc function, void *data) :
  name_(name), end_name_(""), type_(CL_BLOCK_TYPE_NORMAL_BLOCK), function_(function), data_(data)
 {
   ident_ = ClLanguageMgrInst->nextIdent();
 }
 
 ClLanguageCommandDef::
-ClLanguageCommandDef(ClParserScopePtr scope, const string &name,
-                     ClLanguageCmdProc function, void *data) :
+ClLanguageCommandDef(ClParserScopePtr scope, const std::string &name, ClLanguageCmdProc function,
+                     void *data) :
  name_(name), end_name_(""), scope_(scope), type_(CL_BLOCK_TYPE_NORMAL_BLOCK),
  function_(function), data_(data)
 {
@@ -3030,22 +3031,31 @@ runFunction(ClLanguageCommand *command)
 ClLanguageInputFile::
 ClLanguageInputFile()
 {
-  fp_ = stdin;
+  fp_   = stdin;
+  file_ = new CFile(fp_);
+}
+
+ClLanguageInputFile::
+~ClLanguageInputFile()
+{
+  reset();
 }
 
 bool
 ClLanguageInputFile::
-setName(const string &name)
+setName(const std::string &name)
 {
-  FILE *fp = fopen(name.c_str(), "r");
+  reset();
 
-  if (fp == nullptr) {
+  file_ = new CFile(name);
+
+  if (! file_->open(CFile::Mode::READ)) {
     ClLanguageMgrInst->error("failed to read file '%s'", name.c_str());
+    reset();
     return false;
   }
 
-  setFp(fp);
-
+  fp_   = file_->getFP();
   name_ = name;
 
   return true;
@@ -3053,27 +3063,35 @@ setName(const string &name)
 
 void
 ClLanguageInputFile::
-setFp(FILE *fp)
+reset()
 {
-  if (fp_ != fp) {
-    if (fp_ != stdin)
-      fclose(fp_);
+  if (file_)
+    file_->close();
 
-    fp_ = fp;
-  }
+  delete file_;
 
   name_     = "";
+  file_     = nullptr;
+  fp_       = stdin;
   line_num_ = 0;
+}
+
+void
+ClLanguageInputFile::
+setFp(FILE *fp)
+{
+  if (fp_ == fp)
+    return;
+
+  reset();
+
+  fp_   = fp;
+  file_ = new CFile(fp_);
 }
 
 bool
 ClLanguageInputFile::
-readLine(string &line)
+readLine(std::string &line)
 {
-  if (! fp_)
-    fp_ = stdin;
-
-  CFile file(fp_);
-
-  return file.readLine(line);
+  return file_->readLine(line);
 }

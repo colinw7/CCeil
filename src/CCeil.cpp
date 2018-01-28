@@ -21,24 +21,20 @@
 int
 main(int argc, char **argv)
 {
-  /* Initialise Language and Parser */
-
+  // Initialise Language and Parser
   ClLanguageMgrInst->init(&argc, argv);
 
-  /* Turn Real Parsing on if Environment Variable set */
-
+  // Turn Real Parsing on if Environment Variable set
   if (CEnvInst.exists("CL_PARSE_REAL"))
     ClParserInst->setParseAsReals(true);
 
   if (CEnvInst.exists("CL_DOLLAR_PREFIX"))
     ClParserInst->setDollarPrefix(true);
 
-  /* Start Command Line Interface (returns when user enters 'exit') */
-
+  // Start Command Line Interface (returns when user enters 'exit')
   ClLanguageMgrInst->promptLoop();
 
-  /* Terminate Language and Parser */
-
+  // Terminate Language and Parser
   ClLanguageMgrInst->term();
 
   exit(ClLanguageMgrInst->getExitCode());

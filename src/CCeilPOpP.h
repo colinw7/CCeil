@@ -21,7 +21,7 @@ cl_increment_op = {
   "++",
   "Increment",
   14,
-  CL_PARSER_OP_ASSOCIATE_R_TO_L,
+  CLParserOperatorAssociate::R_TO_L,
   PARSER_IR_,
 };
 
@@ -31,7 +31,7 @@ cl_decrement_op = {
   "--",
   "Decrement",
   14,
-  CL_PARSER_OP_ASSOCIATE_R_TO_L,
+  CLParserOperatorAssociate::R_TO_L,
   PARSER_IR_,
 };
 
@@ -43,7 +43,7 @@ cl_open_rbracket_op = {
   "(",
   "Open Round Bracket",
   15,
-  CL_PARSER_OP_ASSOCIATE_L_TO_R,
+  CLParserOperatorAssociate::L_TO_R,
   PARSER_IRS,
 };
 
@@ -53,7 +53,7 @@ cl_close_rbracket_op = {
   ")",
   "Close Round Bracket",
   15,
-  CL_PARSER_OP_ASSOCIATE_L_TO_R,
+  CLParserOperatorAssociate::L_TO_R,
   PARSER_IRS,
 };
 
@@ -63,7 +63,7 @@ cl_open_sbracket_op = {
   "[",
   "Open Square Bracket",
   15,
-  CL_PARSER_OP_ASSOCIATE_L_TO_R,
+  CLParserOperatorAssociate::L_TO_R,
   PARSER_IRS,
 };
 
@@ -73,7 +73,7 @@ cl_close_sbracket_op = {
   "]",
   "Close Square Bracket",
   15,
-  CL_PARSER_OP_ASSOCIATE_L_TO_R,
+  CLParserOperatorAssociate::L_TO_R,
   PARSER_IRS,
 };
 
@@ -83,7 +83,7 @@ cl_open_brace_op = {
   "{",
   "Open Brace",
   15,
-  CL_PARSER_OP_ASSOCIATE_L_TO_R,
+  CLParserOperatorAssociate::L_TO_R,
   PARSER_IRS,
 };
 
@@ -93,7 +93,7 @@ cl_close_brace_op = {
   "}",
   "Close Brace",
   15,
-  CL_PARSER_OP_ASSOCIATE_L_TO_R,
+  CLParserOperatorAssociate::L_TO_R,
   PARSER_IRS,
 };
 
@@ -103,7 +103,7 @@ cl_open_dict_op = {
   "{{",
   "Open Dict",
   15,
-  CL_PARSER_OP_ASSOCIATE_L_TO_R,
+  CLParserOperatorAssociate::L_TO_R,
   PARSER_IRS,
 };
 
@@ -113,7 +113,7 @@ cl_close_dict_op = {
   "}}",
   "Close Dict",
   15,
-  CL_PARSER_OP_ASSOCIATE_L_TO_R,
+  CLParserOperatorAssociate::L_TO_R,
   PARSER_IRS,
 };
 
@@ -123,7 +123,7 @@ cl_comma_op = {
   ",",
   "Comma",
   0,
-  CL_PARSER_OP_ASSOCIATE_L_TO_R,
+  CLParserOperatorAssociate::L_TO_R,
   PARSER_IRS,
 };
 
@@ -133,7 +133,7 @@ cl_question_op = {
   "?",
   "Question Mark",
   2,
-  CL_PARSER_OP_ASSOCIATE_R_TO_L,
+  CLParserOperatorAssociate::R_TO_L,
   PARSER_I__,
 };
 
@@ -143,7 +143,7 @@ cl_colon_op = {
   ":",
   "Colon",
   2,
-  CL_PARSER_OP_ASSOCIATE_R_TO_L,
+  CLParserOperatorAssociate::R_TO_L,
   PARSER_I__,
 };
 
@@ -153,7 +153,7 @@ cl_dot_op = {
   ".",
   "Dot",
   15,
-  CL_PARSER_OP_ASSOCIATE_L_TO_R,
+  CLParserOperatorAssociate::L_TO_R,
   PARSER_IRS,
 };
 
@@ -165,7 +165,7 @@ cl_unary_plus_op = {
   "+",
   "Unary Plus",
   14,
-  CL_PARSER_OP_ASSOCIATE_R_TO_L,
+  CLParserOperatorAssociate::R_TO_L,
   PARSER_IR_,
 };
 
@@ -175,7 +175,7 @@ cl_unary_minus_op = {
   "-",
   "Unary Minus",
   14,
-  CL_PARSER_OP_ASSOCIATE_R_TO_L,
+  CLParserOperatorAssociate::R_TO_L,
   PARSER_IR_,
 };
 
@@ -185,7 +185,7 @@ cl_logical_not_op = {
   "!",
   "Logical Not",
   14,
-  CL_PARSER_OP_ASSOCIATE_R_TO_L,
+  CLParserOperatorAssociate::R_TO_L,
   PARSER_I_S,
 };
 
@@ -195,7 +195,7 @@ cl_bitwise_not_op = {
   "~",
   "Bitwise Not",
   14,
-  CL_PARSER_OP_ASSOCIATE_R_TO_L,
+  CLParserOperatorAssociate::R_TO_L,
   PARSER_I__,
 };
 
@@ -207,7 +207,7 @@ cl_plus_op = {
   "+",
   "Plus",
   11,
-  CL_PARSER_OP_ASSOCIATE_L_TO_R,
+  CLParserOperatorAssociate::L_TO_R,
   PARSER_IRS,
 };
 
@@ -217,7 +217,7 @@ cl_minus_op = {
   "-",
   "Minus",
   11,
-  CL_PARSER_OP_ASSOCIATE_L_TO_R,
+  CLParserOperatorAssociate::L_TO_R,
   PARSER_IRS,
 };
 
@@ -227,7 +227,7 @@ cl_times_op = {
   "*",
   "Times",
   12,
-  CL_PARSER_OP_ASSOCIATE_L_TO_R,
+  CLParserOperatorAssociate::L_TO_R,
   PARSER_IR_,
 };
 
@@ -237,7 +237,7 @@ cl_divide_op = {
   "/",
   "Divide",
   12,
-  CL_PARSER_OP_ASSOCIATE_L_TO_R,
+  CLParserOperatorAssociate::L_TO_R,
   PARSER_IRS,
 };
 
@@ -247,7 +247,7 @@ cl_modulus_op = {
   "%",
   "Modulus",
   12,
-  CL_PARSER_OP_ASSOCIATE_L_TO_R,
+  CLParserOperatorAssociate::L_TO_R,
   PARSER_I__,
 };
 
@@ -257,7 +257,7 @@ cl_power_op = {
   "**",
   "Power",
   13,
-  CL_PARSER_OP_ASSOCIATE_R_TO_L,
+  CLParserOperatorAssociate::R_TO_L,
   PARSER_IR_,
 };
 
@@ -267,7 +267,7 @@ cl_less_op = {
   "<",
   "Less Than",
   9,
-  CL_PARSER_OP_ASSOCIATE_L_TO_R,
+  CLParserOperatorAssociate::L_TO_R,
   PARSER_IRS,
 };
 
@@ -277,7 +277,7 @@ cl_less_equal_op = {
   "<=",
   "Less Than Or Equal",
   9,
-  CL_PARSER_OP_ASSOCIATE_L_TO_R,
+  CLParserOperatorAssociate::L_TO_R,
   PARSER_IRS,
 };
 
@@ -287,7 +287,7 @@ cl_greater_op = {
   ">",
   "Greater Than",
   9,
-  CL_PARSER_OP_ASSOCIATE_L_TO_R,
+  CLParserOperatorAssociate::L_TO_R,
   PARSER_IRS,
 };
 
@@ -297,7 +297,7 @@ cl_greater_equal_op = {
   ">=",
   "Greater Than Or Equal",
   9,
-  CL_PARSER_OP_ASSOCIATE_L_TO_R,
+  CLParserOperatorAssociate::L_TO_R,
   PARSER_IRS,
 };
 
@@ -307,7 +307,7 @@ cl_equal_op = {
   "==",
   "Equal",
   8,
-  CL_PARSER_OP_ASSOCIATE_L_TO_R,
+  CLParserOperatorAssociate::L_TO_R,
   PARSER_IRS,
 };
 
@@ -317,7 +317,7 @@ cl_not_equal_op = {
   "!=",
   "Not Equal",
   8,
-  CL_PARSER_OP_ASSOCIATE_L_TO_R,
+  CLParserOperatorAssociate::L_TO_R,
   PARSER_IRS,
 };
 
@@ -327,7 +327,7 @@ cl_approx_equal_op = {
   "~=",
   "Approx. Equal",
   8,
-  CL_PARSER_OP_ASSOCIATE_L_TO_R,
+  CLParserOperatorAssociate::L_TO_R,
   PARSER_IRS,
 };
 
@@ -337,7 +337,7 @@ cl_logical_and_op = {
   "&&",
   "Logical AND",
   4,
-  CL_PARSER_OP_ASSOCIATE_L_TO_R,
+  CLParserOperatorAssociate::L_TO_R,
   PARSER_I__,
 };
 
@@ -347,7 +347,7 @@ cl_logical_or_op = {
   "||",
   "Logical OR",
   3,
-  CL_PARSER_OP_ASSOCIATE_L_TO_R,
+  CLParserOperatorAssociate::L_TO_R,
   PARSER_I__,
 };
 
@@ -357,7 +357,7 @@ cl_bitwise_and_op = {
   "&",
   "Bitwise AND",
   7,
-  CL_PARSER_OP_ASSOCIATE_L_TO_R,
+  CLParserOperatorAssociate::L_TO_R,
   PARSER_I__,
 };
 
@@ -367,7 +367,7 @@ cl_bitwise_or_op = {
   "|",
   "Bitwise OR",
   5,
-  CL_PARSER_OP_ASSOCIATE_L_TO_R,
+  CLParserOperatorAssociate::L_TO_R,
   PARSER_I__,
 };
 
@@ -377,7 +377,7 @@ cl_bitwise_xor_op = {
   "^",
   "Bitwise XOR",
   6,
-  CL_PARSER_OP_ASSOCIATE_L_TO_R,
+  CLParserOperatorAssociate::L_TO_R,
   PARSER_I__,
 };
 
@@ -387,7 +387,7 @@ cl_lshift_op = {
   "<<",
   "Bit Shift Left",
   10,
-  CL_PARSER_OP_ASSOCIATE_L_TO_R,
+  CLParserOperatorAssociate::L_TO_R,
   PARSER_I__,
 };
 
@@ -397,7 +397,7 @@ cl_rshift_op = {
   ">>",
   "Bit Shift Right",
   10,
-  CL_PARSER_OP_ASSOCIATE_L_TO_R,
+  CLParserOperatorAssociate::L_TO_R,
   PARSER_I__,
 };
 
@@ -407,7 +407,7 @@ cl_array_times_op = {
   "#",
   "Array Multiplier",
   10,
-  CL_PARSER_OP_ASSOCIATE_L_TO_R,
+  CLParserOperatorAssociate::L_TO_R,
   PARSER_IR_,
 };
 
@@ -419,7 +419,7 @@ cl_equals_op = {
   "=",
   "Equals",
   1,
-  CL_PARSER_OP_ASSOCIATE_R_TO_L,
+  CLParserOperatorAssociate::R_TO_L,
   PARSER_IRS,
 };
 
@@ -429,7 +429,7 @@ cl_plus_equals_op = {
   "+=",
   "Plus Equals",
   1,
-  CL_PARSER_OP_ASSOCIATE_L_TO_R,
+  CLParserOperatorAssociate::L_TO_R,
   PARSER_IRS,
 };
 
@@ -439,7 +439,7 @@ cl_minus_equals_op = {
   "-=",
   "Minus Equals",
   1,
-  CL_PARSER_OP_ASSOCIATE_L_TO_R,
+  CLParserOperatorAssociate::L_TO_R,
   PARSER_IRS,
 };
 
@@ -449,7 +449,7 @@ cl_times_equals_op = {
   "*=",
   "Times Equals",
   1,
-  CL_PARSER_OP_ASSOCIATE_L_TO_R,
+  CLParserOperatorAssociate::L_TO_R,
   PARSER_IR_,
 };
 
@@ -459,7 +459,7 @@ cl_divide_equals_op = {
   "/=",
   "Divide Equals",
   1,
-  CL_PARSER_OP_ASSOCIATE_L_TO_R,
+  CLParserOperatorAssociate::L_TO_R,
   PARSER_IR_,
 };
 
@@ -469,7 +469,7 @@ cl_modulus_equals_op = {
   "%=",
   "Modulus Equals",
   1,
-  CL_PARSER_OP_ASSOCIATE_L_TO_R,
+  CLParserOperatorAssociate::L_TO_R,
   PARSER_I__,
 };
 
@@ -479,7 +479,7 @@ cl_bitwise_and_equals_op = {
   "&=",
   "Bitwise AND Equals",
   1,
-  CL_PARSER_OP_ASSOCIATE_L_TO_R,
+  CLParserOperatorAssociate::L_TO_R,
   PARSER_I__,
 };
 
@@ -489,7 +489,7 @@ cl_bitwise_or_equals_op = {
   "|=",
   "Bitwise OR Equals",
   1,
-  CL_PARSER_OP_ASSOCIATE_L_TO_R,
+  CLParserOperatorAssociate::L_TO_R,
   PARSER_I__,
 };
 
@@ -499,7 +499,7 @@ cl_bitwise_xor_equals_op = {
   "^=",
   "Bitwise XOR Equals",
   1,
-  CL_PARSER_OP_ASSOCIATE_L_TO_R,
+  CLParserOperatorAssociate::L_TO_R,
   PARSER_I__,
 };
 
@@ -509,7 +509,7 @@ cl_lshift_equals_op = {
   "<<=",
   "Bit Shift Left Equals",
   1,
-  CL_PARSER_OP_ASSOCIATE_L_TO_R,
+  CLParserOperatorAssociate::L_TO_R,
   PARSER_I__,
 };
 
@@ -519,7 +519,7 @@ cl_rshift_equals_op = {
   ">>=",
   "Bit Shift Right Equals",
   1,
-  CL_PARSER_OP_ASSOCIATE_L_TO_R,
+  CLParserOperatorAssociate::L_TO_R,
   PARSER_I__,
 };
 

@@ -4,9 +4,6 @@
 #include <CCeilPObj.h>
 
 class ClParserInteger : public ClParserObj {
- private:
-  long integer_;
-
  public:
   friend class CRefPtr<ClParserInteger>;
   friend class ClParserValue;
@@ -65,6 +62,8 @@ class ClParserInteger : public ClParserObj {
   bool toBool() const;
 
   //------
+
+  std::string asString() const;
 
   void print() const;
   void print(std::ostream &os) const;
@@ -139,9 +138,16 @@ class ClParserInteger : public ClParserObj {
   ClParserValuePtr min() const;
   ClParserValuePtr max() const;
   ClParserValuePtr sum() const;
-  ClParserValuePtr index(const ClParserObj &obj) const;
+
+  ClParserValuePtr index (const ClParserObj &obj) const;
   ClParserValuePtr rindex(const ClParserObj &obj) const;
+
   ClParserValuePtr sort(ClParserSortDirection direction) const;
+
+  ClParserValuePtr doAssert() const;
+
+ private:
+  long integer_ { 0 };
 };
 
 #endif

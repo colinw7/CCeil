@@ -104,6 +104,10 @@ class ClParserString : public ClParserObj {
   bool toInteger(long *integer) const;
   bool toReal(double *real) const;
 
+  //------
+
+  std::string asString() const;
+
   void print() const;
   void print(std::ostream &os) const;
   void debugPrint() const;
@@ -174,9 +178,13 @@ class ClParserString : public ClParserObj {
   ClParserValuePtr min() const;
   ClParserValuePtr max() const;
   ClParserValuePtr sum() const;
-  ClParserValuePtr index(const ClParserObj &obj) const;
+
+  ClParserValuePtr index (const ClParserObj &obj) const;
   ClParserValuePtr rindex(const ClParserObj &obj) const;
+
   ClParserValuePtr sort(ClParserSortDirection direction) const;
+
+  ClParserValuePtr doAssert() const;
 
  private:
   uint countSubStrings(const std::string &str) const;

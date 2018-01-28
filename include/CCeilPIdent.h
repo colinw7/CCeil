@@ -5,12 +5,12 @@
 
 /**** Private Defines ****/
 
-enum ClParserIdentifierType {
-  CL_PARSER_IDENTIFIER_TYPE_NONE        = 0,
-  CL_PARSER_IDENTIFIER_TYPE_VARIABLE    = 1,
-  CL_PARSER_IDENTIFIER_TYPE_FUNCTION    = 2,
-  CL_PARSER_IDENTIFIER_TYPE_ARGUMENT    = 3,
-  CL_PARSER_IDENTIFIER_TYPE_STRUCT_PART = 4
+enum class ClParserIdentifierType {
+  NONE        = 0,
+  VARIABLE    = 1,
+  FUNCTION    = 2,
+  ARGUMENT    = 3,
+  STRUCT_PART = 4
 };
 
 /**** Private Structures ****/
@@ -38,7 +38,7 @@ class ClParserIdentifier {
   friend class CRefPtr<ClParserIdentifier>;
 
   ClParserIdentifier(const std::string &name) :
-   type_(CL_PARSER_IDENTIFIER_TYPE_NONE), name_(name) {
+   type_(ClParserIdentifierType::NONE), name_(name) {
   }
 
   ClParserIdentifier(const ClParserIdentifier &identifier) :
@@ -65,35 +65,35 @@ class ClParserIdentifier {
   ClParserScopePtr getScope() const;
 
   bool isVariable() const {
-    return (type_ == CL_PARSER_IDENTIFIER_TYPE_VARIABLE);
+    return (type_ == ClParserIdentifierType::VARIABLE);
   }
 
   void setVariable()  {
-    type_ = CL_PARSER_IDENTIFIER_TYPE_VARIABLE;
+    type_ = ClParserIdentifierType::VARIABLE;
   }
 
   bool isFunction() const {
-    return (type_ == CL_PARSER_IDENTIFIER_TYPE_FUNCTION);
+    return (type_ == ClParserIdentifierType::FUNCTION);
   }
 
   void setFunction()  {
-    type_ = CL_PARSER_IDENTIFIER_TYPE_FUNCTION;
+    type_ = ClParserIdentifierType::FUNCTION;
   }
 
   bool isArgument() const {
-    return (type_ == CL_PARSER_IDENTIFIER_TYPE_ARGUMENT);
+    return (type_ == ClParserIdentifierType::ARGUMENT);
   }
 
   void setArgument()  {
-    type_ = CL_PARSER_IDENTIFIER_TYPE_ARGUMENT;
+    type_ = ClParserIdentifierType::ARGUMENT;
   }
 
   bool isStructPart() const {
-    return (type_ == CL_PARSER_IDENTIFIER_TYPE_STRUCT_PART);
+    return (type_ == ClParserIdentifierType::STRUCT_PART);
   }
 
   void setStructPart()  {
-    type_ = CL_PARSER_IDENTIFIER_TYPE_STRUCT_PART;
+    type_ = ClParserIdentifierType::STRUCT_PART;
   }
 
   void addScope(const std::string &scope) {

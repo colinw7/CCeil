@@ -1,7 +1,5 @@
 #include <CCeilPI.h>
 
-using std::string;
-
 static char parser_string_chars         [] = "'\"";
 static char parser_unary_operator_chars [] = "+-!~";
 static char parser_binary_operator_chars[] = "+-*/%<>=!&|^#~";
@@ -44,7 +42,7 @@ parse()
         }
 
         if (parser.isAssign()) {
-          error_code_ = CLERR_INVALID_LVALUE_FOR_ASSIGNMENT;
+          error_code_ = int(ClErr::INVALID_LVALUE_FOR_ASSIGNMENT);
           goto fail;
         }
       }
@@ -56,7 +54,7 @@ parse()
 
     else if (! expression && parse_.isOneOf(parser_unary_operator_chars)) {
       if (! readUnaryOperator(&op)) {
-        error_code_ = CLERR_INVALID_CHARACTER;
+        error_code_ = int(ClErr::INVALID_CHARACTER);
         goto fail;
       }
 
@@ -72,7 +70,7 @@ parse()
       }
 
       if (parser.isAssign()) {
-        error_code_ = CLERR_INVALID_LVALUE_FOR_ASSIGNMENT;
+        error_code_ = int(ClErr::INVALID_LVALUE_FOR_ASSIGNMENT);
         goto fail;
       }
 
@@ -92,7 +90,7 @@ parse()
 
       /* TODO: set end char */
       if (! parser.parse() &&
-          parser.getErrorCode() != CLERR_INVALID_CHARACTER) {
+          parser.getErrorCode() != int(ClErr::INVALID_CHARACTER)) {
         error_code_ = parser.getErrorCode();
         goto fail;
       }
@@ -100,7 +98,7 @@ parse()
       parse_.skipSpace();
 
       if (! parse_.isChar(')')) {
-        error_code_ = CLERR_MISSING_CLOSE_ROUND_BRACKET;
+        error_code_ = int(ClErr::MISSING_CLOSE_ROUND_BRACKET);
         goto fail;
       }
 
@@ -208,7 +206,7 @@ parse()
       ClParserOperatorPtr op1 = ClParserOperatorMgrInst->getOperator(op);
 
       if (! op1->isAssignment() && parser.isAssign()) {
-        error_code_ = CLERR_INVALID_LVALUE_FOR_ASSIGNMENT;
+        error_code_ = int(ClErr::INVALID_LVALUE_FOR_ASSIGNMENT);
         goto fail;
       }
 
@@ -230,7 +228,7 @@ parse()
       ClParserParser parser1(this);
 
       if (! parser1.parse() &&
-          parser1.getErrorCode() != CLERR_INVALID_CHARACTER) {
+          parser1.getErrorCode() != int(ClErr::INVALID_CHARACTER)) {
         error_code_ = parser1.getErrorCode();
         goto fail;
       }
@@ -238,7 +236,7 @@ parse()
       parse_.skipSpace();
 
       if (! parse_.isChar(':')) {
-        error_code_ = CLERR_MISSING_COLON_OPERATOR;
+        error_code_ = int(ClErr::MISSING_COLON_OPERATOR);
         goto fail;
       }
 
@@ -251,7 +249,7 @@ parse()
       ClParserParser parser2(this);
 
       if (! parser2.parse() &&
-          parser2.getErrorCode() != CLERR_INVALID_CHARACTER) {
+          parser2.getErrorCode() != int(ClErr::INVALID_CHARACTER)) {
         error_code_ = parser2.getErrorCode();
         goto fail;
       }
@@ -313,8 +311,8 @@ parse()
       if (! readIdentifier(identifier))
         goto fail;
 
-      const string &   name  = identifier->getName();
-      ClParserScopePtr scope = identifier->getScope();
+      const std::string &name  = identifier->getName();
+      ClParserScopePtr   scope = identifier->getScope();
 
       parse_.skipSpace();
 
@@ -405,7 +403,7 @@ parse()
           parse_.skipSpace();
 
           if (! readIdentifier(identifier)) {
-            error_code_ = CLERR_INVALID_CHARACTER;
+            error_code_ = int(ClErr::INVALID_CHARACTER);
             goto fail;
           }
 
@@ -435,7 +433,7 @@ parse()
     /* <expression> := <string_value> */
 
     else if (! expression && ClParserInst->getDollarPrefix()) {
-      string str;
+      std::string str;
 
       parse_.readNonSpace(str);
 
@@ -450,7 +448,7 @@ parse()
       expression = true;
     }
     else {
-      error_code_ = CLERR_INVALID_CHARACTER;
+      error_code_ = int(ClErr::INVALID_CHARACTER);
       goto fail;
     }
 
@@ -458,17 +456,17 @@ parse()
   }
 
   if (error_code_ == 0 && ! expression) {
-    error_code_ = CLERR_NULL_EXPRESSION;
+    error_code_ = int(ClErr::NULL_EXPRESSION);
     goto fail;
   }
 
-  if (parent_ != NULL)
+  if (parent_)
     parent_->parse_.setPos(parent_->parse_.getPos() + parse_.getPos());
 
   return true;
 
  fail:
-  if (parent_ != NULL)
+  if (parent_)
     parent_->parse_.setPos(parent_->parse_.getPos() + parse_.getPos());
 
   return false;
@@ -489,15 +487,14 @@ skipExpression(bool *assign)
   while (! parse_.eof()) {
     /* <expression> := <unary_operator> <expression> */
 
-    if      (! expression &&
-             strchr(parser_unary_operator_chars, parse_.getCharAt()) != NULL) {
+    if      (! expression && strchr(parser_unary_operator_chars, parse_.getCharAt()) != nullptr) {
       skipUnaryOperator();
 
       if (! skipExpression(assign))
         return false;
 
       if (*assign) {
-        error_code_ = CLERR_INVALID_LVALUE_FOR_ASSIGNMENT;
+        error_code_ = int(ClErr::INVALID_LVALUE_FOR_ASSIGNMENT);
         return false;
       }
 
@@ -511,8 +508,7 @@ skipExpression(bool *assign)
 
       parse_.skipChar();
 
-      if (! skipExpression(&assign1) &&
-          error_code_ != CLERR_INVALID_CHARACTER)
+      if (! skipExpression(&assign1) && error_code_ != int(ClErr::INVALID_CHARACTER))
         return false;
 
       error_code_ = 0;
@@ -520,7 +516,7 @@ skipExpression(bool *assign)
       parse_.skipSpace();
 
       if (! parse_.isChar(')')) {
-        error_code_ = CLERR_MISSING_CLOSE_ROUND_BRACKET;
+        error_code_ = int(ClErr::MISSING_CLOSE_ROUND_BRACKET);
         return false;
       }
 
@@ -595,7 +591,7 @@ skipExpression(bool *assign)
         return false;
 
       if (! assign1 && *assign) {
-        error_code_ = CLERR_INVALID_LVALUE_FOR_ASSIGNMENT;
+        error_code_ = int(ClErr::INVALID_LVALUE_FOR_ASSIGNMENT);
         return false;
       }
 
@@ -613,8 +609,7 @@ skipExpression(bool *assign)
 
       parse_.skipChar();
 
-      if (! skipExpression(&assign1) &&
-          error_code_ != CLERR_INVALID_CHARACTER)
+      if (! skipExpression(&assign1) && error_code_ != int(ClErr::INVALID_CHARACTER))
         return false;
 
       error_code_ = 0;
@@ -622,7 +617,7 @@ skipExpression(bool *assign)
       parse_.skipSpace();
 
       if (! parse_.isChar(':')) {
-        error_code_ = CLERR_MISSING_COLON_OPERATOR;
+        error_code_ = int(ClErr::MISSING_COLON_OPERATOR);
         return false;
       }
 
@@ -719,7 +714,7 @@ skipExpression(bool *assign)
       }
     }
     else {
-      error_code_ = CLERR_INVALID_CHARACTER;
+      error_code_ = int(ClErr::INVALID_CHARACTER);
       return false;
     }
 
@@ -727,7 +722,7 @@ skipExpression(bool *assign)
   }
 
   if (! expression) {
-    error_code_ = CLERR_NULL_EXPRESSION;
+    error_code_ = int(ClErr::NULL_EXPRESSION);
     return false;
   }
 
@@ -976,7 +971,7 @@ readBinaryOperator(ClParserOperatorType *op)
         parse_.skipChars(2);
       }
       else {
-        error_code_ = CLERR_INVALID_OPERATOR;
+        error_code_ = int(ClErr::INVALID_OPERATOR);
         return false;
       }
 
@@ -988,7 +983,7 @@ readBinaryOperator(ClParserOperatorType *op)
         parse_.skipChars(2);
       }
       else {
-        error_code_ = CLERR_INVALID_OPERATOR;
+        error_code_ = int(ClErr::INVALID_OPERATOR);
         return false;
       }
 
@@ -1269,7 +1264,7 @@ bool
 ClParserParser::
 readNumericHexValue(ClParserValuePtr &value)
 {
-  string parse_string;
+  std::string parse_string;
 
   while (! parse_.eof() && parse_.isXDigit()) {
     parse_string += parse_.getCharAt();
@@ -1330,7 +1325,7 @@ bool
 ClParserParser::
 readNumericOctValue(ClParserValuePtr &value)
 {
-  string parse_string;
+  std::string parse_string;
 
   while (! parse_.eof() && parse_.isODigit()) {
     parse_string += parse_.getCharAt();
@@ -1362,7 +1357,7 @@ bool
 ClParserParser::
 readNumericDecValue(ClParserValuePtr &value)
 {
-  string parse_string;
+  std::string parse_string;
 
   while (! parse_.eof() && parse_.isDigit()) {
     parse_string += parse_.getCharAt();
@@ -1402,7 +1397,7 @@ readNumericDecValue(ClParserValuePtr &value)
     }
 
     if (parse_.eof() || ! parse_.isDigit()) {
-      error_code_ = CLERR_MISSING_EXPONENTIAL_VALUE;
+      error_code_ = int(ClErr::MISSING_EXPONENTIAL_VALUE);
       return false;
     }
 
@@ -1417,7 +1412,7 @@ readNumericDecValue(ClParserValuePtr &value)
 
   if (ClParserInst->getParseAsReals() || point_found || exponent_found) {
     if (sscanf(parse_string.c_str(), "%lf", &real) != 1) {
-      error_code_ = CLERR_INVALID_STRING_TO_REAL_CONV;
+      error_code_ = int(ClErr::INVALID_STRING_TO_REAL_CONV);
       return false;
     }
 
@@ -1429,12 +1424,12 @@ readNumericDecValue(ClParserValuePtr &value)
   long integer;
 
   if (sscanf(parse_string.c_str(), "%ld", &integer) != 1) {
-    error_code_ = CLERR_INVALID_STRING_TO_INTEGER_CONV;
+    error_code_ = int(ClErr::INVALID_STRING_TO_INTEGER_CONV);
     return false;
   }
 
   if (sscanf(parse_string.c_str(), "%lf", &real) != 1) {
-    error_code_ = CLERR_INVALID_STRING_TO_INTEGER_CONV;
+    error_code_ = int(ClErr::INVALID_STRING_TO_INTEGER_CONV);
     return false;
   }
 
@@ -1498,7 +1493,7 @@ readStringValue(ClParserValuePtr &value)
 
   parse_.skipChar();
 
-  string parse_string;
+  std::string parse_string;
 
   int c;
 
@@ -1587,7 +1582,7 @@ readStringValue(ClParserValuePtr &value)
   }
 
   if (parse_.eof()) {
-    error_code_ = CLERR_UNTERMINATED_STRING;
+    error_code_ = int(ClErr::UNTERMINATED_STRING);
     return false;
   }
 
@@ -1645,7 +1640,7 @@ ClParserParser::
 readIdentifier(ClParserIdentifierPtr &identifier)
 {
   StringVectorT scopes;
-  string        idstr, str;
+  std::string   idstr, str;
 
   if (! parse_.readIdentifier(idstr))
     return false;
@@ -1679,7 +1674,7 @@ bool
 ClParserParser::
 skipIdentifier()
 {
-  string parse_string;
+  std::string parse_string;
 
   parse_.readIdentifier(parse_string);
 
@@ -1702,7 +1697,7 @@ readArgList()
   while (in_brackets) {
     ClParserParser parser(this);
 
-    if (! parser.parse() && parser.getErrorCode() != CLERR_INVALID_CHARACTER) {
+    if (! parser.parse() && parser.getErrorCode() != int(ClErr::INVALID_CHARACTER)) {
       error_code_ = parser.getErrorCode();
       return false;
     }
@@ -1724,7 +1719,7 @@ readArgList()
       in_brackets = false;
     }
     else {
-      error_code_ = CLERR_INVALID_CHARACTER;
+      error_code_ = int(ClErr::INVALID_CHARACTER);
       return false;
     }
   }
@@ -1744,7 +1739,7 @@ skipArgList()
   while (in_brackets) {
     bool assign;
 
-    if (! skipExpression(&assign) && error_code_ != CLERR_INVALID_CHARACTER)
+    if (! skipExpression(&assign) && error_code_ != int(ClErr::INVALID_CHARACTER))
       return false;
 
     if      (parse_.isChar(','))
@@ -1755,7 +1750,7 @@ skipArgList()
       in_brackets = false;
     }
     else {
-      error_code_ = CLERR_INVALID_CHARACTER;
+      error_code_ = int(ClErr::INVALID_CHARACTER);
       return false;
     }
   }
@@ -1779,7 +1774,7 @@ readArray()
   while (in_brackets) {
     ClParserParser parser(this);
 
-    if (! parser.parse() && parser.getErrorCode() != CLERR_INVALID_CHARACTER) {
+    if (! parser.parse() && parser.getErrorCode() != int(ClErr::INVALID_CHARACTER)) {
       error_code_ = parser.getErrorCode();
       return false;
     }
@@ -1801,7 +1796,7 @@ readArray()
       in_brackets = false;
     }
     else {
-      error_code_ = CLERR_INVALID_CHARACTER;
+      error_code_ = int(ClErr::INVALID_CHARACTER);
       return false;
     }
   }
@@ -1822,7 +1817,7 @@ skipArray()
   while (in_brackets) {
     bool assign;
 
-    if (! skipExpression(&assign) && error_code_ != CLERR_INVALID_CHARACTER)
+    if (! skipExpression(&assign) && error_code_ != int(ClErr::INVALID_CHARACTER))
       return false;
 
     if      (parse_.isChar(','))
@@ -1833,7 +1828,7 @@ skipArray()
       in_brackets = false;
     }
     else {
-      error_code_ = CLERR_INVALID_CHARACTER;
+      error_code_ = int(ClErr::INVALID_CHARACTER);
       return false;
     }
   }
@@ -1857,7 +1852,7 @@ readList()
   while (in_brackets) {
     ClParserParser parser(this);
 
-    if (! parser.parse() && parser.getErrorCode() != CLERR_INVALID_CHARACTER) {
+    if (! parser.parse() && parser.getErrorCode() != int(ClErr::INVALID_CHARACTER)) {
       error_code_ = parser.getErrorCode();
       return false;
     }
@@ -1879,7 +1874,7 @@ readList()
       in_brackets = false;
     }
     else {
-      error_code_ = CLERR_INVALID_CHARACTER;
+      error_code_ = int(ClErr::INVALID_CHARACTER);
       return false;
     }
   }
@@ -1899,7 +1894,7 @@ skipList()
   while (in_brackets) {
     bool assign;
 
-    if (! skipExpression(&assign) && error_code_ != CLERR_INVALID_CHARACTER)
+    if (! skipExpression(&assign) && error_code_ != int(ClErr::INVALID_CHARACTER))
       return false;
 
     if      (parse_.isChar(','))
@@ -1910,7 +1905,7 @@ skipList()
       in_brackets = false;
     }
     else {
-      error_code_ = CLERR_INVALID_CHARACTER;
+      error_code_ = int(ClErr::INVALID_CHARACTER);
       return false;
     }
   }
@@ -1934,7 +1929,7 @@ readDictionary()
   while (in_brackets) {
     ClParserParser parser(this);
 
-    if (! parser.parse() && parser.getErrorCode() != CLERR_INVALID_CHARACTER) {
+    if (! parser.parse() && parser.getErrorCode() != int(ClErr::INVALID_CHARACTER)) {
       error_code_ = parser.getErrorCode();
       return false;
     }
@@ -1956,7 +1951,7 @@ readDictionary()
       in_brackets = false;
     }
     else {
-      error_code_ = CLERR_INVALID_CHARACTER;
+      error_code_ = int(ClErr::INVALID_CHARACTER);
       return false;
     }
   }
@@ -1977,7 +1972,7 @@ skipDictionary()
   while (in_brackets) {
     bool assign;
 
-    if (! skipExpression(&assign) && error_code_ != CLERR_INVALID_CHARACTER)
+    if (! skipExpression(&assign) && error_code_ != int(ClErr::INVALID_CHARACTER))
       return false;
 
     if      (parse_.isChar(','))
@@ -1988,7 +1983,7 @@ skipDictionary()
       in_brackets = false;
     }
     else {
-      error_code_ = CLERR_INVALID_CHARACTER;
+      error_code_ = int(ClErr::INVALID_CHARACTER);
       return false;
     }
   }

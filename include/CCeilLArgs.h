@@ -5,15 +5,14 @@ typedef StringVectorT ClLanguageArgList;
 
 class ClLanguageArgs {
  public:
-  ClLanguageArgs() :
-   arg_list_(NULL), string_stack_(NULL), chars_stack_(NULL), real_array_stack_(NULL),
-   float_array_stack_(NULL), integer_array_stack_(NULL), word_array_stack_(NULL),
-   string_array_stack_(NULL), space_separated_(false) {
-  }
-
+  ClLanguageArgs() { }
  ~ClLanguageArgs() { }
 
-  void setSpaceSeparated(bool flag) { space_separated_ = flag; }
+  void setSpaceSeparated(bool flag) { spaceSeparated_ = flag; }
+  bool isSpaceSeparated() const { return spaceSeparated_; }
+
+  void setStripQuotes(bool flag) { stripQuotes_ = flag; }
+  bool isStripQuotes() const { return stripQuotes_; }
 
   void startArgs(ClLanguageCommand *command);
   void startArgs();
@@ -75,10 +74,10 @@ class ClLanguageArgs {
 
   void getCommandArgList(ClLanguageCommand *command, ClLanguageArgList *arg_list);
 
-  void stringToArgList(const std::string &str, ClLanguageArgList *arg_list);
+  bool stringToArgList(const std::string &str, ClLanguageArgList *arg_list);
 
   static bool readArgList(const std::string &str, int *pos, int end_char, std::string &text);
-  static bool skipArgList(const std::string &str, int *pos, int end_char);
+  static bool skipArgList(const std::string &str, int *pos, int end_char, bool stripQuotes=false);
 
   void replaceCharsInArgList(std::string &str, int c1, int c2);
 
@@ -103,15 +102,16 @@ class ClLanguageArgs {
   typedef std::vector<void **>             StringArrayStack;
 
   ArgListStack       arg_list_stack_;
-  ClLanguageArgList *arg_list_;
-  StringStack       *string_stack_;
-  CharsStack        *chars_stack_;
-  RealArrayStack    *real_array_stack_;
-  FloatArrayStack   *float_array_stack_;
-  IntegerArrayStack *integer_array_stack_;
-  WordArrayStack    *word_array_stack_;
-  StringArrayStack  *string_array_stack_;
-  bool               space_separated_;
+  ClLanguageArgList* arg_list_            { nullptr };
+  StringStack*       string_stack_        { nullptr };
+  CharsStack*        chars_stack_         { nullptr };
+  RealArrayStack*    real_array_stack_    { nullptr };
+  FloatArrayStack*   float_array_stack_   { nullptr };
+  IntegerArrayStack* integer_array_stack_ { nullptr };
+  WordArrayStack*    word_array_stack_    { nullptr };
+  StringArrayStack*  string_array_stack_  { nullptr };
+  bool               spaceSeparated_      { false };
+  bool               stripQuotes_         { false };
 };
 
 #endif

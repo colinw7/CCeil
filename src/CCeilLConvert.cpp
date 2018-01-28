@@ -1,7 +1,5 @@
 #include <CCeilL.h>
 
-using std::string;
-
 /*------------------------------------------------------------------*
  *
  * setTypedStringArrayArg
@@ -57,8 +55,8 @@ using std::string;
 
 void
 ClLanguageConverterMgr::
-setTypedStringArrayArg(ClLanguageArgs *args, int num, const char *from_type,
-                       int num_args, char *arg, ...)
+setTypedStringArrayArg(ClLanguageArgs *args, int num, const char *from_type, int num_args,
+                       char *arg, ...)
 {
   va_list  vargs;
   char    *cargs[CL_MAX_CONVERT_ARGS];
@@ -90,7 +88,7 @@ setTypedStringArrayArg(ClLanguageArgs *args, int num, const char *from_type,
   ClLanguageConverter *converter =
     ClLanguageConverterMgrInst->getConverter(from_type, "cl_string_array");
 
-  if (converter == NULL) {
+  if (! converter) {
     ClLanguageMgrInst->error("No converter for '%s' to str array", from_type);
     *error_code = -1;
     return;
@@ -173,8 +171,8 @@ setTypedStringArrayArg(ClLanguageArgs *args, int num, const char *from_type,
 
 void
 ClLanguageConverterMgr::
-getTypedStringArrayArg(ClLanguageArgs *args, int num, const char *to_type,
-                       int num_args, char *arg, ...)
+getTypedStringArrayArg(ClLanguageArgs *args, int num, const char *to_type, int num_args,
+                       char *arg, ...)
 {
   va_list  vargs;
   char    *cargs[CL_MAX_CONVERT_ARGS];
@@ -206,7 +204,7 @@ getTypedStringArrayArg(ClLanguageArgs *args, int num, const char *to_type,
   ClLanguageConverter *converter =
     ClLanguageConverterMgrInst->getConverter("cl_string_array", to_type);
 
-  if (converter == NULL) {
+  if (! converter) {
     ClLanguageMgrInst->error("No converter for str array to '%s'", to_type);
     *error_code = -1;
     return;
@@ -293,7 +291,7 @@ convertStringMatrixToStringArray(char ***array, uint **dims, uint *num_dims, cha
   if (num_matrix > 0)
     *array = new char * [num_matrix];
   else
-    *array = NULL;
+    *array = nullptr;
 
   for (int i = 0; i < num_matrix; i++)
     (*array)[i] = strdup(&matrix[i*matrix_size]);
@@ -352,7 +350,7 @@ convertStringArrayToStringMatrix(char **array, uint *dims, uint num_dims, char *
 {
   if (num_dims == 0) {
     *num_matrix = 0;
-    *matrix    = NULL;
+    *matrix     = nullptr;
 
     return true;
   }
@@ -367,7 +365,7 @@ convertStringArrayToStringMatrix(char **array, uint *dims, uint num_dims, char *
   if (*num_matrix > 0)
     *matrix = new char [(*num_matrix)*matrix_size];
   else
-    *matrix = NULL;
+    *matrix = nullptr;
 
   for (int i = 0; i < *num_matrix; i++) {
     int len = strlen(array[i]);
@@ -442,7 +440,7 @@ convertCharMatrixToStringArray(char ***array, uint **dims, uint *num_dims, char 
   if (num_matrix > 0)
     *array = new char * [num_matrix];
   else
-    *array = NULL;
+    *array = nullptr;
 
   for (int i = 0; i < num_matrix; i++) {
     (*array)[i] = new char [matrix_size + 1];
@@ -505,7 +503,7 @@ convertStringArrayToCharMatrix(char **array, uint *dims, uint num_dims, char **m
 {
   if (num_dims == 0) {
     *num_matrix = 0;
-    *matrix    = NULL;
+    *matrix     = nullptr;
 
     return true;
   }
@@ -520,7 +518,7 @@ convertStringArrayToCharMatrix(char **array, uint *dims, uint num_dims, char **m
   if (*num_matrix > 0)
     *matrix = new char [(*num_matrix)*matrix_size];
   else
-    *matrix = NULL;
+    *matrix = nullptr;
 
   for (int i = 0; i < *num_matrix; i++) {
     int len = strlen(array[i]);
@@ -546,7 +544,7 @@ convertStringArrayToCharMatrix(char **array, uint *dims, uint num_dims, char **m
  *   named types.
  *
  * CALL:
- *   addConverter(const string &from_type, const string *to_type,
+ *   addConverter(const std::string &from_type, const std::string *to_type,
  *                ClLanguageConvertProc proc);
  *
  * INPUT:
@@ -584,7 +582,7 @@ convertStringArrayToCharMatrix(char **array, uint *dims, uint num_dims, char **m
 
 void
 ClLanguageConverterMgr::
-addConverter(const string &from_type, const string &to_type, ClLanguageConvertProc proc)
+addConverter(const std::string &from_type, const std::string &to_type, ClLanguageConvertProc proc)
 {
   ClLanguageConverter *converter = new ClLanguageConverter;
 
@@ -603,7 +601,7 @@ addConverter(const string &from_type, const string &to_type, ClLanguageConvertPr
  *
  * CALL:
  *   ClLanguageConverter *proc =
- *     getConverter(const string &from_type, const string &to_type);
+ *     getConverter(const std::string &from_type, const std::string &to_type);
  *
  * INPUT:
  *   from_type : Type to convert from.
@@ -614,7 +612,7 @@ addConverter(const string &from_type, const string &to_type, ClLanguageConvertPr
  *   None
  *
  * RETURNS:
- *   proc      : Conversion routine (NULL if none).
+ *   proc      : Conversion routine (null if none).
  *
  * NOTES:
  *   None
@@ -623,7 +621,7 @@ addConverter(const string &from_type, const string &to_type, ClLanguageConvertPr
 
 ClLanguageConverter *
 ClLanguageConverterMgr::
-getConverter(const string &from_type, const string &to_type) const
+getConverter(const std::string &from_type, const std::string &to_type) const
 {
   uint num = converter_list_.size();
 
@@ -635,5 +633,5 @@ getConverter(const string &from_type, const string &to_type) const
       return converter;
   }
 
-  return NULL;
+  return nullptr;
 }

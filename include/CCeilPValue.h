@@ -12,16 +12,18 @@
 /**** Private Structures ****/
 
 class ClParserValueCmp {
- private:
-  ClParserSortDirection direction_;
-
  public:
   explicit ClParserValueCmp(ClParserSortDirection direction) :
    direction_(direction) {
   }
 
   int operator()(ClParserValuePtr obj1, ClParserValuePtr obj2);
+
+ private:
+  ClParserSortDirection direction_;
 };
+
+//---
 
 union ClParserValueData {
   ClParserRealPtr    *real;
@@ -32,6 +34,8 @@ union ClParserValueData {
   ClParserDictPtr    *dict;
   ClParserStructPtr  *structure;
 };
+
+//------
 
 #define ClParserValueMgrInst ClParserValueMgr::getInstance()
 
@@ -86,11 +90,9 @@ class ClParserValueMgr {
   ClParserValuePtr createValue(ClParserTypePtr type, const UIntVectorT &dims);
 };
 
-class ClParserValue {
- private:
-  ClParserValueType type_;
-  ClParserValueData data_;
+//------
 
+class ClParserValue {
  protected:
   friend class ClParserValueMgr;
   friend class CRefPtr<ClParserValue>;
@@ -229,6 +231,8 @@ class ClParserValue {
 
   //--------
 
+  std::string asString() const;
+
   void print() const;
   void print(std::ostream &os) const;
 
@@ -308,9 +312,13 @@ class ClParserValue {
   ClParserValuePtr min() const;
   ClParserValuePtr max() const;
   ClParserValuePtr sum() const;
-  ClParserValuePtr index(ClParserValuePtr value) const;
+
+  ClParserValuePtr index (ClParserValuePtr value) const;
   ClParserValuePtr rindex(ClParserValuePtr value) const;
+
   ClParserValuePtr sort(ClParserSortDirection direction) const;
+
+  ClParserValuePtr doAssert() const;
 
   //--------
 
@@ -330,6 +338,10 @@ class ClParserValue {
   void setList      (ClParserListPtr list);
   void setDictionary(ClParserDictPtr dictionary);
   void setStructure (ClParserStructPtr structure);
+
+ private:
+  ClParserValueType type_;
+  ClParserValueData data_;
 };
 
 #endif

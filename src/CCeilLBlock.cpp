@@ -1,7 +1,5 @@
 #include <CCeilL.h>
 
-using std::string;
-
 /*------------------------------------------------------------------*
  *
  * startBlock
@@ -38,7 +36,7 @@ startBlock(const ClLanguageCommandList &command_list, ClBlockType type)
 {
   /* Save any active block command's environment */
 
-  if (current_block_data_.getCommands() != NULL) {
+  if (current_block_data_.getCommands()) {
     ClLanguageBlockData *block_data = new ClLanguageBlockData(current_block_data_);
 
     block_data_stack_.push_back(block_data);
@@ -48,7 +46,7 @@ startBlock(const ClLanguageCommandList &command_list, ClBlockType type)
 
   /* Set up current block command's environment */
 
-  const string &command_name = ClLanguageMgrInst->getCommandName();
+  const std::string &command_name = ClLanguageMgrInst->getCommandName();
 
   current_block_data_ =
     ClLanguageBlockData((ClBlockType) (type & CL_BLOCK_TYPE_BLOCK_MASK), command_name);
@@ -188,7 +186,7 @@ endBlock()
 
   /* Restore previous block command (if any)*/
 
-  ClLanguageBlockData *block_data = NULL;
+  ClLanguageBlockData *block_data = nullptr;
 
   if (! block_data_stack_.empty()) {
     block_data = block_data_stack_.back();
@@ -196,7 +194,7 @@ endBlock()
     block_data_stack_.pop_back();
   }
 
-  if (block_data != NULL) {
+  if (block_data) {
     current_block_data_ = *block_data;
 
     delete block_data;
@@ -517,7 +515,7 @@ ClLanguageBlockData()
 }
 
 ClLanguageBlockData::
-ClLanguageBlockData(ClBlockType type, const string &name,
+ClLanguageBlockData(ClBlockType type, const std::string &name,
                     ClLanguageCommand **commands, int num_commands) :
  type_(type), name_(name), commands_(commands), num_commands_(num_commands)
 {
@@ -550,7 +548,7 @@ init()
 {
   type_         = CL_BLOCK_TYPE_NORMAL_BLOCK;
   name_         = "";
-  commands_     = NULL;
+  commands_     = nullptr;
   num_commands_ = 0;
 }
 

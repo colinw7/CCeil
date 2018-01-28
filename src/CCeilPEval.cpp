@@ -1,9 +1,7 @@
 #include <CCeilPI.h>
 
-using std::string;
-
 ClParserExpr::
-ClParserExpr(const string &expression) :
+ClParserExpr(const std::string &expression) :
  expression_(expression), compiled_(false)
 {
 }

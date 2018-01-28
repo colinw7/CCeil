@@ -77,9 +77,13 @@ class ClParserReal : public ClParserObj {
 
   //------
 
+  std::string asString() const;
+
   void print() const;
   void print(std::ostream &os) const;
   void debugPrint() const;
+
+  //------
 
   int cmp(const ClParserObj &rhs) const;
 
@@ -148,9 +152,13 @@ class ClParserReal : public ClParserObj {
   ClParserValuePtr min() const;
   ClParserValuePtr max() const;
   ClParserValuePtr sum() const;
-  ClParserValuePtr index(const ClParserObj &obj) const;
+
+  ClParserValuePtr index (const ClParserObj &obj) const;
   ClParserValuePtr rindex(const ClParserObj &obj) const;
+
   ClParserValuePtr sort(ClParserSortDirection direction) const;
+
+  ClParserValuePtr doAssert() const;
 };
 
 #endif

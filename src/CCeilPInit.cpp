@@ -1,8 +1,6 @@
 #include <CCeilPI.h>
 #include <CCeilPErrorP.h>
 
-using std::string;
-
 ClParser *
 ClParser::
 getInstance()
@@ -18,6 +16,8 @@ getInstance()
 ClParser::
 ClParser()
 {
+  varMgr_ = new ClParserVarMgr(this);
+
   angle_type_       = CANGLE_TYPE_RADIANS;
   angle_to_radians_ = 1.0;
   angle_to_degrees_ = 180.0/M_PI;
@@ -34,11 +34,17 @@ ClParser()
 
   init_depth_  = 0;
   output_fp_   = stdout;
-  output_proc_ = NULL;
-  output_data_ = NULL;
+  output_proc_ = nullptr;
+  output_data_ = nullptr;
 
   strcmp_  = (StrCmpProc ) strcmp;
   strncmp_ = (StrNCmpProc) strncmp;
+}
+
+ClParser::
+~ClParser()
+{
+  delete varMgr_;
 }
 
 void
@@ -86,7 +92,7 @@ setCaseSensitive(bool flag)
 
 bool
 ClParser::
-isValidAssignString(const string &str)
+isValidAssignString(const std::string &str)
 {
   ClParserParser parser(str);
 
@@ -98,12 +104,15 @@ isValidAssignString(const string &str)
 
 void
 ClParser::
-assignValue(const string &str, ClParserValuePtr value, int *error_code)
+assignValue(const std::string &str, ClParserValuePtr value, int *error_code)
 {
   *error_code = 0;
 
-  if (ClParserVar::isValidName(str))
-    createVar(str, value);
+  if (ClParserVar::isValidName(str)) {
+    ClParserVarPtr var = getVariable(str, /*create*/true);
+
+    var->setValue(value);
+  }
   else {
     ClParserParser parser(str);
 
@@ -123,7 +132,7 @@ assignValue(const string &str, ClParserValuePtr value, int *error_code)
     ClParserValuePtr value2 = ClParserStackMgrInst->evaluateStack();
 
     if (! value2.isValid()) {
-      *error_code = CLERR_INVALID_EXPRESSION;
+      signalError(error_code, ClErr::INVALID_EXPRESSION);
       return;
     }
   }
@@ -134,8 +143,7 @@ assignValue(const string &str, ClParserValuePtr value, int *error_code)
 
 void
 ClParser::
-assignSubscriptValue(const string &str, int i, ClParserValuePtr value,
-                     int *error_code)
+assignSubscriptValue(const std::string &str, int i, ClParserValuePtr value, int *error_code)
 {
   *error_code = 0;
 
@@ -171,20 +179,20 @@ assignSubscriptValue(const string &str, int i, ClParserValuePtr value,
   ClParserValuePtr value2 = ClParserStackMgrInst->evaluateStack();
 
   if (! value2.isValid()) {
-    *error_code = CLERR_INVALID_EXPRESSION;
+    signalError(error_code, ClErr::INVALID_EXPRESSION);
     return;
   }
 }
 
 bool
 ClParser::
-isValidNewName(ClParserNameType type, const string &name) const
+isValidNewName(ClParserNameType type, const std::string &name) const
 {
   if (isInternFn(name) ||
-      (type != CL_PARSER_NAME_TYPE_FUNCTION && isFunction(name)) ||
-      (type != CL_PARSER_NAME_TYPE_STRUCT   && isType    (name)) ||
-      (type != CL_PARSER_NAME_TYPE_VARIABLE && isVariable(name)) ||
-      (type != CL_PARSER_NAME_TYPE_USERFN   && isUserFn  (name)))
+      (type != ClParserNameType::FUNCTION && isFunction(name)) ||
+      (type != ClParserNameType::STRUCT   && isType    (name)) ||
+      (type != ClParserNameType::VARIABLE && isVariable(name)) ||
+      (type != ClParserNameType::USERFN   && isUserFn  (name)))
     return false;
   else
     return true;
@@ -217,7 +225,7 @@ printAllTypes() const
 
 bool
 ClParser::
-isType(const string &name) const
+isType(const std::string &name) const
 {
   return typeMgr_.isType(name);
 }
@@ -231,21 +239,21 @@ createType()
 
 ClParserTypePtr
 ClParser::
-createType(const string &name)
+createType(const std::string &name)
 {
   return typeMgr_.createType(name);
 }
 
 ClParserTypePtr
 ClParser::
-createType(const string &name, const string &arg_string)
+createType(const std::string &name, const std::string &arg_string)
 {
   return typeMgr_.createType(name, arg_string);
 }
 
 ClParserTypePtr
 ClParser::
-getType(const string &name) const
+getType(const std::string &name) const
 {
   return typeMgr_.getType(name);
 }
@@ -273,7 +281,7 @@ getStringType() const
 
 void
 ClParser::
-deleteType(const string &name)
+deleteType(const std::string &name)
 {
   return typeMgr_.deleteType(name);
 }
@@ -289,115 +297,116 @@ deleteAllTypes()
 
 ClParserVarPtr
 ClParser::
-createStdVar(const string &name, ClParserValuePtr value)
+createStdVar(const std::string &name, ClParserValuePtr value)
 {
-  return varMgr_.createStdVar(name, value);
+  return varMgr_->createStdVar(name, value);
 }
 
 ClParserVarPtr
 ClParser::
-createVar(const string &name, ClParserValuePtr value)
+createVar(const std::string &name, ClParserValuePtr value)
 {
-  return varMgr_.createVar(name, value);
+  return varMgr_->createVar(name, value);
 }
 
 ClParserVarRefPtr
 ClParser::
 createVarRef(ClParserVarPtr variable, const ClParserValueArray &subscripts)
 {
-  return varMgr_.createVarRef(variable, subscripts);
+  return varMgr_->createVarRef(variable, subscripts);
 }
 
 ClParserStructVarRefPtr
 ClParser::
-createStructVarRef(ClParserVarPtr variable, const string &name,
+createStructVarRef(ClParserVarPtr variable, const std::string &name,
                    const ClParserValueArray &subscripts)
 {
-  return varMgr_.createStructVarRef(variable, name, subscripts);
+  return varMgr_->createStructVarRef(variable, name, subscripts);
 }
 
 void
 ClParser::
 newVariableList()
 {
-  varMgr_.newVariableList();
+  varMgr_->newVariableList();
 }
 
 void
 ClParser::
 oldVariableList()
 {
-  varMgr_.oldVariableList();
+  varMgr_->oldVariableList();
 }
 
 void
 ClParser::
 deleteAllVariables()
 {
-  varMgr_.deleteAllVariables();
+  varMgr_->deleteAllVariables();
 }
 
 void
 ClParser::
 printAllVariables() const
 {
-  varMgr_.printAllVariables();
+  varMgr_->printAllVariables();
 }
 
 bool
 ClParser::
-isVariable(const string &name) const
+isVariable(const std::string &name) const
 {
-  return varMgr_.isVariable(name);
+  return varMgr_->isVariable(name);
 }
 
 ClParserVarPtr
 ClParser::
-getVariable(const string &name, bool create) const
+getVariable(const std::string &name, bool create) const
 {
-  return varMgr_.getVariable(name, create);
+  return varMgr_->getVariable(name, create);
 }
 
 ClParserValuePtr
 ClParser::
-getVariableValue(const string &name) const
+getVariableValue(const std::string &name) const
 {
-  return varMgr_.getVariableValue(name);
+  return varMgr_->getVariableValue(name);
 }
 
 void
 ClParser::
-setVariableValue(const string &name, ClParserValuePtr value)
+setVariableValue(const std::string &name, ClParserValuePtr value)
 {
-  varMgr_.setVariableValue(name, value);
+  varMgr_->setVariableValue(name, value);
 }
 
 void
 ClParser::
-removeVariable(const string &name)
+removeVariable(const std::string &name)
 {
-  return varMgr_.removeVariable(name);
+  return varMgr_->removeVariable(name);
 }
 
 void
 ClParser::
 callVariableProc(ClParserVarPtr variable)
 {
-  varMgr_.callVariableProc(variable);
+  varMgr_->callVariableProc(variable);
 }
 
 //------------------
 
 bool
 ClParser::
-createFunc(const string &name, int *error_code)
+createFunc(const std::string &name, int *error_code)
 {
   return funcMgr_.createFunc(name, error_code);
 }
 
 bool
 ClParser::
-createFunc(const string &function_string, const string &expression_string, int *error_code)
+createFunc(const std::string &function_string, const std::string &expression_string,
+           int *error_code)
 {
   return funcMgr_.createFunc(function_string, expression_string, error_code);
 }
@@ -418,21 +427,21 @@ printAllFunctions() const
 
 bool
 ClParser::
-isFunction(const string &name) const
+isFunction(const std::string &name) const
 {
   return funcMgr_.isFunction(name);
 }
 
 ClParserFuncPtr
 ClParser::
-getFunction(const string &name) const
+getFunction(const std::string &name) const
 {
   return funcMgr_.getFunction(name);
 }
 
 void
 ClParser::
-removeFunction(const string &name)
+removeFunction(const std::string &name)
 {
   return funcMgr_.removeFunction(name);
 }
@@ -441,14 +450,14 @@ removeFunction(const string &name)
 
 bool
 ClParser::
-isInternFn(const string &name) const
+isInternFn(const std::string &name) const
 {
   return internFnMgr_.isInternFn(name);
 }
 
 ClParserInternFnPtr
 ClParser::
-getInternFn(const string &name) const
+getInternFn(const std::string &name) const
 {
   return internFnMgr_.getInternFn(name);
 }
@@ -464,7 +473,7 @@ createUserFn(const ClUserFnData &data)
 
 ClParserUserFnPtr
 ClParser::
-createUserFn(const string &name, uint type, int *arg_types, uint num_arg_types,
+createUserFn(const std::string &name, uint type, int *arg_types, uint num_arg_types,
              ClParserUserFnProc proc, void *data)
 {
   return userFnMgr_.createUserFn(name, type, arg_types, num_arg_types, proc, data);
@@ -472,7 +481,7 @@ createUserFn(const string &name, uint type, int *arg_types, uint num_arg_types,
 
 ClParserUserFnPtr
 ClParser::
-createUserFn(const string &name, uint type, const IntVectorT &arg_types,
+createUserFn(const std::string &name, uint type, const IntVectorT &arg_types,
              ClParserUserFnProc proc, void *data)
 {
   return userFnMgr_.createUserFn(name, type, arg_types, proc, data);
@@ -480,21 +489,21 @@ createUserFn(const string &name, uint type, const IntVectorT &arg_types,
 
 void
 ClParser::
-removeUserFn(const string &name)
+removeUserFn(const std::string &name)
 {
   return userFnMgr_.removeUserFn(name);
 }
 
 bool
 ClParser::
-isUserFn(const string &name) const
+isUserFn(const std::string &name) const
 {
   return userFnMgr_.isUserFn(name);
 }
 
 ClParserUserFnPtr
 ClParser::
-getUserFn(const string &name) const
+getUserFn(const std::string &name) const
 {
   return userFnMgr_.getUserFn(name);
 }
@@ -564,8 +573,8 @@ void
 ClParser::
 output(const char *format, va_list *args)
 {
-  if (output_proc_ != NULL) {
-    string str;
+  if (output_proc_) {
+    std::string str;
 
     CStrUtil::vsprintf(str, format, args);
 
@@ -576,6 +585,13 @@ output(const char *format, va_list *args)
 
     fflush(output_fp_);
   }
+}
+
+void
+ClParser::
+signalError(int *error_code, ClErr err) const
+{
+  *error_code = int(err);
 }
 
 void

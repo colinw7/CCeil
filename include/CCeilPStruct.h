@@ -75,6 +75,10 @@ class ClParserStruct : public ClParserObj {
 
   int cmp(const ClParserObj &obj) const;
 
+  //------
+
+  std::string asString() const;
+
   void print() const;
   void print(std::ostream &os) const;
   void debugPrint() const;
@@ -144,9 +148,13 @@ class ClParserStruct : public ClParserObj {
   ClParserValuePtr min() const;
   ClParserValuePtr max() const;
   ClParserValuePtr sum() const;
-  ClParserValuePtr index(const ClParserObj &obj) const;
+
+  ClParserValuePtr index (const ClParserObj &obj) const;
   ClParserValuePtr rindex(const ClParserObj &obj) const;
+
   ClParserValuePtr sort(ClParserSortDirection direction) const;
+
+  ClParserValuePtr doAssert() const;
 
  private:
   template<class T>

@@ -1,7 +1,5 @@
 #include <CCeilL.h>
 
-using std::string;
-
 /*------------------------------------------------------------------*
  *
  * defineModule
@@ -15,7 +13,7 @@ using std::string;
 
 void
 ClModuleMgr::
-defineModule(const string &name, ClModuleDef *module_def)
+defineModule(const std::string &name, ClModuleDef *module_def)
 {
   ClModule *module = createModule(name);
 
@@ -37,7 +35,7 @@ defineModule(const string &name, ClModuleDef *module_def)
 
 void
 ClModuleMgr::
-defineModule(const string &name)
+defineModule(const std::string &name)
 {
   ClModule *module = createModule(name);
 
@@ -46,7 +44,7 @@ defineModule(const string &name)
 
 ClModule *
 ClModuleMgr::
-createModule(const string &name)
+createModule(const std::string &name)
 {
   ClModule *module = getModule(name);
 
@@ -59,7 +57,7 @@ createModule(const string &name)
 
 void
 ClModuleMgr::
-setInitProc(const string &name, ClModuleInitProc proc, void *data)
+setInitProc(const std::string &name, ClModuleInitProc proc, void *data)
 {
   ClModule *module = getModule(name);
 
@@ -69,7 +67,7 @@ setInitProc(const string &name, ClModuleInitProc proc, void *data)
 
 void
 ClModuleMgr::
-setSetProc(const string &name, ClModuleSetProc proc, void *data)
+setSetProc(const std::string &name, ClModuleSetProc proc, void *data)
 {
   ClModule *module = getModule(name);
 
@@ -79,7 +77,7 @@ setSetProc(const string &name, ClModuleSetProc proc, void *data)
 
 void
 ClModuleMgr::
-setTermProc(const string &name, ClModuleTermProc proc, void *data)
+setTermProc(const std::string &name, ClModuleTermProc proc, void *data)
 {
   ClModule *module = getModule(name);
 
@@ -89,7 +87,7 @@ setTermProc(const string &name, ClModuleTermProc proc, void *data)
 
 void
 ClModuleMgr::
-setHelpProc(const string &name, ClModuleHelpProc proc, void *data)
+setHelpProc(const std::string &name, ClModuleHelpProc proc, void *data)
 {
   ClModule *module = getModule(name);
 
@@ -105,7 +103,7 @@ setHelpProc(const string &name, ClModuleHelpProc proc, void *data)
  *   (not implemeted yet).
  *
  * CALL:
- *   bool flag = importModule(const string &name);
+ *   bool flag = importModule(const std::string &name);
  *
  * INPUT:
  *   name : Name of Module to Import.
@@ -125,17 +123,17 @@ setHelpProc(const string &name, ClModuleHelpProc proc, void *data)
 
 bool
 ClModuleMgr::
-importModule(const string &name)
+importModule(const std::string &name)
 {
   ClModule *module = getModule(name);
 
-  if (module == NULL) {
+  if (! module) {
     if (! importExternalModule(name))
       return false;
 
     module = getModule(name);
 
-    if (module == NULL)
+    if (! module)
       return false;
   }
 
@@ -183,7 +181,7 @@ getModuleList(StringVectorT &modules) const
  *   Check if the named module has been imported or not.
  *
  * CALL:
- *   bool flag = isModuleLoaded(const string &name);
+ *   bool flag = isModuleLoaded(const std::string &name);
  *
  * INPUT:
  *   name : Module Name.
@@ -201,11 +199,11 @@ getModuleList(StringVectorT &modules) const
 
 bool
 ClModuleMgr::
-isModuleLoaded(const string &name) const
+isModuleLoaded(const std::string &name) const
 {
   ClModule *module = getModule(name);
 
-  if (module == NULL)
+  if (! module)
     return false;
 
   return module->isLoaded();
@@ -219,7 +217,7 @@ isModuleLoaded(const string &name) const
  *
  * CALL:
  *   bool flag =
- *     execModuleSet(const string &name, char *option, char *args);
+ *     execModuleSet(const std::string &name, char *option, char *args);
  *
  * INPUT:
  *   name   : Name of Module
@@ -239,11 +237,11 @@ isModuleLoaded(const string &name) const
 
 bool
 ClModuleMgr::
-execModuleSet(const string &name, const string &option, const string &args)
+execModuleSet(const std::string &name, const std::string &option, const std::string &args)
 {
   ClModule *module = getModule(name);
 
-  if (module == NULL)
+  if (! module)
     return false;
 
   return module->execSetProc(option, args);
@@ -256,7 +254,7 @@ execModuleSet(const string &name, const string &option, const string &args)
  *
  * CALL:
  *   bool flag =
- *     execModuleHelp(const string &name, const string &args);
+ *     execModuleHelp(const std::string &name, const std::string &args);
  *
  * INPUT:
  *   name : Name of Module
@@ -277,11 +275,11 @@ execModuleSet(const string &name, const string &option, const string &args)
 
 bool
 ClModuleMgr::
-execModuleHelp(const string &name, const string &args)
+execModuleHelp(const std::string &name, const std::string &args)
 {
   ClModule *module = getModule(name);
 
-  if (module == NULL)
+  if (! module)
     return false;
 
   return module->execHelpProc(args);
@@ -347,11 +345,11 @@ reinitModules()
 
 bool
 ClModuleMgr::
-reinitModule(const string &name)
+reinitModule(const std::string &name)
 {
   ClModule *module = getModule(name);
 
-  if (module == NULL)
+  if (! module)
     return false;
 
   return module->execReinitProc();
@@ -399,7 +397,7 @@ termModules()
  *   Terminate the named module.
  *
  * CALL:
- *   bool flag = termModule(const string &name);
+ *   bool flag = termModule(const std::string &name);
  *
  * INPUT:
  *   name : Module Name.
@@ -417,11 +415,11 @@ termModules()
 
 bool
 ClModuleMgr::
-termModule(const string &name)
+termModule(const std::string &name)
 {
   ClModule *module = getModule(name);
 
-  if (module == NULL)
+  if (! module)
     return false;
 
   return module->execTermProc();
@@ -435,7 +433,7 @@ termModule(const string &name)
  *
  * CALL:
  *   bool flag =
- *     importExternalModule(const string &name);
+ *     importExternalModule(const std::string &name);
  *
  * INPUT:
  *   name : Module Name.
@@ -457,25 +455,25 @@ termModule(const string &name)
 
 bool
 ClModuleMgr::
-importExternalModule(const string &/*name*/)
+importExternalModule(const std::string &/*name*/)
 {
 #ifdef CL_IMPORT_EXTERNAL
-  string libname = moduleSearchLib("CL_LIBRARY_PATH", name);
+  std::string libname = moduleSearchLib("CL_LIBRARY_PATH", name);
 
-  if (libname == NULL)
+  if (! libname)
     libname = moduleSearchLib("LD_LIBRARY_PATH", name);
 
-  if (libname == NULL)
-    libname = moduleSearchLib(NULL, name);
+  if (! libname)
+    libname = moduleSearchLib(nullptr, name);
 
-  if (libname == NULL) {
+  if (! libname) {
     ClLanguageMgrInst->error("Failed to Find Module for %s", name);
     return false;
   }
 
   /*-------------*/
 
-  char *symbol = NULL;
+  char *symbol = nullptr;
 
   CShLib shlib(libname);
 
@@ -484,7 +482,7 @@ importExternalModule(const string &/*name*/)
     return false;
   }
 
-  string symname;
+  std::string symname;
 
   if (name[0] != '_') {
     symname = "cl_";
@@ -506,7 +504,7 @@ importExternalModule(const string &/*name*/)
     }
   }
 
-  if (symbol == NULL)
+  if (! symbol)
     return false;
 
   /*-------------*/
@@ -528,8 +526,8 @@ importExternalModule(const string &/*name*/)
  *   called 'cl_<name>.so'.
  *
  * CALL:
- *   string filename =
- *     moduleSearchLib(const string &envname, const string &name);
+ *   std::string filename =
+ *     moduleSearchLib(const std::string &envname, const std::string &name);
  *
  * INPUT:
  *   envname  : Environment Variable Name.
@@ -537,13 +535,13 @@ importExternalModule(const string &/*name*/)
  *   name     : Module Name.
  *
  * RETURNS:
- *   filename : Full path name of the library file (NULL if not found).
+ *   filename : Full path name of the library file (null if not found).
  *
  *------------------------------------------------------------------*/
 
-string
+std::string
 ClModuleMgr::
-moduleSearchLib(const string &envname, const string &name)
+moduleSearchLib(const std::string &envname, const std::string &name)
 {
   if (CEnvInst.exists(envname))
     envval = CEnvInst.get(envname);
@@ -556,7 +554,7 @@ moduleSearchLib(const string &envname, const string &name)
 
   unsigned int num_paths = paths.size();
 
-  string filename;
+  std::string filename;
 
   unsigned int i = 0;
 
@@ -592,7 +590,7 @@ moduleSearchLib(const string &envname, const string &name)
  *
  * CALL:
  *   ClModule *module =
- *     getModule(const string &name);
+ *     getModule(const std::string &name);
  *
  * INPUT:
  *   name   : Module Name.
@@ -601,7 +599,7 @@ moduleSearchLib(const string &envname, const string &name)
  *   None
  *
  * RETURNS:
- *   module : Module Data Structure (NULL if not found).
+ *   module : Module Data Structure (null if not found).
  *
  * NOTES:
  *   None
@@ -610,14 +608,14 @@ moduleSearchLib(const string &envname, const string &name)
 
 ClModule *
 ClModuleMgr::
-getModule(const string &name) const
+getModule(const std::string &name) const
 {
   ModuleMap::const_iterator p = module_list_.find(name);
 
   if (p != module_list_.end())
     return (*p).second;
 
-  return NULL;
+  return nullptr;
 }
 
 /*------------------------------------------------------------------*
@@ -658,15 +656,15 @@ deleteModules()
 //------------------
 
 ClModule::
-ClModule(const string &name) :
+ClModule(const std::string &name) :
  name_(name)
 {
-  init_proc_ = NULL; init_data_ = NULL;
-  set_proc_  = NULL; set_data_  = NULL;
-  term_proc_ = NULL; term_data_ = NULL;
-  help_proc_ = NULL; help_data_ = NULL;
+  init_proc_ = nullptr; init_data_ = nullptr;
+  set_proc_  = nullptr; set_data_  = nullptr;
+  term_proc_ = nullptr; term_data_ = nullptr;
+  help_proc_ = nullptr; help_data_ = nullptr;
 
-  state_ = MODULE_UNLOADED;
+  state_ = State::UNLOADED;
 }
 
 bool
@@ -680,7 +678,7 @@ execInitProc()
     bool rc = (*init_proc_)(CL_MODULE_INIT_TYPE_INIT, init_data_);
 
     if (rc)
-      state_ = MODULE_LOADED;
+      state_ = State::LOADED;
 
     return rc;
   }
@@ -703,7 +701,7 @@ execReinitProc()
 
 bool
 ClModule::
-execSetProc(const string &option, const string &args)
+execSetProc(const std::string &option, const std::string &args)
 {
   if (! isLoaded())
     return false;
@@ -729,7 +727,7 @@ execTermProc()
 
 bool
 ClModule::
-execHelpProc(const string &args)
+execHelpProc(const std::string &args)
 {
   if (! isLoaded())
     return false;

@@ -1,9 +1,6 @@
 #include <CCeilPI.h>
 #include <cerrno>
 
-using std::string;
-using std::ostream;
-
 void
 ClParserInteger::
 copy(const ClParserObj &obj)
@@ -120,7 +117,7 @@ divide(const ClParserObj &obj) const
   const ClParserInteger &integer = reinterpret_cast<const ClParserInteger &>(obj);
 
   if (integer.integer_ == 0)
-    CITHROW(CLERR_DIVIDE_BY_ZERO);
+    ClErrThrow(ClErr::DIVIDE_BY_ZERO);
 
   long value = integer_ / integer.integer_;
 
@@ -134,7 +131,7 @@ modulus(const ClParserObj &obj) const
   const ClParserInteger &integer = reinterpret_cast<const ClParserInteger &>(obj);
 
   if (integer.integer_ == 0)
-    CITHROW(CLERR_DIVIDE_BY_ZERO);
+    ClErrThrow(ClErr::DIVIDE_BY_ZERO);
 
   long value = integer_ % integer.integer_;
 
@@ -283,7 +280,7 @@ sqrt() const
   double value = CMathGen::sqrt(integer_);
 
   if (errno != 0 && ClParserInst->getMathFail())
-    CITHROW(CLERR_INVALID_SQRT_VALUE);
+    ClErrThrow(ClErr::INVALID_SQRT_VALUE);
 
   return ClParserValueMgrInst->createValue(value);
 }
@@ -324,7 +321,7 @@ acos() const
   double value = ClParserInst->fromRadians(CMathGen::acos(integer_));
 
   if (errno != 0 && ClParserInst->getMathFail())
-    CITHROW(CLERR_INVALID_ACOS_VALUE);
+    ClErrThrow(ClErr::INVALID_ACOS_VALUE);
 
   return ClParserValueMgrInst->createValue(value);
 }
@@ -338,7 +335,7 @@ asin() const
   double value = ClParserInst->fromRadians(CMathGen::asin(integer_));
 
   if (errno != 0 && ClParserInst->getMathFail())
-    CITHROW(CLERR_INVALID_ASIN_VALUE);
+    ClErrThrow(ClErr::INVALID_ASIN_VALUE);
 
   return ClParserValueMgrInst->createValue(value);
 }
@@ -379,7 +376,7 @@ log() const
   double value = CMathGen::log(integer_);
 
   if (errno != 0 && ClParserInst->getMathFail())
-    CITHROW(CLERR_INVALID_LOG_VALUE);
+    ClErrThrow(ClErr::INVALID_LOG_VALUE);
 
   return ClParserValueMgrInst->createValue(value);
 }
@@ -393,7 +390,7 @@ log10() const
   double value = CMathGen::log10(integer_);
 
   if (errno != 0 && ClParserInst->getMathFail())
-    CITHROW(CLERR_INVALID_LOG_VALUE);
+    ClErrThrow(ClErr::INVALID_LOG_VALUE);
 
   return ClParserValueMgrInst->createValue(value);
 }
@@ -429,7 +426,7 @@ ClParserValuePtr
 ClParserInteger::
 toChar() const
 {
-  string text(" ");
+  std::string text(" ");
 
   text[0] = (char) integer_;
 
@@ -458,7 +455,7 @@ ClParserValuePtr
 ClParserInteger::
 toString() const
 {
-  string text = ClParserInst->toString(integer_);
+  std::string text = asString();
 
   return ClParserValueMgrInst->createValue(text);
 }
@@ -531,7 +528,7 @@ ClParserValuePtr
 ClParserInteger::
 index(const ClParserObj &) const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValueMgrInst->createValue(0L);
 }
@@ -540,7 +537,7 @@ ClParserValuePtr
 ClParserInteger::
 rindex(const ClParserObj &) const
 {
-  CITHROW(CLERR_INVALID_TYPE_FOR_OPERATOR);
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
   return ClParserValueMgrInst->createValue(0L);
 }
@@ -552,6 +549,15 @@ sort(ClParserSortDirection) const
   long value = integer_;
 
   return ClParserValueMgrInst->createValue(value);
+}
+
+ClParserValuePtr
+ClParserInteger::
+doAssert() const
+{
+  assert(integer_);
+
+  return ClParserValuePtr();
 }
 
 //-----------------
@@ -580,23 +586,32 @@ cmp(const ClParserInteger &rhs) const
     return 0;
 }
 
-void
+//------
+
+std::string
 ClParserInteger::
-print() const
+asString() const
 {
-  ClParserInst->output("%s", ClParserInst->toString(integer_).c_str());
+  return ClParserInst->toString(integer_);
 }
 
 void
 ClParserInteger::
-print(ostream &os) const
+print() const
 {
-  os << ClParserInst->toString(integer_);
+  ClParserInst->output("%s", asString().c_str());
+}
+
+void
+ClParserInteger::
+print(std::ostream &os) const
+{
+  os << asString();
 }
 
 void
 ClParserInteger::
 debugPrint() const
 {
-  fprintf(stderr, " %ld ", integer_);
+  fprintf(stderr, " %s ", asString().c_str());
 }

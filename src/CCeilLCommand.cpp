@@ -1,14 +1,12 @@
 #include <CCeilL.h>
 #include <cstdlib>
 
-using std::string;
-
 ClLanguageCommand::
-ClLanguageCommand(uint ident, void *data, const string &args,
+ClLanguageCommand(uint ident, void *data, const std::string &args,
                   const ClLanguageCommandList &command_list) :
  ident_(ident), data_(data), args_(args), command_list_(command_list)
 {
-  line_num_ = ClLanguageMgrInst->getInputFile().getLineNum();
+  line_num_ = ClLanguageMgrInst->getInputFile()->getLineNum();
 }
 
 ClLanguageCommand::
@@ -45,8 +43,8 @@ clearCommands()
 //----------
 
 ClLanguageSystemCommand::
-ClLanguageSystemCommand(const string &args) :
- ClLanguageCommand(CL_SYSTEM_COMMAND, NULL, args)
+ClLanguageSystemCommand(const std::string &args) :
+ ClLanguageCommand(CL_SYSTEM_COMMAND, nullptr, args)
 {
   init();
 }
@@ -57,7 +55,7 @@ ClLanguageSystemCommand::
   term();
 }
 
-string
+std::string
 ClLanguageSystemCommand::
 toName() const
 {
@@ -67,7 +65,7 @@ toName() const
 //----------
 
 ClLanguageProcCommand::
-ClLanguageProcCommand(ClLanguageProc *proc, const string &args) :
+ClLanguageProcCommand(ClLanguageProc *proc, const std::string &args) :
  ClLanguageCommand(CL_PROCEDURE_COMMAND, proc, args, proc->getCommandList())
 {
   init();
@@ -100,7 +98,7 @@ getProcedure() const
   return (ClLanguageProc *) data_;
 }
 
-string
+std::string
 ClLanguageProcCommand::
 toName() const
 {
@@ -110,7 +108,7 @@ toName() const
 //----------
 
 ClLanguagePosProcCommand::
-ClLanguagePosProcCommand(const string &name, const string &line) :
+ClLanguagePosProcCommand(const std::string &name, const std::string &line) :
  ClLanguageCommand(CL_POS_PROC_COMMAND, strdup(name.c_str()), line)
 {
   init();
@@ -140,14 +138,14 @@ term()
   free((char *) data_);
 }
 
-string
+std::string
 ClLanguagePosProcCommand::
 toName() const
 {
-  return string((char *) data_);
+  return std::string((char *) data_);
 }
 
-const string &
+const std::string &
 ClLanguagePosProcCommand::
 getLine() const
 {
@@ -169,7 +167,7 @@ ClLanguageLabelCommand::
   term();
 }
 
-string
+std::string
 ClLanguageLabelCommand::
 toName() const
 {
@@ -186,7 +184,7 @@ getLabelData() const
 //----------
 
 ClLanguageExpressionCommand::
-ClLanguageExpressionCommand(const string &name, const string &line) :
+ClLanguageExpressionCommand(const std::string &name, const std::string &line) :
  ClLanguageCommand(CL_EXPRESSION_COMMAND, strdup(name.c_str()), line)
 {
   init();
@@ -216,18 +214,18 @@ term()
   free((char *) data_);
 }
 
-string
+std::string
 ClLanguageExpressionCommand::
 toName() const
 {
-  return string((char *) data_);
+  return std::string((char *) data_);
 }
 
 //----------
 
 ClLanguageLanguageCommand::
-ClLanguageLanguageCommand(const string &args) :
- ClLanguageCommand(CL_LANGUAGE_COMMAND, NULL, args)
+ClLanguageLanguageCommand(const std::string &args) :
+ ClLanguageCommand(CL_LANGUAGE_COMMAND, nullptr, args)
 {
   init();
 }
@@ -238,7 +236,7 @@ ClLanguageLanguageCommand::
   term();
 }
 
-string
+std::string
 ClLanguageLanguageCommand::
 toName() const
 {
@@ -248,8 +246,8 @@ toName() const
 //----------
 
 ClLanguageCommandDefCommand::
-ClLanguageCommandDefCommand(ClLanguageCommandDef *command_def,
-                            const string &args, bool is_end_cmd) :
+ClLanguageCommandDefCommand(ClLanguageCommandDef *command_def, const std::string &args,
+                            bool is_end_cmd) :
  ClLanguageCommand(command_def->getIdent(), command_def, args)
 {
   if (is_end_cmd)
@@ -264,7 +262,7 @@ ClLanguageCommandDefCommand::
   term();
 }
 
-string
+std::string
 ClLanguageCommandDefCommand::
 toName() const
 {

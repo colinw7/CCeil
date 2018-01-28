@@ -52,10 +52,12 @@ CCeilPVar.cpp \
 
 OBJS = $(patsubst %.cpp,$(OBJ_DIR)/%.o,$(SRC))
 
-LIBS = -lCCeil -lCArgs -lCFile -lCMath -lCOS -lCUtil -lCStrUtil -lCGlob
+LIBS = \
+-lCCeil -lCArgs -lCFile -lCMath -lCOS \
+-lCUtil -lCStrUtil -lCGlob
 
 CPPFLAGS = \
--std=c++11 \
+-std=c++14 \
 -I$(INC_DIR) \
 -I../../CArgs/include \
 -I../../CFile/include \

@@ -7,16 +7,16 @@
 
 /**** Private Defines ****/
 
-enum ClParserStackNodeType {
-  CL_PARSER_STACK_NODE_NONE           = 0,
-  CL_PARSER_STACK_NODE_OPERATOR       = 1,
-  CL_PARSER_STACK_NODE_INTERN_FN      = 2,
-  CL_PARSER_STACK_NODE_VALUE          = 3,
-  CL_PARSER_STACK_NODE_VAR_REF        = 4,
-  CL_PARSER_STACK_NODE_STRUCT_VAR_REF = 5,
-  CL_PARSER_STACK_NODE_IDENTIFIER     = 6,
-  CL_PARSER_STACK_NODE_USER_FN        = 7,
-  CL_PARSER_STACK_NODE_TYPE           = 8
+enum class ClParserStackNodeType {
+  NONE           = 0,
+  OPERATOR       = 1,
+  INTERN_FN      = 2,
+  VALUE          = 3,
+  VAR_REF        = 4,
+  STRUCT_VAR_REF = 5,
+  IDENTIFIER     = 6,
+  USER_FN        = 7,
+  TYPE           = 8
 };
 
 /**** Private Structures ****/
@@ -243,83 +243,83 @@ class ClParserStackNode {
  ~ClParserStackNode();
 
   bool isOperator() const {
-    return (type_ == CL_PARSER_STACK_NODE_OPERATOR);
+    return (type_ == ClParserStackNodeType::OPERATOR);
   }
 
   bool isOperator(ClParserOperatorType type);
 
   ClParserOperatorPtr getOperator() const {
-    assert(type_ == CL_PARSER_STACK_NODE_OPERATOR);
+    assert(type_ == ClParserStackNodeType::OPERATOR);
 
     return *data_.op;
   }
 
   bool isInternFn() const {
-    return (type_ == CL_PARSER_STACK_NODE_INTERN_FN);
+    return (type_ == ClParserStackNodeType::INTERN_FN);
   }
 
   ClParserInternFnPtr getInternFn() const {
-    assert(type_ == CL_PARSER_STACK_NODE_INTERN_FN);
+    assert(type_ == ClParserStackNodeType::INTERN_FN);
 
     return *data_.internfn;
   }
 
   bool isValue() const {
-    return (type_ == CL_PARSER_STACK_NODE_VALUE);
+    return (type_ == ClParserStackNodeType::VALUE);
   }
 
   ClParserValuePtr getValue() const {
-    assert(type_ == CL_PARSER_STACK_NODE_VALUE);
+    assert(type_ == ClParserStackNodeType::VALUE);
 
     return *data_.value;
   }
 
   bool isVarRef() const {
-    return (type_ == CL_PARSER_STACK_NODE_VAR_REF);
+    return (type_ == ClParserStackNodeType::VAR_REF);
   }
 
   ClParserVarRefPtr getVarRef() const {
-    assert(type_ == CL_PARSER_STACK_NODE_VAR_REF);
+    assert(type_ == ClParserStackNodeType::VAR_REF);
 
     return *data_.var_ref;
   }
 
   bool isStructVarRef() const {
-    return (type_ == CL_PARSER_STACK_NODE_STRUCT_VAR_REF);
+    return (type_ == ClParserStackNodeType::STRUCT_VAR_REF);
   }
 
   ClParserStructVarRefPtr getStructVarRef() const {
-    assert(type_ == CL_PARSER_STACK_NODE_STRUCT_VAR_REF);
+    assert(type_ == ClParserStackNodeType::STRUCT_VAR_REF);
 
     return *data_.svar_ref;
   }
 
   bool isIdentifier() const {
-    return (type_ == CL_PARSER_STACK_NODE_IDENTIFIER);
+    return (type_ == ClParserStackNodeType::IDENTIFIER);
   }
 
   ClParserIdentifierPtr getIdentifier() const {
-    assert(type_ == CL_PARSER_STACK_NODE_IDENTIFIER);
+    assert(type_ == ClParserStackNodeType::IDENTIFIER);
 
     return *data_.identifier;
   }
 
   bool isUserFn() const {
-    return (type_ == CL_PARSER_STACK_NODE_USER_FN);
+    return (type_ == ClParserStackNodeType::USER_FN);
   }
 
   ClParserUserFnPtr getUserFn() {
-    assert(type_ == CL_PARSER_STACK_NODE_USER_FN);
+    assert(type_ == ClParserStackNodeType::USER_FN);
 
     return *data_.userfn;
   }
 
   bool isType() const {
-    return (type_ == CL_PARSER_STACK_NODE_TYPE);
+    return (type_ == ClParserStackNodeType::TYPE);
   }
 
   ClParserTypePtr getType() {
-    assert(type_ == CL_PARSER_STACK_NODE_TYPE);
+    assert(type_ == ClParserStackNodeType::TYPE);
 
     return *data_.type;
   }

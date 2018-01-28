@@ -1,7 +1,5 @@
 #include <CCeilL.h>
 
-using std::string;
-
 CCeilLErrorMgr::
 CCeilLErrorMgr()
 {
@@ -57,14 +55,13 @@ error(const char *format, va_list *vargs)
   CStrUtil::vsprintf(error_string_, format, vargs);
 
   if (error_proc_ != nullptr) {
-    string str;
+    std::string str;
 
-    const string &input_file = ClLanguageMgrInst->getInputFile().getName();
+    const std::string &input_file = ClLanguageMgrInst->getInputFile()->getName();
 
     if (input_file != "")
       CStrUtil::sprintf(str, "Error in %s:%d - %s\n", input_file.c_str(),
-                        ClLanguageMgrInst->getCommandLineNum(),
-                        error_string_.c_str());
+                        ClLanguageMgrInst->getCommandLineNum(), error_string_.c_str());
     else
       CStrUtil::sprintf(str, "Error - %s\n", error_string_.c_str());
 
@@ -135,10 +132,10 @@ syntaxError(const char *format, va_list *vargs)
   CStrUtil::vsprintf(error_string_, format, vargs);
 
   if (! ClSignalMgrInst->checkSignalCommand(SIGSYNTAX)) {
-    const string &input_file = ClLanguageMgrInst->getInputFile().getName();
+    const std::string &input_file = ClLanguageMgrInst->getInputFile()->getName();
 
     if (error_proc_ != nullptr) {
-      string str;
+      std::string str;
 
       if (input_file != "")
         CStrUtil::sprintf(str, "Syntax Error in %s:%d - %s\n", input_file.c_str(),
@@ -227,10 +224,10 @@ expressionError(int error_code, const char *format, va_list *vargs)
   CStrUtil::vsprintf(error_string_, format, vargs);
 
   if (! ClSignalMgrInst->checkSignalCommand(SIGEXPR)) {
-    const string &input_file = ClLanguageMgrInst->getInputFile().getName();
+    const std::string &input_file = ClLanguageMgrInst->getInputFile()->getName();
 
     if (error_proc_ != nullptr) {
-      string str;
+      std::string str;
 
       if (error_code != -1) {
         if (input_file != "")

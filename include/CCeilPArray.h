@@ -5,15 +5,9 @@
 #include <CMultiArray.h>
 
 class ClParserArray : public ClParserObj {
- private:
+ public:
   typedef CMultiArrayT<ClParserValuePtr> ValueArray;
 
-  static int error_code_;
-
-  ClParserValueType type_;
-  ValueArray        values_;
-
- public:
   static int getErrorCode() { return error_code_; }
 
  public:
@@ -260,6 +254,8 @@ class ClParserArray : public ClParserObj {
 
   ClParserValuePtr sort(ClParserSortDirection direction) const;
 
+  ClParserValuePtr doAssert() const;
+
   //------
 
   ClParserValuePtr binaryOp(ClParserOperatorPtr op, ClParserArray *array);
@@ -269,15 +265,27 @@ class ClParserArray : public ClParserObj {
 
   ClParserArrayPtr arrayTimes(const ClParserArray &array);
 
+  //------
+
+  std::string asString() const;
+
   void print() const;
   void print(std::ostream &os) const;
   void debugPrint() const;
+
+  //------
 
   bool getSubscriptRange(int *i1, int *i2) const;
 
  private:
   bool indexToData(int *i) const;
   bool indexToData(int *i, uint dim) const;
+
+ private:
+  static int error_code_;
+
+  ClParserValueType type_;
+  ValueArray        values_;
 };
 
 #endif

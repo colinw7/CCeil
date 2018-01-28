@@ -34,27 +34,27 @@ class ClModule {
 
   const std::string &getName() const { return name_; }
 
-  void setInitProc(ClModuleInitProc proc, void *data=NULL) {
+  void setInitProc(ClModuleInitProc proc, void *data=nullptr) {
     init_proc_ = proc;
     init_data_ = data;
   }
 
-  void setSetProc (ClModuleSetProc proc, void *data=NULL) {
+  void setSetProc (ClModuleSetProc proc, void *data=nullptr) {
     set_proc_ = proc;
     set_data_ = data;
   }
 
-  void setTermProc(ClModuleTermProc proc, void *data=NULL) {
+  void setTermProc(ClModuleTermProc proc, void *data=nullptr) {
     term_proc_ = proc;
     term_data_ = data;
   }
 
-  void setHelpProc(ClModuleHelpProc proc, void *data=NULL) {
+  void setHelpProc(ClModuleHelpProc proc, void *data=nullptr) {
     help_proc_ = proc;
     help_data_ = data;
   }
 
-  bool isLoaded() const { return (state_ == MODULE_LOADED); }
+  bool isLoaded() const { return (state_ == State::LOADED); }
 
   bool execInitProc();
   bool execReinitProc();
@@ -63,21 +63,21 @@ class ClModule {
   bool execHelpProc(const std::string &args);
 
  private:
-  enum State {
-    MODULE_UNLOADED = 0,
-    MODULE_LOADED   = 1
+  enum class State {
+    UNLOADED = 0,
+    LOADED   = 1
   };
 
   std::string       name_;
-  ClModuleInitProc  init_proc_;
-  void             *init_data_;
-  ClModuleSetProc   set_proc_;
-  void             *set_data_;
-  ClModuleTermProc  term_proc_;
-  void             *term_data_;
-  ClModuleHelpProc  help_proc_;
-  void             *help_data_;
-  State             state_;
+  ClModuleInitProc  init_proc_ { nullptr };
+  void             *init_data_ { nullptr };
+  ClModuleSetProc   set_proc_  { nullptr };
+  void             *set_data_  { nullptr };
+  ClModuleTermProc  term_proc_ { nullptr };
+  void             *term_data_ { nullptr };
+  ClModuleHelpProc  help_proc_ { nullptr };
+  void             *help_data_ { nullptr };
+  State             state_     { State::UNLOADED };
 };
 
 //------
@@ -98,10 +98,10 @@ class ClModuleMgr {
   void defineModule(const std::string &name, ClModuleDef *module_def);
   void defineModule(const std::string &name);
 
-  void setInitProc(const std::string &name, ClModuleInitProc proc, void *data=NULL);
-  void setSetProc (const std::string &name, ClModuleSetProc  proc, void *data=NULL);
-  void setTermProc(const std::string &name, ClModuleTermProc proc, void *data=NULL);
-  void setHelpProc(const std::string &name, ClModuleHelpProc proc, void *data=NULL);
+  void setInitProc(const std::string &name, ClModuleInitProc proc, void *data=nullptr);
+  void setSetProc (const std::string &name, ClModuleSetProc  proc, void *data=nullptr);
+  void setTermProc(const std::string &name, ClModuleTermProc proc, void *data=nullptr);
+  void setHelpProc(const std::string &name, ClModuleHelpProc proc, void *data=nullptr);
 
   bool importModule(const std::string &name);
 
