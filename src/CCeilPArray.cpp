@@ -231,36 +231,32 @@ createArray(const ClParserArray &array)
 
 ClParserArray::
 ClParserArray() :
- ClParserObj(CL_PARSER_VALUE_TYPE_ARRAY),
- type_(CL_PARSER_VALUE_TYPE_NONE)
+ ClParserObj(CL_PARSER_VALUE_TYPE_ARRAY), type_(CL_PARSER_VALUE_TYPE_NONE)
 {
 }
 
 ClParserArray::
 ClParserArray(ClParserValueType type) :
- ClParserObj(CL_PARSER_VALUE_TYPE_ARRAY),
- type_(type)
+ ClParserObj(CL_PARSER_VALUE_TYPE_ARRAY), type_(type)
 {
 }
 
 ClParserArray::
 ClParserArray(ClParserValueType type, const uint *dims, uint num_dims) :
- ClParserObj(CL_PARSER_VALUE_TYPE_ARRAY),
- type_(type), values_(dims, num_dims, ClParserValuePtr())
+ ClParserObj(CL_PARSER_VALUE_TYPE_ARRAY), type_(type),
+ values_(dims, num_dims, ClParserValuePtr())
 {
 }
 
 ClParserArray::
 ClParserArray(ClParserValueType type, const UIntVectorT &dims) :
- ClParserObj(CL_PARSER_VALUE_TYPE_ARRAY),
- type_(type), values_(dims, ClParserValuePtr())
+ ClParserObj(CL_PARSER_VALUE_TYPE_ARRAY), type_(type), values_(dims, ClParserValuePtr())
 {
 }
 
 ClParserArray::
 ClParserArray(ClParserValueType type, const ValueArray &values) :
- ClParserObj(CL_PARSER_VALUE_TYPE_ARRAY),
- type_(type), values_(values)
+ ClParserObj(CL_PARSER_VALUE_TYPE_ARRAY), type_(type), values_(values)
 {
 }
 
@@ -1231,8 +1227,7 @@ getSubscriptValue(const IntVectorT &subscripts) const
 
 bool
 ClParserArray::
-setSubscriptValue(const int *subscripts, uint num_subscripts,
-                  ClParserValuePtr value)
+setSubscriptValue(const int *subscripts, uint num_subscripts, ClParserValuePtr value)
 {
   UIntVectorT subscripts1;
 
@@ -1537,8 +1532,7 @@ expandTo(const ClParserArray &array)
   uint num_dims2 = array.getNumDims();
 
   for (uint i = 0; i < num_dims1; ++i) {
-    if (      getDim(num_dims1 - i - 1) !=
-        array.getDim(num_dims2 - i - 1)) {
+    if (getDim(num_dims1 - i - 1) != array.getDim(num_dims2 - i - 1)) {
       error_code_ = int(ClErr::INVALID_TYPE_MIX);
       return false;
     }
@@ -1605,13 +1599,11 @@ setIndexArray()
 
   if      (type_ == CL_PARSER_VALUE_TYPE_INTEGER) {
     for (uint i = 0; i < num_data; ++i)
-      values_.setLinearValue(i,
-        ClParserValueMgrInst->createValue((long) (i + 1)));
+      values_.setLinearValue(i, ClParserValueMgrInst->createValue((long) (i + 1)));
   }
   else if (type_ == CL_PARSER_VALUE_TYPE_REAL) {
     for (uint i = 0; i < num_data; ++i)
-      values_.setLinearValue(i,
-        ClParserValueMgrInst->createValue((double) (i + 1)));
+      values_.setLinearValue(i, ClParserValueMgrInst->createValue((double) (i + 1)));
   }
   else if (type_ == CL_PARSER_VALUE_TYPE_STRING) {
     char temp_string[32];
@@ -1621,8 +1613,7 @@ setIndexArray()
 
       uint len = strlen(temp_string);
 
-      values_.setLinearValue(i,
-        ClParserValueMgrInst->createValue(temp_string, len));
+      values_.setLinearValue(i, ClParserValueMgrInst->createValue(temp_string, len));
     }
   }
   else
@@ -1738,138 +1729,277 @@ bitNot() const
 
 // Binary Ops
 
+// <array> + <obj>
 ClParserValuePtr
 ClParserArray::
 plus(const ClParserObj &obj) const
 {
-  const ClParserArray &array =
-    reinterpret_cast<const ClParserArray &>(obj);
+  ClParserArrayPtr array1 = this->dupArray();
 
-  ClParserArrayPtr array1 = array.dupArray();
+  uint n = getNumData();
 
-  for (uint i = 0; i < getNumData(); ++i) {
-    ClParserValuePtr value1, value2;
+  if (obj.getBaseType() == CL_PARSER_VALUE_TYPE_ARRAY) {
+    const ClParserArray &array = reinterpret_cast<const ClParserArray &>(obj);
 
-          values_.getLinearValue(i, value1);
-    array.values_.getLinearValue(i, value2);
+    for (uint i = 0; i < n; ++i) {
+      ClParserValuePtr value1, value2;
 
-    array1->values_.setLinearValue(i, value1->plus(value2));
+            values_.getLinearValue(i, value1);
+      array.values_.getLinearValue(i, value2);
+
+      array1->values_.setLinearValue(i, value1->plus(value2));
+    }
+  }
+  else {
+    bool isReal = (getType() == CL_PARSER_VALUE_TYPE_REAL ||
+                   obj.getBaseType() == CL_PARSER_VALUE_TYPE_REAL);
+
+    ClParserValuePtr value2 = ClParserValueMgrInst->createValue(obj);
+
+    for (uint i = 0; i < n; ++i) {
+      ClParserValuePtr value1;
+
+      values_.getLinearValue(i, value1);
+
+      if (isReal) {
+        value1->convertToReal();
+        value2->convertToReal();
+      }
+
+      array1->values_.setLinearValue(i, value1->plus(value2));
+    }
   }
 
   return ClParserValueMgrInst->createValue(array1);
 }
 
+// <array> - <obj>
 ClParserValuePtr
 ClParserArray::
 minus(const ClParserObj &obj) const
 {
-  const ClParserArray &array =
-    reinterpret_cast<const ClParserArray &>(obj);
+  ClParserArrayPtr array1 = this->dupArray();
 
-  ClParserArrayPtr array1 = array.dupArray();
+  uint n = getNumData();
 
-  for (uint i = 0; i < getNumData(); ++i) {
-    ClParserValuePtr value1, value2;
+  if (obj.getBaseType() == CL_PARSER_VALUE_TYPE_ARRAY) {
+    const ClParserArray &array = reinterpret_cast<const ClParserArray &>(obj);
 
-          values_.getLinearValue(i, value1);
-    array.values_.getLinearValue(i, value2);
+    for (uint i = 0; i < n; ++i) {
+      ClParserValuePtr value1, value2;
 
-    array1->values_.setLinearValue(i, value1->minus(value2));
+            values_.getLinearValue(i, value1);
+      array.values_.getLinearValue(i, value2);
+
+      array1->values_.setLinearValue(i, value1->minus(value2));
+    }
+  }
+  else {
+    bool isReal = (getType() == CL_PARSER_VALUE_TYPE_REAL ||
+                   obj.getBaseType() == CL_PARSER_VALUE_TYPE_REAL);
+
+    ClParserValuePtr value2 = ClParserValueMgrInst->createValue(obj);
+
+    for (uint i = 0; i < n; ++i) {
+      ClParserValuePtr value1;
+
+      values_.getLinearValue(i, value1);
+
+      if (isReal) {
+        value1->convertToReal();
+        value2->convertToReal();
+      }
+
+      array1->values_.setLinearValue(i, value1->minus(value2));
+    }
   }
 
   return ClParserValueMgrInst->createValue(array1);
 }
 
+// <array> * <obj>
 ClParserValuePtr
 ClParserArray::
 times(const ClParserObj &obj) const
 {
-  const ClParserArray &array =
-    reinterpret_cast<const ClParserArray &>(obj);
+  ClParserArrayPtr array1 = this->dupArray();
 
-  ClParserArrayPtr array1 = array.dupArray();
+  uint n = getNumData();
 
-  for (uint i = 0; i < getNumData(); ++i) {
-    ClParserValuePtr value1, value2;
+  if (obj.getBaseType() == CL_PARSER_VALUE_TYPE_ARRAY) {
+    const ClParserArray &array = reinterpret_cast<const ClParserArray &>(obj);
 
-          values_.getLinearValue(i, value1);
-    array.values_.getLinearValue(i, value2);
+    for (uint i = 0; i < n; ++i) {
+      ClParserValuePtr value1, value2;
 
-    array1->values_.setLinearValue(i, value1->times(value2));
+            values_.getLinearValue(i, value1);
+      array.values_.getLinearValue(i, value2);
+
+      array1->values_.setLinearValue(i, value1->times(value2));
+    }
+  }
+  else {
+    bool isReal = (getType() == CL_PARSER_VALUE_TYPE_REAL ||
+                   obj.getBaseType() == CL_PARSER_VALUE_TYPE_REAL);
+
+    ClParserValuePtr value2 = ClParserValueMgrInst->createValue(obj);
+
+    for (uint i = 0; i < n; ++i) {
+      ClParserValuePtr value1;
+
+      values_.getLinearValue(i, value1);
+
+      if (isReal) {
+        value1->convertToReal();
+        value2->convertToReal();
+      }
+
+      array1->values_.setLinearValue(i, value1->times(value2));
+    }
   }
 
   return ClParserValueMgrInst->createValue(array1);
 }
 
+// <array> / <obj>
 ClParserValuePtr
 ClParserArray::
 divide(const ClParserObj &obj) const
 {
-  const ClParserArray &array =
-    reinterpret_cast<const ClParserArray &>(obj);
+  ClParserArrayPtr array1 = this->dupArray();
 
-  ClParserArrayPtr array1 = array.dupArray();
+  uint n = getNumData();
 
-  for (uint i = 0; i < getNumData(); ++i) {
-    ClParserValuePtr value1, value2;
+  if (obj.getBaseType() == CL_PARSER_VALUE_TYPE_ARRAY) {
+    const ClParserArray &array = reinterpret_cast<const ClParserArray &>(obj);
 
-          values_.getLinearValue(i, value1);
-    array.values_.getLinearValue(i, value2);
+    for (uint i = 0; i < n; ++i) {
+      ClParserValuePtr value1, value2;
 
-    array1->values_.setLinearValue(i, value1->divide(value2));
+            values_.getLinearValue(i, value1);
+      array.values_.getLinearValue(i, value2);
+
+      array1->values_.setLinearValue(i, value1->divide(value2));
+    }
+  }
+  else {
+    bool isReal = (getType() == CL_PARSER_VALUE_TYPE_REAL ||
+                   obj.getBaseType() == CL_PARSER_VALUE_TYPE_REAL);
+
+    ClParserValuePtr value2 = ClParserValueMgrInst->createValue(obj);
+
+    for (uint i = 0; i < n; ++i) {
+      ClParserValuePtr value1;
+
+      values_.getLinearValue(i, value1);
+
+      if (isReal) {
+        value1->convertToReal();
+        value2->convertToReal();
+      }
+
+      array1->values_.setLinearValue(i, value1->divide(value2));
+    }
   }
 
   return ClParserValueMgrInst->createValue(array1);
 }
 
+// <array> % <obj>
 ClParserValuePtr
 ClParserArray::
 modulus(const ClParserObj &obj) const
 {
-  const ClParserArray &array =
-    reinterpret_cast<const ClParserArray &>(obj);
+  ClParserArrayPtr array1 = this->dupArray();
 
-  ClParserArrayPtr array1 = array.dupArray();
+  uint n = getNumData();
 
-  for (uint i = 0; i < getNumData(); ++i) {
-    ClParserValuePtr value1, value2;
+  if (obj.getBaseType() == CL_PARSER_VALUE_TYPE_ARRAY) {
+    const ClParserArray &array = reinterpret_cast<const ClParserArray &>(obj);
 
-          values_.getLinearValue(i, value1);
-    array.values_.getLinearValue(i, value2);
+    for (uint i = 0; i < n; ++i) {
+      ClParserValuePtr value1, value2;
 
-    array1->values_.setLinearValue(i, value1->modulus(value2));
+            values_.getLinearValue(i, value1);
+      array.values_.getLinearValue(i, value2);
+
+      array1->values_.setLinearValue(i, value1->modulus(value2));
+    }
+  }
+  else {
+    bool isReal = (getType() == CL_PARSER_VALUE_TYPE_REAL ||
+                   obj.getBaseType() == CL_PARSER_VALUE_TYPE_REAL);
+
+    ClParserValuePtr value2 = ClParserValueMgrInst->createValue(obj);
+
+    for (uint i = 0; i < n; ++i) {
+      ClParserValuePtr value1;
+
+      values_.getLinearValue(i, value1);
+
+      if (isReal) {
+        value1->convertToReal();
+        value2->convertToReal();
+      }
+
+
+      array1->values_.setLinearValue(i, value1->modulus(value2));
+    }
   }
 
   return ClParserValueMgrInst->createValue(array1);
 }
 
+// <array> ** <obj>
 ClParserValuePtr
 ClParserArray::
 power(const ClParserObj &obj) const
 {
-  const ClParserArray &array =
-    reinterpret_cast<const ClParserArray &>(obj);
+  ClParserArrayPtr array1 = this->dupArray();
 
-  ClParserArrayPtr array1 = array.dupArray();
+  uint n = getNumData();
 
-  for (uint i = 0; i < getNumData(); ++i) {
-    ClParserValuePtr value1, value2;
+  if (obj.getBaseType() == CL_PARSER_VALUE_TYPE_ARRAY) {
+    const ClParserArray &array = reinterpret_cast<const ClParserArray &>(obj);
 
-          values_.getLinearValue(i, value1);
-    array.values_.getLinearValue(i, value2);
+    for (uint i = 0; i < n; ++i) {
+      ClParserValuePtr value1, value2;
 
-    array1->values_.setLinearValue(i, value1->power(value2));
+            values_.getLinearValue(i, value1);
+      array.values_.getLinearValue(i, value2);
+
+      array1->values_.setLinearValue(i, value1->power(value2));
+    }
+  }
+  else {
+    bool isReal = (getType() == CL_PARSER_VALUE_TYPE_REAL ||
+                   obj.getBaseType() == CL_PARSER_VALUE_TYPE_REAL);
+
+    ClParserValuePtr value2 = ClParserValueMgrInst->createValue(obj);
+
+    for (uint i = 0; i < n; ++i) {
+      ClParserValuePtr value1;
+
+      values_.getLinearValue(i, value1);
+
+      if (isReal) {
+        value1->convertToReal();
+        value2->convertToReal();
+      }
+
+      array1->values_.setLinearValue(i, value1->power(value2));
+    }
   }
 
   return ClParserValueMgrInst->createValue(array1);
 }
 
+// <array> =~ <obj>
 ClParserValuePtr
 ClParserArray::
 approxEqual(const ClParserObj &obj) const
 {
-  const ClParserArray &array =
-    reinterpret_cast<const ClParserArray &>(obj);
+  const ClParserArray &array = reinterpret_cast<const ClParserArray &>(obj);
 
   ClParserArrayPtr array1 = array.dupArray();
 
@@ -1885,106 +2015,221 @@ approxEqual(const ClParserObj &obj) const
   return ClParserValueMgrInst->createValue(array1);
 }
 
+// <array> & <obj>
 ClParserValuePtr
 ClParserArray::
 bitAnd(const ClParserObj &obj) const
 {
-  const ClParserArray &array =
-    reinterpret_cast<const ClParserArray &>(obj);
+  ClParserArrayPtr array1 = this->dupArray();
 
-  ClParserArrayPtr array1 = array.dupArray();
+  uint n = getNumData();
 
-  for (uint i = 0; i < getNumData(); ++i) {
-    ClParserValuePtr value1, value2;
+  if (obj.getBaseType() == CL_PARSER_VALUE_TYPE_ARRAY) {
+    const ClParserArray &array = reinterpret_cast<const ClParserArray &>(obj);
 
-          values_.getLinearValue(i, value1);
-    array.values_.getLinearValue(i, value2);
+    for (uint i = 0; i < n; ++i) {
+      ClParserValuePtr value1, value2;
 
-    array1->values_.setLinearValue(i, value1->bitAnd(value2));
+            values_.getLinearValue(i, value1);
+      array.values_.getLinearValue(i, value2);
+
+      array1->values_.setLinearValue(i, value1->bitAnd(value2));
+    }
+  }
+  else {
+    bool isInteger = (getType() == CL_PARSER_VALUE_TYPE_INTEGER ||
+                      obj.getBaseType() == CL_PARSER_VALUE_TYPE_INTEGER);
+
+    ClParserValuePtr value2 = ClParserValueMgrInst->createValue(obj);
+
+    for (uint i = 0; i < n; ++i) {
+      ClParserValuePtr value1;
+
+      values_.getLinearValue(i, value1);
+
+      if (! isInteger) {
+        value1->convertToInteger();
+        value2->convertToInteger();
+      }
+
+      array1->values_.setLinearValue(i, value1->bitAnd(value2));
+    }
   }
 
   return ClParserValueMgrInst->createValue(array1);
 }
 
+// <array> | <obj>
 ClParserValuePtr
 ClParserArray::
 bitOr(const ClParserObj &obj) const
 {
-  const ClParserArray &array =
-    reinterpret_cast<const ClParserArray &>(obj);
+  ClParserArrayPtr array1 = this->dupArray();
 
-  ClParserArrayPtr array1 = array.dupArray();
+  uint n = getNumData();
 
-  for (uint i = 0; i < getNumData(); ++i) {
-    ClParserValuePtr value1, value2;
+  if (obj.getBaseType() == CL_PARSER_VALUE_TYPE_ARRAY) {
+    const ClParserArray &array = reinterpret_cast<const ClParserArray &>(obj);
 
-          values_.getLinearValue(i, value1);
-    array.values_.getLinearValue(i, value2);
+    for (uint i = 0; i < n; ++i) {
+      ClParserValuePtr value1, value2;
 
-    array1->values_.setLinearValue(i, value1->bitOr(value2));
+            values_.getLinearValue(i, value1);
+      array.values_.getLinearValue(i, value2);
+
+      array1->values_.setLinearValue(i, value1->bitOr(value2));
+    }
+  }
+  else {
+    bool isInteger = (getType() == CL_PARSER_VALUE_TYPE_INTEGER ||
+                      obj.getBaseType() == CL_PARSER_VALUE_TYPE_INTEGER);
+
+    ClParserValuePtr value2 = ClParserValueMgrInst->createValue(obj);
+
+    for (uint i = 0; i < n; ++i) {
+      ClParserValuePtr value1;
+
+      values_.getLinearValue(i, value1);
+
+      if (! isInteger) {
+        value1->convertToInteger();
+        value2->convertToInteger();
+      }
+
+      array1->values_.setLinearValue(i, value1->bitOr(value2));
+    }
   }
 
   return ClParserValueMgrInst->createValue(array1);
 }
 
+// <array> ^ <obj>
 ClParserValuePtr
 ClParserArray::
 bitXor(const ClParserObj &obj) const
 {
-  const ClParserArray &array =
-    reinterpret_cast<const ClParserArray &>(obj);
+  ClParserArrayPtr array1 = this->dupArray();
 
-  ClParserArrayPtr array1 = array.dupArray();
+  uint n = getNumData();
 
-  for (uint i = 0; i < getNumData(); ++i) {
-    ClParserValuePtr value1, value2;
+  if (obj.getBaseType() == CL_PARSER_VALUE_TYPE_ARRAY) {
+    const ClParserArray &array = reinterpret_cast<const ClParserArray &>(obj);
 
-          values_.getLinearValue(i, value1);
-    array.values_.getLinearValue(i, value2);
+    for (uint i = 0; i < n; ++i) {
+      ClParserValuePtr value1, value2;
 
-    array1->values_.setLinearValue(i, value1->bitXor(value2));
+            values_.getLinearValue(i, value1);
+      array.values_.getLinearValue(i, value2);
+
+      array1->values_.setLinearValue(i, value1->bitXor(value2));
+    }
+  }
+  else {
+    bool isInteger = (getType() == CL_PARSER_VALUE_TYPE_INTEGER ||
+                      obj.getBaseType() == CL_PARSER_VALUE_TYPE_INTEGER);
+
+    ClParserValuePtr value2 = ClParserValueMgrInst->createValue(obj);
+
+    for (uint i = 0; i < n; ++i) {
+      ClParserValuePtr value1;
+
+      values_.getLinearValue(i, value1);
+
+      if (! isInteger) {
+        value1->convertToInteger();
+        value2->convertToInteger();
+      }
+
+      array1->values_.setLinearValue(i, value1->bitXor(value2));
+    }
   }
 
   return ClParserValueMgrInst->createValue(array1);
 }
 
+// <array> << <obj>
 ClParserValuePtr
 ClParserArray::
 bitLShift(const ClParserObj &obj) const
 {
-  const ClParserArray &array =
-    reinterpret_cast<const ClParserArray &>(obj);
+  ClParserArrayPtr array1 = this->dupArray();
 
-  ClParserArrayPtr array1 = array.dupArray();
+  uint n = getNumData();
 
-  for (uint i = 0; i < getNumData(); ++i) {
-    ClParserValuePtr value1, value2;
+  if (obj.getBaseType() == CL_PARSER_VALUE_TYPE_ARRAY) {
+    const ClParserArray &array = reinterpret_cast<const ClParserArray &>(obj);
 
-          values_.getLinearValue(i, value1);
-    array.values_.getLinearValue(i, value2);
+    for (uint i = 0; i < n; ++i) {
+      ClParserValuePtr value1, value2;
 
-    array1->values_.setLinearValue(i, value1->bitLShift(value2));
+            values_.getLinearValue(i, value1);
+      array.values_.getLinearValue(i, value2);
+
+      array1->values_.setLinearValue(i, value1->bitLShift(value2));
+    }
+  }
+  else {
+    bool isInteger = (getType() == CL_PARSER_VALUE_TYPE_INTEGER ||
+                      obj.getBaseType() == CL_PARSER_VALUE_TYPE_INTEGER);
+
+    ClParserValuePtr value2 = ClParserValueMgrInst->createValue(obj);
+
+    for (uint i = 0; i < n; ++i) {
+      ClParserValuePtr value1;
+
+      values_.getLinearValue(i, value1);
+
+      if (! isInteger) {
+        value1->convertToInteger();
+        value2->convertToInteger();
+      }
+
+      array1->values_.setLinearValue(i, value1->bitLShift(value2));
+    }
   }
 
   return ClParserValueMgrInst->createValue(array1);
 }
 
+// <array> >> <obj>
 ClParserValuePtr
 ClParserArray::
 bitRShift(const ClParserObj &obj) const
 {
-  const ClParserArray &array =
-    reinterpret_cast<const ClParserArray &>(obj);
+  ClParserArrayPtr array1 = this->dupArray();
 
-  ClParserArrayPtr array1 = array.dupArray();
+  uint n = getNumData();
 
-  for (uint i = 0; i < getNumData(); ++i) {
-    ClParserValuePtr value1, value2;
+  if (obj.getBaseType() == CL_PARSER_VALUE_TYPE_ARRAY) {
+    const ClParserArray &array = reinterpret_cast<const ClParserArray &>(obj);
 
-          values_.getLinearValue(i, value1);
-    array.values_.getLinearValue(i, value2);
+    for (uint i = 0; i < n; ++i) {
+      ClParserValuePtr value1, value2;
 
-    array1->values_.setLinearValue(i, value1->bitRShift(value2));
+            values_.getLinearValue(i, value1);
+      array.values_.getLinearValue(i, value2);
+
+      array1->values_.setLinearValue(i, value1->bitRShift(value2));
+    }
+  }
+  else {
+    bool isInteger = (getType() == CL_PARSER_VALUE_TYPE_INTEGER ||
+                      obj.getBaseType() == CL_PARSER_VALUE_TYPE_INTEGER);
+
+    ClParserValuePtr value2 = ClParserValueMgrInst->createValue(obj);
+
+    for (uint i = 0; i < n; ++i) {
+      ClParserValuePtr value1;
+
+      values_.getLinearValue(i, value1);
+
+      if (! isInteger) {
+        value1->convertToInteger();
+        value2->convertToInteger();
+      }
+
+      array1->values_.setLinearValue(i, value1->bitRShift(value2));
+    }
   }
 
   return ClParserValueMgrInst->createValue(array1);
@@ -2506,8 +2751,7 @@ dim() const
     ClParserArrayPtr array = createArray(&num_dims, 1, long(0));
 
     for (uint i = 0; i < num_dims; ++i)
-      array->values_.setLinearValue(i,
-        ClParserValueMgrInst->createValue(long(getDim(i))));
+      array->values_.setLinearValue(i, ClParserValueMgrInst->createValue(long(getDim(i))));
 
     return ClParserValueMgrInst->createValue(array);
   }
@@ -2625,8 +2869,7 @@ doAssert() const
 
 ClParserValuePtr
 ClParserArray::
-internFn(ClParserInternFnPtr internfn, const ClParserValuePtr *values,
-         uint num_values)
+internFn(ClParserInternFnPtr internfn, const ClParserValuePtr *values, uint num_values)
 {
   error_code_ = 0;
 
@@ -2647,8 +2890,7 @@ internFn(ClParserInternFnPtr internfn, const ClParserValuePtr *values,
           return ClParserValuePtr();
         }
 
-        ClParserArrayPtr array =
-          createArray(CL_PARSER_VALUE_TYPE_INTEGER, &num_values, 1);
+        ClParserArrayPtr array = createArray(CL_PARSER_VALUE_TYPE_INTEGER, &num_values, 1);
 
         for (uint i = 0; i < array->getNumData(); ++i) {
           ClParserValuePtr value;
@@ -2657,8 +2899,7 @@ internFn(ClParserInternFnPtr internfn, const ClParserValuePtr *values,
 
           long flag = (*is_func)(value->getInteger()->getValue());
 
-          array->values_.setLinearValue(i,
-            ClParserValueMgrInst->createValue(flag));
+          array->values_.setLinearValue(i, ClParserValueMgrInst->createValue(flag));
         }
 
         return ClParserValueMgrInst->createValue(array);
@@ -2708,8 +2949,7 @@ internFn(ClParserInternFnPtr internfn, const ClParserValuePtr *values,
       return value;
     }
     case CLParserInternFnType::TOLOWER: {
-      ClParserArrayPtr array =
-        createArray(CL_PARSER_VALUE_TYPE_STRING, &num_values, 1);
+      ClParserArrayPtr array = createArray(CL_PARSER_VALUE_TYPE_STRING, &num_values, 1);
 
       for (uint i = 0; i < array->getNumData(); ++i) {
         ClParserValuePtr value;
@@ -2720,15 +2960,13 @@ internFn(ClParserInternFnPtr internfn, const ClParserValuePtr *values,
 
         str = CStrUtil::toLower(str);
 
-        array->values_.setLinearValue(i,
-          ClParserValueMgrInst->createValue(str));
+        array->values_.setLinearValue(i, ClParserValueMgrInst->createValue(str));
       }
 
       return ClParserValueMgrInst->createValue(array);
     }
     case CLParserInternFnType::TOUPPER: {
-      ClParserArrayPtr array =
-        createArray(CL_PARSER_VALUE_TYPE_STRING, &num_values, 1);
+      ClParserArrayPtr array = createArray(CL_PARSER_VALUE_TYPE_STRING, &num_values, 1);
 
       for (uint i = 0; i < array->getNumData(); ++i) {
         ClParserValuePtr value;
@@ -2739,8 +2977,7 @@ internFn(ClParserInternFnPtr internfn, const ClParserValuePtr *values,
 
         str = CStrUtil::toUpper(str);
 
-        array->values_.setLinearValue(i,
-          ClParserValueMgrInst->createValue(str));
+        array->values_.setLinearValue(i, ClParserValueMgrInst->createValue(str));
       }
 
       return ClParserValueMgrInst->createValue(array);

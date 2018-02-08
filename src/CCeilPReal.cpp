@@ -97,8 +97,7 @@ ClParserValuePtr
 ClParserReal::
 plus(const ClParserObj &obj) const
 {
-  const ClParserReal &real =
-    reinterpret_cast<const ClParserReal &>(obj);
+  const ClParserReal &real = reinterpret_cast<const ClParserReal &>(obj);
 
   double result;
 
@@ -114,8 +113,7 @@ ClParserValuePtr
 ClParserReal::
 minus(const ClParserObj &obj) const
 {
-  const ClParserReal &real =
-    reinterpret_cast<const ClParserReal &>(obj);
+  const ClParserReal &real = reinterpret_cast<const ClParserReal &>(obj);
 
   double result;
 
@@ -131,8 +129,7 @@ ClParserValuePtr
 ClParserReal::
 times(const ClParserObj &obj) const
 {
-  const ClParserReal &real =
-    reinterpret_cast<const ClParserReal &>(obj);
+  const ClParserReal &real = reinterpret_cast<const ClParserReal &>(obj);
 
   double result;
 
@@ -148,8 +145,7 @@ ClParserValuePtr
 ClParserReal::
 divide(const ClParserObj &obj) const
 {
-  const ClParserReal &real =
-    reinterpret_cast<const ClParserReal &>(obj);
+  const ClParserReal &real = reinterpret_cast<const ClParserReal &>(obj);
 
   double result;
 
@@ -174,8 +170,7 @@ ClParserValuePtr
 ClParserReal::
 modulus(const ClParserObj &obj) const
 {
-  const ClParserReal &real =
-    reinterpret_cast<const ClParserReal &>(obj);
+  const ClParserReal &real = reinterpret_cast<const ClParserReal &>(obj);
 
   errno = 0;
 
@@ -191,8 +186,7 @@ ClParserValuePtr
 ClParserReal::
 power(const ClParserObj &obj) const
 {
-  const ClParserReal &real =
-    reinterpret_cast<const ClParserReal &>(obj);
+  const ClParserReal &real = reinterpret_cast<const ClParserReal &>(obj);
 
   errno = 0;
 
@@ -208,8 +202,7 @@ ClParserValuePtr
 ClParserReal::
 approxEqual(const ClParserObj &obj) const
 {
-  const ClParserReal &real =
-    reinterpret_cast<const ClParserReal &>(obj);
+  const ClParserReal &real = reinterpret_cast<const ClParserReal &>(obj);
 
   long result = long(::fabs(real_ - real.real_) < ClParserInst->getTolerance());
 
@@ -220,8 +213,7 @@ ClParserValuePtr
 ClParserReal::
 bitAnd(const ClParserObj &obj) const
 {
-  const ClParserReal &real =
-    reinterpret_cast<const ClParserReal &>(obj);
+  const ClParserReal &real = reinterpret_cast<const ClParserReal &>(obj);
 
   long result = long(((long) real_) & ((long) real.real_));
 
@@ -232,8 +224,7 @@ ClParserValuePtr
 ClParserReal::
 bitOr(const ClParserObj &obj) const
 {
-  const ClParserReal &real =
-    reinterpret_cast<const ClParserReal &>(obj);
+  const ClParserReal &real = reinterpret_cast<const ClParserReal &>(obj);
 
   long result = long(((long) real_) | ((long) real.real_));
 
@@ -244,8 +235,7 @@ ClParserValuePtr
 ClParserReal::
 bitXor(const ClParserObj &obj) const
 {
-  const ClParserReal &real =
-    reinterpret_cast<const ClParserReal &>(obj);
+  const ClParserReal &real = reinterpret_cast<const ClParserReal &>(obj);
 
   long result = long(((long) real_) ^ ((long) real.real_));
 
@@ -256,8 +246,7 @@ ClParserValuePtr
 ClParserReal::
 bitLShift(const ClParserObj &obj) const
 {
-  const ClParserReal &real =
-    reinterpret_cast<const ClParserReal &>(obj);
+  const ClParserReal &real = reinterpret_cast<const ClParserReal &>(obj);
 
   double result = real_*CMathGen::pow(2.0, real.real_);
 
@@ -268,8 +257,7 @@ ClParserValuePtr
 ClParserReal::
 bitRShift(const ClParserObj &obj) const
 {
-  const ClParserReal &real =
-    reinterpret_cast<const ClParserReal &>(obj);
+  const ClParserReal &real = reinterpret_cast<const ClParserReal &>(obj);
 
   double result = real_/CMathGen::pow(2.0, real.real_);
 
