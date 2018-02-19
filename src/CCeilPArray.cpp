@@ -630,9 +630,9 @@ void
 ClParserArray::
 copy(const ClParserObj &obj)
 {
-  assert(base_type_ == obj.getBaseType());
+  assert(getBaseType() == obj.getBaseType());
 
-  const ClParserArray &rhs = reinterpret_cast<const ClParserArray &>(obj);
+  const ClParserArray &rhs = castObj(obj);
 
   *this = rhs;
 }
@@ -1428,10 +1428,10 @@ int
 ClParserArray::
 cmp(const ClParserObj &obj) const
 {
-  if (base_type_ != obj.getBaseType())
-    return CMathGen::sign((long) (base_type_ - obj.getBaseType()));
+  if (getBaseType() != obj.getBaseType())
+    return CMathGen::sign((long) (getBaseType() - obj.getBaseType()));
 
-  const ClParserArray &rhs = reinterpret_cast<const ClParserArray &>(obj);
+  const ClParserArray &rhs = castObj(obj);
 
   if (type_ != rhs.type_)
     return (type_ - rhs.type_);
@@ -1739,7 +1739,7 @@ plus(const ClParserObj &obj) const
   uint n = getNumData();
 
   if (obj.getBaseType() == CL_PARSER_VALUE_TYPE_ARRAY) {
-    const ClParserArray &array = reinterpret_cast<const ClParserArray &>(obj);
+    const ClParserArray &array = castObj(obj);
 
     for (uint i = 0; i < n; ++i) {
       ClParserValuePtr value1, value2;
@@ -1783,7 +1783,7 @@ minus(const ClParserObj &obj) const
   uint n = getNumData();
 
   if (obj.getBaseType() == CL_PARSER_VALUE_TYPE_ARRAY) {
-    const ClParserArray &array = reinterpret_cast<const ClParserArray &>(obj);
+    const ClParserArray &array = castObj(obj);
 
     for (uint i = 0; i < n; ++i) {
       ClParserValuePtr value1, value2;
@@ -1827,7 +1827,7 @@ times(const ClParserObj &obj) const
   uint n = getNumData();
 
   if (obj.getBaseType() == CL_PARSER_VALUE_TYPE_ARRAY) {
-    const ClParserArray &array = reinterpret_cast<const ClParserArray &>(obj);
+    const ClParserArray &array = castObj(obj);
 
     for (uint i = 0; i < n; ++i) {
       ClParserValuePtr value1, value2;
@@ -1871,7 +1871,7 @@ divide(const ClParserObj &obj) const
   uint n = getNumData();
 
   if (obj.getBaseType() == CL_PARSER_VALUE_TYPE_ARRAY) {
-    const ClParserArray &array = reinterpret_cast<const ClParserArray &>(obj);
+    const ClParserArray &array = castObj(obj);
 
     for (uint i = 0; i < n; ++i) {
       ClParserValuePtr value1, value2;
@@ -1915,7 +1915,7 @@ modulus(const ClParserObj &obj) const
   uint n = getNumData();
 
   if (obj.getBaseType() == CL_PARSER_VALUE_TYPE_ARRAY) {
-    const ClParserArray &array = reinterpret_cast<const ClParserArray &>(obj);
+    const ClParserArray &array = castObj(obj);
 
     for (uint i = 0; i < n; ++i) {
       ClParserValuePtr value1, value2;
@@ -1960,7 +1960,7 @@ power(const ClParserObj &obj) const
   uint n = getNumData();
 
   if (obj.getBaseType() == CL_PARSER_VALUE_TYPE_ARRAY) {
-    const ClParserArray &array = reinterpret_cast<const ClParserArray &>(obj);
+    const ClParserArray &array = castObj(obj);
 
     for (uint i = 0; i < n; ++i) {
       ClParserValuePtr value1, value2;
@@ -1999,7 +1999,8 @@ ClParserValuePtr
 ClParserArray::
 approxEqual(const ClParserObj &obj) const
 {
-  const ClParserArray &array = reinterpret_cast<const ClParserArray &>(obj);
+#if 0
+  const ClParserArray &array = castObj(obj);
 
   ClParserArrayPtr array1 = array.dupArray();
 
@@ -2013,6 +2014,43 @@ approxEqual(const ClParserObj &obj) const
   }
 
   return ClParserValueMgrInst->createValue(array1);
+#else
+  if (getBaseType() != obj.getBaseType())
+    return ClParserValueMgrInst->createValue(0L);
+
+  const ClParserArray &rhs = castObj(obj);
+
+  if (type_ != rhs.type_)
+    return ClParserValueMgrInst->createValue(0L);
+
+  if (getNumData() != rhs.getNumData())
+    return ClParserValueMgrInst->createValue(0L);
+
+  if (getNumDims() != rhs.getNumDims())
+    return ClParserValueMgrInst->createValue(0L);
+
+  uint num_dims1 = getNumDims();
+
+  for (uint i = 0; i < num_dims1; ++i)
+    if (getDim(i) != rhs.getDim(i))
+      return ClParserValueMgrInst->createValue(0L);
+
+  for (uint i = 0; i < getNumData(); ++i) {
+    ClParserValuePtr value1, value2;
+
+        values_.getLinearValue(i, value1);
+    rhs.values_.getLinearValue(i, value2);
+
+    ClParserValuePtr rval = value1->approxEqual(value2);
+
+    long rc;
+
+    if (! rval->integerValue(&rc) || rc == 0)
+      return ClParserValueMgrInst->createValue(0L);
+  }
+
+  return ClParserValueMgrInst->createValue(1L);
+#endif
 }
 
 // <array> & <obj>
@@ -2025,7 +2063,7 @@ bitAnd(const ClParserObj &obj) const
   uint n = getNumData();
 
   if (obj.getBaseType() == CL_PARSER_VALUE_TYPE_ARRAY) {
-    const ClParserArray &array = reinterpret_cast<const ClParserArray &>(obj);
+    const ClParserArray &array = castObj(obj);
 
     for (uint i = 0; i < n; ++i) {
       ClParserValuePtr value1, value2;
@@ -2069,7 +2107,7 @@ bitOr(const ClParserObj &obj) const
   uint n = getNumData();
 
   if (obj.getBaseType() == CL_PARSER_VALUE_TYPE_ARRAY) {
-    const ClParserArray &array = reinterpret_cast<const ClParserArray &>(obj);
+    const ClParserArray &array = castObj(obj);
 
     for (uint i = 0; i < n; ++i) {
       ClParserValuePtr value1, value2;
@@ -2113,7 +2151,7 @@ bitXor(const ClParserObj &obj) const
   uint n = getNumData();
 
   if (obj.getBaseType() == CL_PARSER_VALUE_TYPE_ARRAY) {
-    const ClParserArray &array = reinterpret_cast<const ClParserArray &>(obj);
+    const ClParserArray &array = castObj(obj);
 
     for (uint i = 0; i < n; ++i) {
       ClParserValuePtr value1, value2;
@@ -2157,7 +2195,7 @@ bitLShift(const ClParserObj &obj) const
   uint n = getNumData();
 
   if (obj.getBaseType() == CL_PARSER_VALUE_TYPE_ARRAY) {
-    const ClParserArray &array = reinterpret_cast<const ClParserArray &>(obj);
+    const ClParserArray &array = castObj(obj);
 
     for (uint i = 0; i < n; ++i) {
       ClParserValuePtr value1, value2;
@@ -2201,7 +2239,7 @@ bitRShift(const ClParserObj &obj) const
   uint n = getNumData();
 
   if (obj.getBaseType() == CL_PARSER_VALUE_TYPE_ARRAY) {
-    const ClParserArray &array = reinterpret_cast<const ClParserArray &>(obj);
+    const ClParserArray &array = castObj(obj);
 
     for (uint i = 0; i < n; ++i) {
       ClParserValuePtr value1, value2;

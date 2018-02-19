@@ -1,79 +1,106 @@
-4.567
+assert(4.567 ~= 4.567)
 
-+1.4
--2.3
-~3.1
+assert(+1.4 ~= 1.4)
+assert(-2.3 ~= 0.0 - 2.3)
+assert(~3.1 != 4)
 
-1.1 + 2.7
-5.3 - 3.4
-3.3 * 5.1
-4.5 / 2.5
-5.4 % 3.1
-3.3 ** 3.7
+assert(1.1 + 2.7 ~= 3.8)
+assert(5.3 - 3.4 ~= 1.9)
+assert(3.3 * 5.1 ~= 16.83)
+assert(4.5 / 2.5 ~= 1.8)
+assert(5.4 % 3.1 ~= 2.3)
+assert(3.3 ** 3.7 ~= 82.889893)
 
-1.1 == 1.2
-1.1 ~= 1.100001
-1.2 != 1.2
-1.3 <  2.7
-1.5 <= 2.5
-1.7 >  2.3
-1.9 >= 2.1
+assert(! (1.1 == 1.2))
+assert(1.1 ~= 1.100001)
+assert(! (1.2 != 1.2))
+assert(1.3 <  2.7)
+assert(1.5 <= 2.5)
+assert(2.5 <= 2.5)
+assert(! (1.7 >  2.3))
+assert(! (1.9 >= 2.1))
+assert((1.9 >= 1.9))
 
-3.2 & 4.1
-3.2 | 4.1
-3.2 ^ 4.1
+assert((3.2 & 4.1) == 0)
+assert((3.2 | 4.1) == 7)
+assert((3.2 ^ 4.1) == 7)
 
-2 << 2
-8 >> 2
-3.1 << 2.2
-7.2 >> 1.3
+assert((2 << 2) == 8)
+assert((8 >> 2) == 2)
+assert((3.1 << 2.2) ~= 14.243860)
+assert((7.2 >> 1.3) ~= 2.924109)
 
-abs(-6.3)
-acos(0.1)
-addr(2.1)
-arrayI(10.1)
-arrayR(10.2)
-arrayS(10.3)
+assert(abs(-6.3) ~= 6.3)
+assert(ceil(-3.4) ~= -3.0)
+assert(floor(2.1) ~= 2.0)
+
+assert(acos(0.1) ~= 1.470629)
+assert(asin(0.1) ~= 0.100167)
+assert(atan(0.2) ~= 0.197396)
+
+assert(atan2(1.1, 1.2) ~= 0.741947)
+
+#addr(2.1)
+
+assert(arrayI(10.1) == [0,0,0,0,0,0,0,0,0,0])
+assert(arrayR(10.2) ~= [0,0,0,0,0,0,0,0,0,0])
+assert(arrayS(10.3) == ["","","","","","","","","",""])
+
 #arrcat
-asin(0.1)
-atan(0.2)
-atan2(1.1, 1.2)
-ceil(-3.4)
-char(43.4)
-cos(23.1)
-cosh(1.1)
-dim(10.3)
-exp(4.7)
-floor(2.1)
-indarrI(5.1)
-indarrR(5.1)
-indarrS(5.1)
-index(1.1,1.1)
-int(24.2)
-isNaN(1.34)
-isNaN("NaN")
-isctype(6.5,"print")
-len(123.21)
-log(11.1)
-log10(12.123)
-max(2.23)
-min(1.64)
-ndim(11.64)
-real(12.12)
-rindex(.41,.51)
-sign(-3.323)
-sin(21.1)
-sinh(1.2)
-sort(1.2)
-sqr(23.2)
-sqrt(45.2)
-string(123.12)
+
+assert(char(43.4) == "+")
+
+assert(cos(23.1) ~= -0.445690)
+assert(sin(21.1) ~= 0.777794)
+assert(tan(34.9) ~= 0.356531)
+
+assert(cosh(1.1) ~= 1.668519)
+assert(sinh(1.2) ~= 1.509461)
+assert(tanh(1.8) ~= 0.946806)
+
+assert(exp(4.7) ~= 109.947172)
+assert(log(11.1) ~= 2.406945)
+assert(log10(12.123) ~= 1.083610)
+
+assert(indarrI(5.1) == [1,2,3,4,5])
+assert(indarrR(5.1) ~= [1,2,3,4,5])
+assert(indarrS(5.1) == ["1","2","3","4","5"])
+
+assert(isNaN(1.34) == 0)
+assert(isNaN("NaN") == 1)
+
+assert(int(24.2) == 24)
+assert(real(12.12) ~= 12.12)
+assert(string(123.12) == "123.120000")
+
+#index(1.1,1.1)
+
+assert(isctype(6.5,"print") == 0)
+
+assert(len(123.21) == 1)
+assert(dim(10.3) == 1)
+assert(ndim(11.64) == 1)
+
+assert(max(2.23) ~= 2.23)
+assert(min(1.64) ~= 1.64)
+assert(sum(3.9) ~= 3.9)
+
+#rindex(.41,.51)
+
+assert(sign(-3.323) ~= -1.0)
+
+assert(sort(1.2) ~= 1.2)
+
+assert(sqr(23.2) ~= 538.240000)
+assert(sqrt(45.2) ~= 6.723095)
+
 #subarr
-sum(3.9)
-tan(34.9)
-tanh(1.8)
-tolower(65.2)
-toupper(43.212)
+
+assert(tolower(65.2) == 97)
+assert(toupper(43.212) == 43)
+
 #typearr
-valtyp(12.12)
+
+assert(valtyp(12.12) == 2)
+
 #where

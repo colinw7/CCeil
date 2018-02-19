@@ -17,11 +17,8 @@ ClParserVarMgr::
 {
   delete varMap_;
 
-  VarMapStack::const_iterator p1 = varMapStack_.begin();
-  VarMapStack::const_iterator p2 = varMapStack_.end  ();
-
-  for ( ; p1 != p2; ++p1)
-    delete *p1;
+  for (auto &varMap : varMapStack_)
+    delete varMap;
 }
 
 ClParserVarPtr
@@ -61,8 +58,7 @@ ClParserVarMgr::
 createStructVarRef(ClParserVarPtr variable, const std::string &name,
                    const ClParserValueArray &subscripts)
 {
-  ClParserStructVarRef *svar_ref =
-    new ClParserStructVarRef(variable, name, subscripts);
+  ClParserStructVarRef *svar_ref = new ClParserStructVarRef(variable, name, subscripts);
 
   return ClParserStructVarRefPtr(svar_ref);
 }
@@ -315,15 +311,15 @@ addVariableProc(const std::string &name, ClParserVarMgr::VarProc proc, void *dat
 
   VarProcData *proc_data = new VarProcData(name, proc, data);
 
-  var_proc_data_list_.push_back(proc_data);
+  varProcDataList_.push_back(proc_data);
 }
 
 void
 ClParserVarMgr::
 deleteVariableProc(const std::string &name, ClParserVarMgr::VarProc proc, void *data)
 {
-  VarProcDataList::const_iterator p1 = var_proc_data_list_.begin();
-  VarProcDataList::const_iterator p2 = var_proc_data_list_.end  ();
+  VarProcDataList::const_iterator p1 = varProcDataList_.begin();
+  VarProcDataList::const_iterator p2 = varProcDataList_.end  ();
 
   for ( ; p1 != p2; ++ p1) {
     VarProcData *proc_data = *p1;
@@ -331,7 +327,7 @@ deleteVariableProc(const std::string &name, ClParserVarMgr::VarProc proc, void *
     if (proc_data->name == name &&
         proc_data->proc == proc &&
         proc_data->data == data) {
-      var_proc_data_list_.remove(proc_data);
+      varProcDataList_.remove(proc_data);
 
       delete proc_data;
 
@@ -344,8 +340,8 @@ void
 ClParserVarMgr::
 callVariableProc(ClParserVarPtr variable)
 {
-  VarProcDataList::const_iterator p1 = var_proc_data_list_.begin();
-  VarProcDataList::const_iterator p2 = var_proc_data_list_.end  ();
+  VarProcDataList::const_iterator p1 = varProcDataList_.begin();
+  VarProcDataList::const_iterator p2 = varProcDataList_.end  ();
 
   for ( ; p1 != p2; ++ p1) {
     VarProcData *proc_data = *p1;
@@ -615,8 +611,7 @@ setValue(ClParserValuePtr new_value)
             for (uint j = 0; j < num_subscripts1; ++j)
               subscripts1.push_back(subscripts_[j + i + 1]);
 
-            ClParserVarRefPtr var_ref1 =
-              ClParserInst->createVarRef(variable_, subscripts1);
+            ClParserVarRefPtr var_ref1 = ClParserInst->createVarRef(variable_, subscripts1);
 
             if (! var_ref1->setValue(new_value))
               return false;
@@ -643,8 +638,7 @@ setValue(ClParserValuePtr new_value)
             for (uint j = 0; j < num_subscripts1; ++j)
               subscripts1.push_back(subscripts_[j + i + 1]);
 
-            ClParserVarRefPtr var_ref1 =
-              ClParserInst->createVarRef(variable_, subscripts1);
+            ClParserVarRefPtr var_ref1 = ClParserInst->createVarRef(variable_, subscripts1);
 
             if (! var_ref1->setValue(new_value))
               return false;
@@ -669,8 +663,7 @@ setValue(ClParserValuePtr new_value)
             for (uint j = 0; j < num_subscripts1; ++j)
               subscripts1.push_back(subscripts_[j + i + 1]);
 
-            ClParserVarRefPtr var_ref1 =
-              ClParserInst->createVarRef(variable_, subscripts1);
+            ClParserVarRefPtr var_ref1 = ClParserInst->createVarRef(variable_, subscripts1);
 
             if (! var_ref1->setValue(new_value))
               return false;
@@ -695,8 +688,7 @@ setValue(ClParserValuePtr new_value)
             for (uint j = 0; j < num_subscripts1; ++j)
               subscripts1.push_back(subscripts_[j + i + 1]);
 
-            ClParserVarRefPtr var_ref1 =
-              ClParserInst->createVarRef(variable_, subscripts1);
+            ClParserVarRefPtr var_ref1 = ClParserInst->createVarRef(variable_, subscripts1);
 
             if (! var_ref1->setValue(new_value))
               return false;
@@ -709,8 +701,7 @@ setValue(ClParserValuePtr new_value)
 
             ClParserValuePtr svalue = array1->getSubscriptValue(subscripts);
 
-            if ( new_value->getStructure()->getType() !=
-                svalue->getStructure()->getType())
+            if ( new_value->getStructure()->getType() != svalue->getStructure()->getType())
               return false;
 
             svalue = new_value;
@@ -753,8 +744,7 @@ setValue(ClParserValuePtr new_value)
       for (uint i = 0; i < num_subscripts1; ++i)
         subscripts1.push_back(subscripts_[i + 1]);
 
-      ClParserVarRefPtr var_ref1 =
-        ClParserInst->createVarRef(variable_, subscripts1);
+      ClParserVarRefPtr var_ref1 = ClParserInst->createVarRef(variable_, subscripts1);
 
       if (! var_ref1->setValue(new_value))
         return false;
@@ -785,8 +775,7 @@ setValue(ClParserValuePtr new_value)
       for (uint i = 0; i < num_subscripts1; ++i)
         subscripts1.push_back(subscripts_[i + 1]);
 
-      ClParserVarRefPtr var_ref1 =
-        ClParserInst->createVarRef(variable_, subscripts1);
+      ClParserVarRefPtr var_ref1 = ClParserInst->createVarRef(variable_, subscripts1);
 
       if (! var_ref1->setValue(new_value))
         return false;

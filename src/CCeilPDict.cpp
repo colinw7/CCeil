@@ -29,12 +29,12 @@ ClParserDictMgr::
 objToKey(const ClParserObj &obj)
 {
   if      (obj.getBaseType() == CL_PARSER_VALUE_TYPE_INTEGER) {
-    const ClParserInteger &integer = reinterpret_cast<const ClParserInteger &>(obj);
+    const ClParserInteger &integer = ClParserInteger::castObj(obj);
 
     return integerToKey(integer.getValue());
   }
   else if (obj.getBaseType() == CL_PARSER_VALUE_TYPE_STRING) {
-    const ClParserString &str = reinterpret_cast<const ClParserString &>(obj);
+    const ClParserString &str = ClParserString::castObj(obj);
 
     return stringToKey(str.getText());
   }
@@ -198,7 +198,7 @@ copy(const ClParserObj &obj)
 {
   assert(base_type_ == obj.getBaseType());
 
-  const ClParserDict &rhs = reinterpret_cast<const ClParserDict &>(obj);
+  const ClParserDict &rhs = castObj(obj);
 
   *this = rhs;
 }
@@ -340,7 +340,7 @@ cmp(const ClParserObj &obj) const
   if (base_type_ != obj.getBaseType())
     return CMathGen::sign((long) (base_type_ - obj.getBaseType()));
 
-  const ClParserDict &rhs = reinterpret_cast<const ClParserDict &>(obj);
+  const ClParserDict &rhs = castObj(obj);
 
   if (numValues() != rhs.numValues())
     return (numValues() - rhs.numValues());
@@ -555,7 +555,7 @@ plus(const ClParserObj &obj) const
   if (obj.getBaseType() != CL_PARSER_VALUE_TYPE_DICTIONARY)
     ClErrThrow(ClErr::INVALID_TYPE_MIX);
 
-  const ClParserDict &dict = reinterpret_cast<const ClParserDict &>(obj);
+  const ClParserDict &dict = castObj(obj);
 
   ClParserDictPtr dict1 = dupDict();
 
@@ -1052,8 +1052,7 @@ getKeyValue(int ind) const
 
   ClParserValuePtr key_value = key.getAsValue();
 
-  ClParserValuePtr lvalue =
-    ClParserValueMgrInst->createValue(CL_PARSER_VALUE_TYPE_LIST);
+  ClParserValuePtr lvalue = ClParserValueMgrInst->createValue(CL_PARSER_VALUE_TYPE_LIST);
 
   lvalue->getList()->addValue(key_value);
   lvalue->getList()->addValue(value);

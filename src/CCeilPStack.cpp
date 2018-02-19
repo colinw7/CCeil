@@ -571,8 +571,7 @@ unstackArrayValue(int *error_code)
     pop(op);
     pop(op);
 
-    ClParserValuePtr array_value =
-      ClParserValueMgrInst->createValue(CL_PARSER_VALUE_TYPE_ARRAY);
+    ClParserValuePtr array_value = ClParserValueMgrInst->createValue(CL_PARSER_VALUE_TYPE_ARRAY);
 
     push(array_value);
 
@@ -676,8 +675,7 @@ unstackListValue(int *error_code)
     pop(op);
     pop(op);
 
-    ClParserValuePtr list_value =
-      ClParserValueMgrInst->createValue(CL_PARSER_VALUE_TYPE_LIST);
+    ClParserValuePtr list_value = ClParserValueMgrInst->createValue(CL_PARSER_VALUE_TYPE_LIST);
 
     push(list_value);
 
@@ -728,11 +726,9 @@ unstackListValue(int *error_code)
   ClParserValuePtr list_value;
 
   if (! values.empty())
-    list_value =
-      ClParserValueMgrInst->createValue(CL_PARSER_VALUE_TYPE_LIST, values);
+    list_value = ClParserValueMgrInst->createValue(CL_PARSER_VALUE_TYPE_LIST, values);
   else
-    list_value =
-      ClParserValueMgrInst->createValue(CL_PARSER_VALUE_TYPE_LIST);
+    list_value = ClParserValueMgrInst->createValue(CL_PARSER_VALUE_TYPE_LIST);
 
   push(list_value);
 }
@@ -819,11 +815,9 @@ unstackDictionaryValue(int *error_code)
   ClParserValuePtr dict_value;
 
   if (! values.empty())
-    dict_value =
-     ClParserValueMgrInst->createValue(CL_PARSER_VALUE_TYPE_DICTIONARY, values);
+    dict_value = ClParserValueMgrInst->createValue(CL_PARSER_VALUE_TYPE_DICTIONARY, values);
   else
-    dict_value =
-     ClParserValueMgrInst->createValue(CL_PARSER_VALUE_TYPE_DICTIONARY);
+    dict_value = ClParserValueMgrInst->createValue(CL_PARSER_VALUE_TYPE_DICTIONARY);
 
   push(dict_value);
 }
@@ -1003,8 +997,7 @@ unstackInlineOperator(int *error_code)
 
   toPrev();
 
-  ClParserValuePtr value =
-    ClParserProcessInlineOperator(op, var_ref, postfix, error_code);
+  ClParserValuePtr value = ClParserProcessInlineOperator(op, var_ref, postfix, error_code);
 
   if (*error_code != 0)
     return;
@@ -1038,8 +1031,7 @@ unstackUnaryOperator(int *error_code)
 
   pop(op);
 
-  ClParserValuePtr value =
-    ClParserProcessUnaryOperator(op, value1, error_code);
+  ClParserValuePtr value = ClParserProcessUnaryOperator(op, value1, error_code);
 
   if (*error_code != 0)
     return;
@@ -1085,8 +1077,7 @@ unstackBinaryOperator(int *error_code)
     return;
   }
 
-  ClParserValuePtr value =
-    ClParserProcessBinaryOperator(value1, op, value2, error_code);
+  ClParserValuePtr value = ClParserProcessBinaryOperator(value1, op, value2, error_code);
 
   if (*error_code != 0)
     return;
@@ -1267,8 +1258,7 @@ unstackInternalFunction(int *error_code)
     return;
   }
 
-  ClParserValuePtr value =
-   ClParserProcessInternFn(internfn, value_list, error_code);
+  ClParserValuePtr value = ClParserProcessInternFn(internfn, value_list, error_code);
 
   if (*error_code != 0 || ! value.isValid())
     return;
@@ -1372,8 +1362,7 @@ unstackUserFunction(int *error_code)
     }
   }
 
-  ClParserValuePtr value =
-    ClParserProcessUserFn(userfn, arg_value_list, error_code);
+  ClParserValuePtr value = ClParserProcessUserFn(userfn, arg_value_list, error_code);
 
   if (*error_code != 0 || ! value.isValid())
     return;
@@ -1791,10 +1780,8 @@ unstackFunction(int *error_code)
   function_value.function = function;
   function_value.values   = values;
 
-  ClParserStack::StackNodeList::const_iterator p1 =
-    function->getStack()->stackNodeListBegin();
-  ClParserStack::StackNodeList::const_iterator p2 =
-    function->getStack()->stackNodeListEnd  ();
+  ClParserStack::StackNodeList::const_iterator p1 = function->getStack()->stackNodeListBegin();
+  ClParserStack::StackNodeList::const_iterator p2 = function->getStack()->stackNodeListEnd  ();
 
   for ( ; p1 != p2; ++p1)
     stackFunctionStackNode(*p1, &function_value);
@@ -2749,8 +2736,7 @@ void
 ClParserStack::
 pushStackNode(ClParserStackNode *stack_node)
 {
-  current_stack_node_ =
-    stack_node_list_.insert(current_stack_node_, stack_node);
+  current_stack_node_ = stack_node_list_.insert(current_stack_node_, stack_node);
 
   if (ClParserInst->isDebug())
     debugPrintCurrent();

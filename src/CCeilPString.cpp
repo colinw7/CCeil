@@ -47,7 +47,7 @@ copy(const ClParserObj &obj)
 {
   assert(base_type_ == obj.getBaseType());
 
-  const ClParserString &rhs = reinterpret_cast<const ClParserString &>(obj);
+  const ClParserString &rhs = castObj(obj);
 
   *this = rhs;
 }
@@ -345,7 +345,7 @@ cmp(const ClParserObj &obj) const
   if (base_type_ != obj.getBaseType())
     return CMathGen::sign((long) (base_type_ - obj.getBaseType()));
 
-  const ClParserString &rhs = reinterpret_cast<const ClParserString &>(obj);
+  const ClParserString &rhs = castObj(obj);
 
   return text_.compare(rhs.text_);
 }
@@ -569,17 +569,13 @@ format(ClParserValuePtr value, std::string &result) const
             const char *value_format1 = value_format.c_str();
 
             if      (field_width_as_value && precision_as_value)
-              ::sprintf(buffer, value_format1,
-                        field_width, precision, text.c_str());
+              ::sprintf(buffer, value_format1, field_width, precision, text.c_str());
             else if (field_width_as_value)
-              ::sprintf(buffer, value_format1,
-                        field_width, text.c_str());
+              ::sprintf(buffer, value_format1, field_width, text.c_str());
             else if (precision_as_value)
-              ::sprintf(buffer, value_format1,
-                        precision, text.c_str());
+              ::sprintf(buffer, value_format1, precision, text.c_str());
             else
-              ::sprintf(buffer, value_format1,
-                        text.c_str());
+              ::sprintf(buffer, value_format1, text.c_str());
 
             result += buffer;
 
@@ -827,7 +823,7 @@ ClParserValuePtr
 ClParserString::
 plus(const ClParserObj &obj) const
 {
-  const ClParserString &str = reinterpret_cast<const ClParserString &>(obj);
+  const ClParserString &str = castObj(obj);
 
   std::string result = text_ + str.text_;
 
@@ -838,7 +834,7 @@ ClParserValuePtr
 ClParserString::
 minus(const ClParserObj &obj) const
 {
-  const ClParserString &str = reinterpret_cast<const ClParserString &>(obj);
+  const ClParserString &str = castObj(obj);
 
   std::string result;
 
@@ -856,7 +852,7 @@ ClParserValuePtr
 ClParserString::
 times(const ClParserObj &obj) const
 {
-  const ClParserInteger &integer = reinterpret_cast<const ClParserInteger &>(obj);
+  const ClParserInteger &integer = ClParserInteger::castObj(obj);
 
   long num = integer.getValue();
 
@@ -881,7 +877,7 @@ ClParserValuePtr
 ClParserString::
 divide(const ClParserObj &obj) const
 {
-  const ClParserString &str = reinterpret_cast<const ClParserString &>(obj);
+  const ClParserString &str = castObj(obj);
 
   if (str.text_ == "")
     ClErrThrow(ClErr::DIVIDE_BY_ZERO);
@@ -918,7 +914,7 @@ ClParserValuePtr
 ClParserString::
 approxEqual(const ClParserObj &obj) const
 {
-  const ClParserString &str = reinterpret_cast<const ClParserString &>(obj);
+  const ClParserString &str = castObj(obj);
 
   CGlob compile(str.text_);
 
@@ -961,7 +957,7 @@ ClParserValuePtr
 ClParserString::
 bitLShift(const ClParserObj &obj) const
 {
-  const ClParserInteger &integer = reinterpret_cast<const ClParserInteger &>(obj);
+  const ClParserInteger &integer = ClParserInteger::castObj(obj);
 
   long num = integer.getValue();
 
@@ -976,7 +972,7 @@ ClParserValuePtr
 ClParserString::
 bitRShift(const ClParserObj &obj) const
 {
-  const ClParserInteger &integer = reinterpret_cast<const ClParserInteger &>(obj);
+  const ClParserInteger &integer = ClParserInteger::castObj(obj);
 
   long num = -integer.getValue();
 
@@ -1390,7 +1386,7 @@ ClParserValuePtr
 ClParserString::
 index(const ClParserObj &obj) const
 {
-  const ClParserString &str = reinterpret_cast<const ClParserString &>(obj);
+  const ClParserString &str = castObj(obj);
 
   long result = getStringPos(str.text_) + 1;
 
@@ -1401,7 +1397,7 @@ ClParserValuePtr
 ClParserString::
 rindex(const ClParserObj &obj) const
 {
-  const ClParserString &str = reinterpret_cast<const ClParserString &>(obj);
+  const ClParserString &str = castObj(obj);
 
   long result = getStringRPos(str.text_) + 1;
 

@@ -431,21 +431,18 @@ ClStdCommandsInit(ClModuleInitType flag, void *)
  * ClStdCommandsSet
  *   The 'set' method for the 'builtin' module.
  *
- *   This routine allows the environment to be customised
- *   using the specified option with any arguments this
- *   requries :-
+ *   This routine allows the environment to be customised using the specified
+ *   option with any arguments this requries :-
  *
  *   Options
  *   -------
  *
- *   angle_type <radians|degrees> : Set Angle Type to
- *                                : Degrees/Radians
+ *   angle_type <radians|degrees> : Set Angle Type to Degrees or Radians
  *   prompt <string>              : Set Prompt String
  *   real_format <string>         : Set Real Format String
  *   integer_format <string>      : Set Integer Format String
  *   string_format <string>       : Set String Format String
- *   math_fail <yes|no>           : Set whether a math failure
- *                                : causes an error or a NaN value.
+ *   math_fail <yes|no>           : Set whether a math failure causes an error or a NaN value.
  *   debug <level>                : Set Debug Level
  *
  * CALL:
@@ -474,6 +471,7 @@ ClStdCommandsSet(const char *option, const char *args, void *)
     CAngleType  angle_type = ClParserInst->getAngleType();
     std::string prompt     = ClLanguageMgrInst->getPrompt();
     bool        math_fail  = ClParserInst->getMathFail();
+    double      tolerance  = ClParserInst->getTolerance();
 
     ClLanguageMgrInst->output("angle_type     %s\n"  , CUtil::toString(angle_type).c_str());
     ClLanguageMgrInst->output("prompt         '%s'\n", prompt.c_str());
@@ -481,6 +479,7 @@ ClStdCommandsSet(const char *option, const char *args, void *)
     ClLanguageMgrInst->output("integer_format '%s'\n", ClParserInst->getIntegerFormat().c_str());
     ClLanguageMgrInst->output("string_format  '%s'\n", ClParserInst->getStringFormat().c_str());
     ClLanguageMgrInst->output("math_fail      %s\n"  , CStrUtil::toString(math_fail).c_str());
+    ClLanguageMgrInst->output("tolerance      %s\n"  , CStrUtil::toString(tolerance).c_str());
 
     return true;
   }
@@ -611,6 +610,18 @@ ClStdCommandsSet(const char *option, const char *args, void *)
       ClParserInst->setMathFail(CStrUtil::toBool(args));
     else
       ClLanguageMgrInst->error("invalid args '%s' for 'set %s'", args, option);
+  }
+  else if (CStrUtil::casecmp(option, "tolerance") == 0) {
+    /* Set tolerance to real value */
+
+    double r = ClParserInst->getTolerance();
+
+    if (! CStrUtil::toReal(args, &r)) {
+      ClLanguageMgrInst->error("invalid tolerance '%s' for 'set %s'", args, option);
+      return false;
+    }
+
+    ClParserInst->setTolerance(r);
   }
   else if (CStrUtil::casecmp(option, "debug") == 0) {
     int level;

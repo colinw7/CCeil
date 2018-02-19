@@ -63,8 +63,7 @@ ClParserStruct(ClParserTypePtr type) :
   uint num_sub_types = (type_.isValid() ? type_->getNumSubTypes() : 0);
 
   for (uint i = 0; i < num_sub_types; ++i)
-    values_[type_->getSubType(i)->getName()] =
-      type_->getSubType(i)->getValue();
+    values_[type_->getSubType(i)->getName()] = type_->getSubType(i)->getValue();
 }
 
 ClParserStruct::
@@ -91,8 +90,7 @@ ClParserStruct(ClParserTypePtr type, const ClParserValueArray &values) :
   }
 
   for ( ; i < type_->getNumSubTypes(); ++i)
-    values_[type_->getSubType(i)->getName()] =
-      type_->getSubType(i)->getValue();
+    values_[type_->getSubType(i)->getName()] = type_->getSubType(i)->getValue();
 }
 
 ClParserStruct::
@@ -117,8 +115,7 @@ ClParserStruct(ClParserTypePtr type, const ClParserValuePtr *values, uint num_va
   }
 
   for ( ; i < type_->getNumSubTypes(); ++i)
-    values_[type_->getSubType(i)->getName()] =
-      type_->getSubType(i)->getValue();
+    values_[type_->getSubType(i)->getName()] = type_->getSubType(i)->getValue();
 }
 
 ClParserStruct::
@@ -161,7 +158,7 @@ copy(const ClParserObj &obj)
 {
   assert(base_type_ == obj.getBaseType());
 
-  const ClParserStruct &rhs = reinterpret_cast<const ClParserStruct &>(obj);
+  const ClParserStruct &rhs = castObj(obj);
 
   *this = rhs;
 }
@@ -268,7 +265,7 @@ cmp(const ClParserObj &obj) const
   if (base_type_ != obj.getBaseType())
     return CMathGen::sign((long) (base_type_ - obj.getBaseType()));
 
-  const ClParserStruct &rhs = reinterpret_cast<const ClParserStruct &>(obj);
+  const ClParserStruct &rhs = castObj(obj);
 
   if (type_ != rhs.type_) {
     if (type_->getName() < rhs.type_->getName())
@@ -424,7 +421,7 @@ ClParserValuePtr
 ClParserStruct::BinaryFunc::
 process(const ClParserStruct &lstructure, const ClParserObj &robj) const
 {
-  const ClParserStruct &rstructure = reinterpret_cast<const ClParserStruct &>(robj);
+  const ClParserStruct &rstructure = castObj(robj);
 
   if (lstructure.getType() != rstructure.getType())
     ClErrThrow(ClErr::INVALID_TYPE_MIX);

@@ -84,7 +84,7 @@ class ClParserInternFnMgr {
 
 struct ClParserArg {
   uint types    { 0 };
-  uint variable { 0 };
+  bool variable { false };
 };
 
 //---

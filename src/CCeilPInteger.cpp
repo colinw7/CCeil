@@ -7,7 +7,7 @@ copy(const ClParserObj &obj)
 {
   assert(base_type_ == obj.getBaseType());
 
-  const ClParserInteger &rhs = reinterpret_cast<const ClParserInteger &>(obj);
+  const ClParserInteger &rhs = castObj(obj);
 
   *this = rhs;
 }
@@ -81,7 +81,7 @@ ClParserValuePtr
 ClParserInteger::
 plus(const ClParserObj &obj) const
 {
-  const ClParserInteger &integer = reinterpret_cast<const ClParserInteger &>(obj);
+  const ClParserInteger &integer = castObj(obj);
 
   long value = integer_ + integer.integer_;
 
@@ -92,7 +92,7 @@ ClParserValuePtr
 ClParserInteger::
 minus(const ClParserObj &obj) const
 {
-  const ClParserInteger &integer = reinterpret_cast<const ClParserInteger &>(obj);
+  const ClParserInteger &integer = castObj(obj);
 
   long value = integer_ - integer.integer_;
 
@@ -103,7 +103,7 @@ ClParserValuePtr
 ClParserInteger::
 times(const ClParserObj &obj) const
 {
-  const ClParserInteger &integer = reinterpret_cast<const ClParserInteger &>(obj);
+  const ClParserInteger &integer = castObj(obj);
 
   long value = integer_ * integer.integer_;
 
@@ -114,7 +114,7 @@ ClParserValuePtr
 ClParserInteger::
 divide(const ClParserObj &obj) const
 {
-  const ClParserInteger &integer = reinterpret_cast<const ClParserInteger &>(obj);
+  const ClParserInteger &integer = castObj(obj);
 
   if (integer.integer_ == 0)
     ClErrThrow(ClErr::DIVIDE_BY_ZERO);
@@ -128,7 +128,7 @@ ClParserValuePtr
 ClParserInteger::
 modulus(const ClParserObj &obj) const
 {
-  const ClParserInteger &integer = reinterpret_cast<const ClParserInteger &>(obj);
+  const ClParserInteger &integer = castObj(obj);
 
   if (integer.integer_ == 0)
     ClErrThrow(ClErr::DIVIDE_BY_ZERO);
@@ -142,18 +142,23 @@ ClParserValuePtr
 ClParserInteger::
 power(const ClParserObj &obj) const
 {
-  const ClParserInteger &integer = reinterpret_cast<const ClParserInteger &>(obj);
+  const ClParserInteger &integer = castObj(obj);
 
-  double value = CMathGen::pow(integer_, integer.integer_);
+  double real = CMathGen::pow(integer_, integer.integer_);
 
-  return ClParserValueMgrInst->createValue(value);
+  long ireal;
+
+  if (isInteger(real, ireal))
+    return ClParserValueMgrInst->createValue(ireal);
+  else
+    return ClParserValueMgrInst->createValue(real);
 }
 
 ClParserValuePtr
 ClParserInteger::
 approxEqual(const ClParserObj &obj) const
 {
-  const ClParserInteger &integer = reinterpret_cast<const ClParserInteger &>(obj);
+  const ClParserInteger &integer = castObj(obj);
 
   long value = (integer_ == integer.integer_);
 
@@ -164,7 +169,7 @@ ClParserValuePtr
 ClParserInteger::
 bitAnd(const ClParserObj &obj) const
 {
-  const ClParserInteger &integer = reinterpret_cast<const ClParserInteger &>(obj);
+  const ClParserInteger &integer = castObj(obj);
 
   long value = (integer_ & integer.integer_);
 
@@ -175,7 +180,7 @@ ClParserValuePtr
 ClParserInteger::
 bitOr(const ClParserObj &obj) const
 {
-  const ClParserInteger &integer = reinterpret_cast<const ClParserInteger &>(obj);
+  const ClParserInteger &integer = castObj(obj);
 
   long value = (integer_ | integer.integer_);
 
@@ -186,7 +191,7 @@ ClParserValuePtr
 ClParserInteger::
 bitXor(const ClParserObj &obj) const
 {
-  const ClParserInteger &integer = reinterpret_cast<const ClParserInteger &>(obj);
+  const ClParserInteger &integer = castObj(obj);
 
   long value = (integer_ ^ integer.integer_);
 
@@ -197,7 +202,7 @@ ClParserValuePtr
 ClParserInteger::
 bitLShift(const ClParserObj &obj) const
 {
-  const ClParserInteger &integer = reinterpret_cast<const ClParserInteger &>(obj);
+  const ClParserInteger &integer = castObj(obj);
 
   long value = (integer_ << integer.integer_);
 
@@ -208,7 +213,7 @@ ClParserValuePtr
 ClParserInteger::
 bitRShift(const ClParserObj &obj) const
 {
-  const ClParserInteger &integer = reinterpret_cast<const ClParserInteger &>(obj);
+  const ClParserInteger &integer = castObj(obj);
 
   long value = (integer_ >> integer.integer_);
 
@@ -266,9 +271,14 @@ ClParserValuePtr
 ClParserInteger::
 sqr() const
 {
-  long value = (integer_ * integer_);
+  double real = (1.0*integer_)*integer_;
 
-  return ClParserValueMgrInst->createValue(value);
+  long ireal;
+
+  if (isInteger(real, ireal))
+    return ClParserValueMgrInst->createValue(ireal);
+  else
+    return ClParserValueMgrInst->createValue(real);
 }
 
 ClParserValuePtr
@@ -277,12 +287,17 @@ sqrt() const
 {
   errno = 0;
 
-  double value = CMathGen::sqrt(integer_);
+  double real = CMathGen::sqrt(integer_);
 
   if (errno != 0 && ClParserInst->getMathFail())
     ClErrThrow(ClErr::INVALID_SQRT_VALUE);
 
-  return ClParserValueMgrInst->createValue(value);
+  long ireal;
+
+  if (isInteger(real, ireal))
+    return ClParserValueMgrInst->createValue(ireal);
+  else
+    return ClParserValueMgrInst->createValue(real);
 }
 
 ClParserValuePtr
@@ -569,7 +584,7 @@ cmp(const ClParserObj &obj) const
   if (base_type_ != obj.getBaseType())
     return CMathGen::sign((long) (base_type_ - obj.getBaseType()));
 
-  const ClParserInteger &rhs = reinterpret_cast<const ClParserInteger &>(obj);
+  const ClParserInteger &rhs = castObj(obj);
 
   return cmp(rhs);
 }
@@ -584,6 +599,19 @@ cmp(const ClParserInteger &rhs) const
     return 1;
   else
     return 0;
+}
+
+//------
+
+bool
+ClParserInteger::
+isInteger(double real, long &ireal)
+{
+  ireal = (long) real;
+
+  double real1 = (double) ireal;
+
+  return (fabs(real1 - real) < 1E-6);
 }
 
 //------

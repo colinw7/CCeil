@@ -74,10 +74,10 @@ class ClParserVarMgr {
   typedef std::vector<VarMap *>                VarMapStack;
   typedef std::list<VarProcData *>             VarProcDataList;
 
-  ClParser*        parser_             { nullptr };
-  VarMap          *varMap_             { nullptr };
-  VarMapStack      varMapStack_;
-  VarProcDataList  var_proc_data_list_;
+  ClParser*       parser_         { nullptr };
+  VarMap*         varMap_         { nullptr };
+  VarMapStack     varMapStack_;
+  VarProcDataList varProcDataList_;
 };
 
 //------

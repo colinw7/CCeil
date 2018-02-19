@@ -4,11 +4,6 @@
 #include <CCeilPObj.h>
 
 class ClParserList : public ClParserObj {
- private:
-  static int error_code_;
-
-  ClParserValueList values_;
-
  public:
   static int getErrorCode() { return error_code_; }
 
@@ -17,6 +12,13 @@ class ClParserList : public ClParserObj {
   static ClParserListPtr createList(const ClParserValuePtr *values, uint num_values);
   static ClParserListPtr createList(const ClParserValueArray &values);
   static ClParserListPtr createList(const ClParserList &list);
+
+ public:
+  static const ClParserList &castObj(const ClParserObj &obj) {
+    assert(obj.getBaseType() == CL_PARSER_VALUE_TYPE_LIST);
+
+    return reinterpret_cast<const ClParserList &>(obj);
+  }
 
  protected:
   friend class CRefPtr<ClParserList>;
@@ -162,6 +164,11 @@ class ClParserList : public ClParserObj {
  private:
   void addListValues(const ClParserList &list);
   bool deleteListValues(const ClParserList &list);
+
+ private:
+  static int error_code_;
+
+  ClParserValueList values_;
 };
 
 #endif

@@ -473,44 +473,37 @@ ClParserValue(const ClParserObj &obj) :
 
   switch (type_) {
     case CL_PARSER_VALUE_TYPE_REAL: {
-      const ClParserReal *real =
-        static_cast<const ClParserReal *>(&obj);
+      const ClParserReal *real = static_cast<const ClParserReal *>(&obj);
       setReal(ClParserReal::createReal(*real));
       break;
     }
     case CL_PARSER_VALUE_TYPE_INTEGER: {
-      const ClParserInteger *integer =
-        static_cast<const ClParserInteger *>(&obj);
+      const ClParserInteger *integer = static_cast<const ClParserInteger *>(&obj);
       setInteger(ClParserInteger::createInteger(*integer));
       break;
     }
     case CL_PARSER_VALUE_TYPE_STRING: {
-      const ClParserString *str =
-        static_cast<const ClParserString *>(&obj);
+      const ClParserString *str = static_cast<const ClParserString *>(&obj);
       setString(ClParserString::createString(*str));
       break;
     }
     case CL_PARSER_VALUE_TYPE_ARRAY: {
-      const ClParserArray *array =
-        static_cast<const ClParserArray *>(&obj);
+      const ClParserArray *array = static_cast<const ClParserArray *>(&obj);
       setArray(ClParserArray::createArray(*array));
       break;
     }
     case CL_PARSER_VALUE_TYPE_LIST: {
-      const ClParserList *list =
-        static_cast<const ClParserList *>(&obj);
+      const ClParserList *list = static_cast<const ClParserList *>(&obj);
       setList(ClParserList::createList(*list));
       break;
     }
     case CL_PARSER_VALUE_TYPE_DICTIONARY: {
-      const ClParserDict *dict =
-        static_cast<const ClParserDict *>(&obj);
+      const ClParserDict *dict = static_cast<const ClParserDict *>(&obj);
       setDictionary(ClParserDict::createDict(*dict));
       break;
     }
     case CL_PARSER_VALUE_TYPE_STRUCTURE: {
-      const ClParserStruct *str =
-        static_cast<const ClParserStruct *>(&obj);
+      const ClParserStruct *str = static_cast<const ClParserStruct *>(&obj);
       setStructure(ClParserStruct::createStruct(*str));
       break;
     }
@@ -1418,10 +1411,8 @@ toSubValues(ClParserValueArray &values) const
       values.push_back((*data_.dict)->getKeyValue(i));
   }
   else if (type_ == CL_PARSER_VALUE_TYPE_STRUCTURE) {
-    ClParserStruct::ValueMap::const_iterator p1 =
-      (*data_.structure)->getValuesBegin();
-    ClParserStruct::ValueMap::const_iterator p2 =
-      (*data_.structure)->getValuesEnd  ();
+    ClParserStruct::ValueMap::const_iterator p1 = (*data_.structure)->getValuesBegin();
+    ClParserStruct::ValueMap::const_iterator p2 = (*data_.structure)->getValuesEnd  ();
 
     for (uint i = 0; p1 != p2; ++p1, ++i)
       values.push_back(p1->second);
@@ -1499,8 +1490,7 @@ subscriptValue(ClParserValuePtr subscript, ClParserValuePtr &value) const
 
     array->toIntegers(subscripts);
 
-    ClParserValuePtr value1 =
-      (*data_.array)->getSubscriptValue(subscripts);
+    ClParserValuePtr value1 = (*data_.array)->getSubscriptValue(subscripts);
 
     if (! value1.isValid())
       return false;
@@ -1517,8 +1507,7 @@ subscriptValue(ClParserValuePtr subscript, ClParserValuePtr &value) const
 
     array->toIntegers(subscripts);
 
-    ClParserValuePtr value2 =
-      (*data_.list)->subscriptValue(subscripts);
+    ClParserValuePtr value2 = (*data_.list)->subscriptValue(subscripts);
 
     if (! value2.isValid())
       return false;
@@ -1528,8 +1517,7 @@ subscriptValue(ClParserValuePtr subscript, ClParserValuePtr &value) const
     return true;
   }
   else if (type_ == CL_PARSER_VALUE_TYPE_DICTIONARY) {
-    ClParserValuePtr value2 =
-      (*data_.dict)->subscriptValue(&subscript, 1);
+    ClParserValuePtr value2 = (*data_.dict)->subscriptValue(&subscript, 1);
 
     if (! value2.isValid())
       return false;
@@ -1553,8 +1541,7 @@ checkBinaryTypes(ClParserValuePtr &value1, ClParserValuePtr &value2)
 {
   if (! value1->isType(CL_PARSER_VALUE_TYPE_LIST) &&
         value2->isType(CL_PARSER_VALUE_TYPE_LIST)) {
-    ClParserValuePtr value3 =
-      ClParserValueMgrInst->createValue(CL_PARSER_VALUE_TYPE_LIST);
+    ClParserValuePtr value3 = ClParserValueMgrInst->createValue(CL_PARSER_VALUE_TYPE_LIST);
 
     value3->getList()->addValue(value1);
 
@@ -1592,8 +1579,7 @@ checkBinaryTypes(ClParserValuePtr &value1, ClParserValuePtr &value2)
       ClParserValuePtr svalue1 = array1->getValue(1);
       ClParserValuePtr svalue2 = array2->getValue(1);
 
-      if (svalue1->getStructure()->getType() !=
-          svalue2->getStructure()->getType())
+      if (svalue1->getStructure()->getType() != svalue2->getStructure()->getType())
         return false;
     }
 
@@ -1786,8 +1772,7 @@ checkBinaryTypes(ClParserValuePtr &value1, ClParserValuePtr &value2)
   }
   else {
     if (value1->isType(CL_PARSER_VALUE_TYPE_STRUCTURE)) {
-      if (value1->getStructure()->getType() !=
-          value2->getStructure()->getType())
+      if (value1->getStructure()->getType() != value2->getStructure()->getType())
         return false;
     }
   }

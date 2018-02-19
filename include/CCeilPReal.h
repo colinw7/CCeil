@@ -4,13 +4,11 @@
 #include <CCeilPObj.h>
 
 class ClParserReal : public ClParserObj {
- private:
-  double real_;
-
  protected:
   friend class CRefPtr<ClParserReal>;
   friend class ClParserValue;
 
+ protected:
   static ClParserRealPtr createReal(double real=0.0) {
     ClParserReal *preal = new ClParserReal(real);
 
@@ -52,6 +50,12 @@ class ClParserReal : public ClParserObj {
   ClParserReal *dup() const;
 
  public:
+  static const ClParserReal &castObj(const ClParserObj &obj) {
+    assert(obj.getBaseType() == CL_PARSER_VALUE_TYPE_REAL);
+
+    return reinterpret_cast<const ClParserReal &>(obj);
+  }
+
   void copy(const ClParserObj &obj);
 
   //--------
@@ -64,14 +68,7 @@ class ClParserReal : public ClParserObj {
 
   bool isNanValue() const;
 
-  long getInteger() const {
-    // TODO: range check
-
-    if (! isNanValue())
-      return (long) real_;
-    else
-      return 0;
-  }
+  long getInteger() const;
 
   bool toBool() const;
 
@@ -159,6 +156,12 @@ class ClParserReal : public ClParserObj {
   ClParserValuePtr sort(ClParserSortDirection direction) const;
 
   ClParserValuePtr doAssert() const;
+
+ private:
+  long ival() const;
+
+ private:
+  double real_;
 };
 
 #endif

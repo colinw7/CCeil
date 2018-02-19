@@ -136,13 +136,6 @@ class ClParserDictMgr {
 };
 
 class ClParserDict : public ClParserObj {
- private:
-  typedef std::list<ClParserKeyValue> KeyValueList;
-
-  static int error_code_;
-
-  KeyValueList key_values_;
-
  public:
   static int getErrorCode() { return error_code_; }
 
@@ -150,6 +143,13 @@ class ClParserDict : public ClParserObj {
   static ClParserDictPtr createDict(const ClParserValuePtr *values, uint num_values);
   static ClParserDictPtr createDict(const ClParserValueArray &values);
   static ClParserDictPtr createDict(const ClParserDict &dict);
+
+ public:
+  static const ClParserDict &castObj(const ClParserObj &obj) {
+    assert(obj.getBaseType() == CL_PARSER_VALUE_TYPE_DICTIONARY);
+
+    return reinterpret_cast<const ClParserDict &>(obj);
+  }
 
  protected:
   friend class CRefPtr<ClParserDict>;
@@ -297,6 +297,13 @@ class ClParserDict : public ClParserObj {
 
  private:
   void addValues(const ClParserDict &list);
+
+ private:
+  typedef std::list<ClParserKeyValue> KeyValueList;
+
+  static int error_code_;
+
+  KeyValueList key_values_;
 };
 
 #endif

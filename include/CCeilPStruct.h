@@ -8,10 +8,6 @@ class ClParserStruct : public ClParserObj {
  public:
   typedef std::map<std::string,ClParserValuePtr> ValueMap;
 
- private:
-  ClParserTypePtr type_;
-  ValueMap        values_;
-
  public:
   struct BinaryFunc {
     virtual ~BinaryFunc() { }
@@ -28,6 +24,13 @@ class ClParserStruct : public ClParserObj {
                                         uint num_values);
   static ClParserStructPtr createStruct(ClParserTypePtr type, const ClParserValueArray &values);
   static ClParserStructPtr createStruct(const ClParserStruct &structure);
+
+ public:
+  static const ClParserStruct &castObj(const ClParserObj &obj) {
+    assert(obj.getBaseType() == CL_PARSER_VALUE_TYPE_STRUCTURE);
+
+    return reinterpret_cast<const ClParserStruct &>(obj);
+  }
 
  protected:
   friend class CRefPtr<ClParserStruct>;
@@ -163,6 +166,10 @@ class ClParserStruct : public ClParserObj {
 
     return func.process(*this, obj);
   }
+
+ private:
+  ClParserTypePtr type_;
+  ValueMap        values_;
 };
 
 /**** Private Routines ****/

@@ -8,7 +8,7 @@ copy(const ClParserObj &obj)
 {
   assert(base_type_ == obj.getBaseType());
 
-  const ClParserReal &rhs = reinterpret_cast<const ClParserReal &>(obj);
+  const ClParserReal &rhs = castObj(obj);
 
   *this = rhs;
 }
@@ -30,6 +30,18 @@ isNanValue() const
   return false;
 }
 
+long
+ClParserReal::
+getInteger() const
+{
+  // TODO: range check
+
+  if (! isNanValue())
+    return long(real_);
+  else
+    return 0;
+}
+
 bool
 ClParserReal::
 toBool() const
@@ -45,7 +57,7 @@ const ClParserObj &
 ClParserReal::
 increment()
 {
-  if (! COSNaN::is_nan(real_))
+  if (! isNanValue())
     ++real_;
 
   return *this;
@@ -55,7 +67,7 @@ const ClParserObj &
 ClParserReal::
 decrement()
 {
-  if (! COSNaN::is_nan(real_))
+  if (! isNanValue())
     --real_;
 
   return *this;
@@ -83,8 +95,8 @@ ClParserValuePtr
 ClParserReal::
 bitNot() const
 {
-  if (! COSNaN::is_nan(real_))
-    return ClParserValueMgrInst->createValue(~long(real_));
+  if (! isNanValue())
+    return ClParserValueMgrInst->createValue(~getInteger());
   else
     return ClParserValueMgrInst->createValue( long(0    ));
 }
@@ -97,11 +109,11 @@ ClParserValuePtr
 ClParserReal::
 plus(const ClParserObj &obj) const
 {
-  const ClParserReal &real = reinterpret_cast<const ClParserReal &>(obj);
+  const ClParserReal &real = castObj(obj);
 
   double result;
 
-  if (COSNaN::is_nan(real_) || COSNaN::is_nan(real.real_))
+  if (isNanValue() || real.isNanValue())
     COSNaN::set_nan(&result);
   else
     result = real_ + real.real_;
@@ -113,11 +125,11 @@ ClParserValuePtr
 ClParserReal::
 minus(const ClParserObj &obj) const
 {
-  const ClParserReal &real = reinterpret_cast<const ClParserReal &>(obj);
+  const ClParserReal &real = castObj(obj);
 
   double result;
 
-  if (COSNaN::is_nan(real_) || COSNaN::is_nan(real.real_))
+  if (isNanValue() || real.isNanValue())
     COSNaN::set_nan(&result);
   else
     result = real_ - real.real_;
@@ -129,11 +141,11 @@ ClParserValuePtr
 ClParserReal::
 times(const ClParserObj &obj) const
 {
-  const ClParserReal &real = reinterpret_cast<const ClParserReal &>(obj);
+  const ClParserReal &real = castObj(obj);
 
   double result;
 
-  if (COSNaN::is_nan(real_) || COSNaN::is_nan(real.real_))
+  if (isNanValue() || real.isNanValue())
     COSNaN::set_nan(&result);
   else
     result = real_ * real.real_;
@@ -145,7 +157,7 @@ ClParserValuePtr
 ClParserReal::
 divide(const ClParserObj &obj) const
 {
-  const ClParserReal &real = reinterpret_cast<const ClParserReal &>(obj);
+  const ClParserReal &real = castObj(obj);
 
   double result;
 
@@ -158,7 +170,7 @@ divide(const ClParserObj &obj) const
     else
       SetPosInf(result);
   }
-  else if (COSNaN::is_nan(real_) || COSNaN::is_nan(real.real_))
+  else if (isNanValue() || real.isNanValue())
     COSNaN::set_nan(&result);
   else
     result = real_ / real.real_;
@@ -170,7 +182,7 @@ ClParserValuePtr
 ClParserReal::
 modulus(const ClParserObj &obj) const
 {
-  const ClParserReal &real = reinterpret_cast<const ClParserReal &>(obj);
+  const ClParserReal &real = castObj(obj);
 
   errno = 0;
 
@@ -186,7 +198,7 @@ ClParserValuePtr
 ClParserReal::
 power(const ClParserObj &obj) const
 {
-  const ClParserReal &real = reinterpret_cast<const ClParserReal &>(obj);
+  const ClParserReal &real = castObj(obj);
 
   errno = 0;
 
@@ -202,7 +214,7 @@ ClParserValuePtr
 ClParserReal::
 approxEqual(const ClParserObj &obj) const
 {
-  const ClParserReal &real = reinterpret_cast<const ClParserReal &>(obj);
+  const ClParserReal &real = castObj(obj);
 
   long result = long(::fabs(real_ - real.real_) < ClParserInst->getTolerance());
 
@@ -213,9 +225,9 @@ ClParserValuePtr
 ClParserReal::
 bitAnd(const ClParserObj &obj) const
 {
-  const ClParserReal &real = reinterpret_cast<const ClParserReal &>(obj);
+  const ClParserReal &real = castObj(obj);
 
-  long result = long(((long) real_) & ((long) real.real_));
+  long result = long(getInteger() & real.getInteger());
 
   return ClParserValueMgrInst->createValue(result);
 }
@@ -224,9 +236,9 @@ ClParserValuePtr
 ClParserReal::
 bitOr(const ClParserObj &obj) const
 {
-  const ClParserReal &real = reinterpret_cast<const ClParserReal &>(obj);
+  const ClParserReal &real = castObj(obj);
 
-  long result = long(((long) real_) | ((long) real.real_));
+  long result = long(getInteger() | real.getInteger());
 
   return ClParserValueMgrInst->createValue(result);
 }
@@ -235,9 +247,9 @@ ClParserValuePtr
 ClParserReal::
 bitXor(const ClParserObj &obj) const
 {
-  const ClParserReal &real = reinterpret_cast<const ClParserReal &>(obj);
+  const ClParserReal &real = castObj(obj);
 
-  long result = long(((long) real_) ^ ((long) real.real_));
+  long result = long(getInteger() ^ real.getInteger());
 
   return ClParserValueMgrInst->createValue(result);
 }
@@ -246,7 +258,7 @@ ClParserValuePtr
 ClParserReal::
 bitLShift(const ClParserObj &obj) const
 {
-  const ClParserReal &real = reinterpret_cast<const ClParserReal &>(obj);
+  const ClParserReal &real = castObj(obj);
 
   double result = real_*CMathGen::pow(2.0, real.real_);
 
@@ -257,7 +269,7 @@ ClParserValuePtr
 ClParserReal::
 bitRShift(const ClParserObj &obj) const
 {
-  const ClParserReal &real = reinterpret_cast<const ClParserReal &>(obj);
+  const ClParserReal &real = castObj(obj);
 
   double result = real_/CMathGen::pow(2.0, real.real_);
 
@@ -274,7 +286,7 @@ abs() const
 {
   double result;
 
-  if      (COSNaN::is_nan(real_))
+  if      (isNanValue())
     COSNaN::set_nan(&result);
   else if (real_ < 0.0)
     result = -real_;
@@ -290,7 +302,7 @@ ceil() const
 {
   double result;
 
-  if      (COSNaN::is_nan(real_))
+  if      (isNanValue())
     COSNaN::set_nan(&result);
   else
     result = ::ceil(real_);
@@ -304,7 +316,7 @@ floor() const
 {
   double result;
 
-  if      (COSNaN::is_nan(real_))
+  if      (isNanValue())
     COSNaN::set_nan(&result);
   else
     result = ::floor(real_);
@@ -318,7 +330,7 @@ sign() const
 {
   double result;
 
-  if      (COSNaN::is_nan(real_))
+  if      (isNanValue())
     COSNaN::set_nan(&result);
   else if (real_ > 0.0)
     result =  1.0;
@@ -336,7 +348,7 @@ sqr() const
 {
   double result;
 
-  if      (COSNaN::is_nan(real_))
+  if (isNanValue())
     COSNaN::set_nan(&result);
   else
     result = real_ * real_;
@@ -364,7 +376,7 @@ cos() const
 {
   double result;
 
-  if (COSNaN::is_nan(real_))
+  if (isNanValue())
     COSNaN::set_nan(&result);
   else
     result = ::cos(ClParserInst->toRadians(real_));
@@ -378,7 +390,7 @@ sin() const
 {
   double result;
 
-  if (COSNaN::is_nan(real_))
+  if (isNanValue())
     COSNaN::set_nan(&result);
   else
     result = ::sin(ClParserInst->toRadians(real_));
@@ -392,7 +404,7 @@ tan() const
 {
   double result;
 
-  if (COSNaN::is_nan(real_))
+  if (isNanValue())
     COSNaN::set_nan(&result);
   else
     result = ::tan(ClParserInst->toRadians(real_));
@@ -434,7 +446,7 @@ atan() const
 {
   double result;
 
-  if (COSNaN::is_nan(real_))
+  if (isNanValue())
     COSNaN::set_nan(&result);
   else
     result = ClParserInst->fromRadians(::atan(real_));
@@ -448,7 +460,7 @@ atan(double real) const
 {
   double result;
 
-  if (COSNaN::is_nan(real_) || COSNaN::is_nan(real))
+  if (isNanValue() || COSNaN::is_nan(real))
     COSNaN::set_nan(&result);
   else
     result = ClParserInst->fromRadians(::atan2(real_, real));
@@ -462,7 +474,7 @@ exp() const
 {
   double result;
 
-  if (COSNaN::is_nan(real_))
+  if (isNanValue())
     COSNaN::set_nan(&result);
   else
     result = ::exp(real_);
@@ -504,7 +516,7 @@ cosh() const
 {
   double result;
 
-  if (COSNaN::is_nan(real_))
+  if (isNanValue())
     COSNaN::set_nan(&result);
   else
     result = ::cosh(ClParserInst->toRadians(real_));
@@ -518,7 +530,7 @@ sinh() const
 {
   double result;
 
-  if (COSNaN::is_nan(real_))
+  if (isNanValue())
     COSNaN::set_nan(&result);
   else
     result = ::sinh(ClParserInst->toRadians(real_));
@@ -532,7 +544,7 @@ tanh() const
 {
   double result;
 
-  if (COSNaN::is_nan(real_))
+  if (isNanValue())
     COSNaN::set_nan(&result);
   else
     result = ::tanh(ClParserInst->toRadians(real_));
@@ -546,7 +558,7 @@ toChar() const
 {
   std::string result(" ");
 
-  result[0] = (char) real_;
+  result[0] = (char) getInteger();
 
   return ClParserValueMgrInst->createValue(result);
 }
@@ -555,12 +567,7 @@ ClParserValuePtr
 ClParserReal::
 toInt() const
 {
-  long result;
-
-  if (COSNaN::is_nan(real_))
-    result = 0;
-  else
-    result = long(real_);
+  long result = getInteger();
 
   return ClParserValueMgrInst->createValue(result);
 }
@@ -587,7 +594,7 @@ ClParserValuePtr
 ClParserReal::
 isNan() const
 {
-  long result = COSNaN::is_nan(real_);
+  long result = isNanValue();
 
   return ClParserValueMgrInst->createValue(result);
 }
@@ -596,18 +603,28 @@ ClParserValuePtr
 ClParserReal::
 toLower() const
 {
-  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
+  int c = (int) getInteger();
 
-  return ClParserValuePtr();
+  if (isupper(c))
+    c = tolower(c);
+
+  long value = (long) c;
+
+  return ClParserValueMgrInst->createValue(value);
 }
 
 ClParserValuePtr
 ClParserReal::
 toUpper() const
 {
-  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
+  int c = (int) getInteger();
 
-  return ClParserValuePtr();
+  if (islower(c))
+    c = toupper(c);
+
+  long value = (long) c;
+
+  return ClParserValueMgrInst->createValue(value);
 }
 
 ClParserValuePtr
@@ -682,13 +699,13 @@ cmp(const ClParserObj &obj) const
   if (base_type_ != obj.getBaseType())
     return CMathGen::sign((long) (base_type_ - obj.getBaseType()));
 
-  const ClParserReal &rhs = reinterpret_cast<const ClParserReal &>(obj);
+  const ClParserReal &rhs = castObj(obj);
 
-  if      (COSNaN::is_nan(real_) && COSNaN::is_nan(rhs.real_))
+  if      (isNanValue() && rhs.isNanValue())
     return 1;
-  else if (COSNaN::is_nan(real_))
+  else if (isNanValue())
     return 1;
-  else if (COSNaN::is_nan(rhs.real_))
+  else if (rhs.isNanValue())
     return -1;
   else if (real_ < rhs.real_)
     return -1;
@@ -708,7 +725,7 @@ asString() const
     return "+Inf";
   else if (IsNegInf(real_))
     return "-Inf";
-  else if (COSNaN::is_nan(real_))
+  else if (isNanValue())
     return "NaN";
   else
     return ClParserInst->toString(real_);

@@ -49,6 +49,12 @@ class ClParserInteger : public ClParserObj {
   ClParserInteger *dup() const;
 
  public:
+  static const ClParserInteger &castObj(const ClParserObj &obj) {
+    assert(obj.getBaseType() == CL_PARSER_VALUE_TYPE_INTEGER);
+
+    return reinterpret_cast<const ClParserInteger &>(obj);
+  }
+
   void copy(const ClParserObj &obj);
 
   //--------
@@ -145,6 +151,9 @@ class ClParserInteger : public ClParserObj {
   ClParserValuePtr sort(ClParserSortDirection direction) const;
 
   ClParserValuePtr doAssert() const;
+
+ private:
+  static bool isInteger(double real, long &integer);
 
  private:
   long integer_ { 0 };

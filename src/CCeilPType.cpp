@@ -335,8 +335,7 @@ addSubType(const std::string &name, uint *dims, uint num_dims)
 {
   ClParserTypePtr type = ClParserInst->getType(name_);
 
-  ClParserSubType *sub_type =
-    new ClParserSubType(name, type, dims, num_dims);
+  ClParserSubType *sub_type = new ClParserSubType(name, type, dims, num_dims);
 
   sub_types_.push_back(sub_type);
 }
@@ -347,8 +346,7 @@ addSubType(const std::string &name, const UIntVectorT &dims)
 {
   ClParserTypePtr type = ClParserInst->getType(name_);
 
-  ClParserSubType *sub_type =
-    new ClParserSubType(name, type, dims);
+  ClParserSubType *sub_type = new ClParserSubType(name, type, dims);
 
   sub_types_.push_back(sub_type);
 }

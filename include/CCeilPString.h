@@ -4,9 +4,6 @@
 #include <CCeilPObj.h>
 
 class ClParserString : public ClParserObj {
- private:
-  std::string text_;
-
  protected:
   friend class CRefPtr<ClParserString>;
   friend class ClParserValue;
@@ -48,6 +45,12 @@ class ClParserString : public ClParserObj {
   ClParserString *dup() const;
 
  public:
+  static const ClParserString &castObj(const ClParserObj &obj) {
+    assert(obj.getBaseType() == CL_PARSER_VALUE_TYPE_STRING);
+
+    return reinterpret_cast<const ClParserString &>(obj);
+  }
+
   void copy(const ClParserObj &obj);
 
   //--------
@@ -193,6 +196,9 @@ class ClParserString : public ClParserObj {
   int getStringRPos(const std::string &str) const;
 
   bool indexToText(int *ind) const;
+
+ private:
+  std::string text_;
 };
 
 #endif

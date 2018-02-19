@@ -94,7 +94,7 @@ copy(const ClParserObj &obj)
 {
   assert(base_type_ == obj.getBaseType());
 
-  const ClParserList &rhs = reinterpret_cast<const ClParserList &>(obj);
+  const ClParserList &rhs = castObj(obj);
 
   *this = rhs;
 }
@@ -387,7 +387,7 @@ cmp(const ClParserObj &obj) const
   if (base_type_ != obj.getBaseType())
     return CMathGen::sign((long) (base_type_ - obj.getBaseType()));
 
-  const ClParserList &rhs = reinterpret_cast<const ClParserList &>(obj);
+  const ClParserList &rhs = castObj(obj);
 
   uint num_values1 = values_.size();
   uint num_values2 = rhs.values_.size();
@@ -493,8 +493,7 @@ plus(const ClParserObj &obj) const
   ClParserListPtr list = dupList();
 
   if (obj.getBaseType() == CL_PARSER_VALUE_TYPE_LIST) {
-    const ClParserList &list1 =
-      reinterpret_cast<const ClParserList &>(obj);
+    const ClParserList &list1 = castObj(obj);
 
     list->addListValues(list1);
   }
@@ -514,8 +513,7 @@ minus(const ClParserObj &obj) const
   ClParserListPtr list = dupList();
 
   if (obj.getBaseType() == CL_PARSER_VALUE_TYPE_LIST) {
-    const ClParserList &list1 =
-      reinterpret_cast<const ClParserList &>(obj);
+    const ClParserList &list1 = castObj(obj);
 
     list->deleteListValues(list1);
   }
@@ -535,8 +533,7 @@ times(const ClParserObj &obj) const
   if (obj.getBaseType() != CL_PARSER_VALUE_TYPE_INTEGER)
     ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
-  const ClParserInteger &integer =
-    reinterpret_cast<const ClParserInteger &>(obj);
+  const ClParserInteger &integer = ClParserInteger::castObj(obj);
 
   long num = integer.getValue();
 
@@ -627,8 +624,7 @@ bitLShift(const ClParserObj &obj) const
   if (obj.getBaseType() != CL_PARSER_VALUE_TYPE_INTEGER)
     ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
-  const ClParserInteger &integer =
-    reinterpret_cast<const ClParserInteger &>(obj);
+  const ClParserInteger &integer = ClParserInteger::castObj(obj);
 
   long num = integer.getValue();
 
@@ -646,8 +642,7 @@ bitRShift(const ClParserObj &obj) const
   if (obj.getBaseType() != CL_PARSER_VALUE_TYPE_INTEGER)
     ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
 
-  const ClParserInteger &integer =
-    reinterpret_cast<const ClParserInteger &>(obj);
+  const ClParserInteger &integer = ClParserInteger::castObj(obj);
 
   long num = -integer.getValue();
 

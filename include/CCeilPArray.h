@@ -44,6 +44,13 @@ class ClParserArray : public ClParserObj {
 
   static ClParserArrayPtr createArray(const ClParserArray &array);
 
+ public:
+  static const ClParserArray &castObj(const ClParserObj &obj) {
+    assert(obj.getBaseType() == CL_PARSER_VALUE_TYPE_ARRAY);
+
+    return reinterpret_cast<const ClParserArray &>(obj);
+  }
+
  protected:
   friend class CRefPtr<ClParserArray>;
   friend class ClParserValue;

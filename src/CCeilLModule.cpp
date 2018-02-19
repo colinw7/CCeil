@@ -212,8 +212,7 @@ isModuleLoaded(const std::string &name) const
 /*------------------------------------------------------------------*
  *
  * execModuleSet
- *   Call a module's set method for the specified option
- *   and its value.
+ *   Call a module's set method for the specified option and its value.
  *
  * CALL:
  *   bool flag =
@@ -224,8 +223,7 @@ isModuleLoaded(const std::string &name) const
  *
  *   option : Option Name to Set.
  *
- *   args   : String containing additional arguments
- *          : to use to set the option.
+ *   args   : String containing additional arguments to use to set the option.
  *
  * RETURNS:
  *   flag   : Whether the set was successful or not.
@@ -259,8 +257,7 @@ execModuleSet(const std::string &name, const std::string &option, const std::str
  * INPUT:
  *   name : Name of Module
  *
- *   args : String containing additional arguments
- *        : supplied when help was invoked.
+ *   args : String containing additional arguments supplied when help was invoked.
  *
  * OUTPUT:
  *   None

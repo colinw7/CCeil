@@ -26,8 +26,7 @@ createUserFn(const ClUserFnData &data)
   else
     type = 0;
 
-  ClParserUserFnPtr userfn =
-    createUserFn(data.name, type, arg_types, data.proc, data.data);
+  ClParserUserFnPtr userfn = createUserFn(data.name, type, arg_types, data.proc, data.data);
 
   if (data.num != 0)
     *data.num = userfn->getInd();
@@ -53,8 +52,7 @@ ClParserUserFnMgr::
 createUserFn(const std::string &name, uint type, const IntVectorT &arg_types,
              ClParserUserFnProc proc, void *data)
 {
-  ClParserUserFn *userfn =
-    new ClParserUserFn(name, type, arg_types, proc, data);
+  ClParserUserFn *userfn = new ClParserUserFn(name, type, arg_types, proc, data);
 
   user_function_map_[name] = userfn;
 
