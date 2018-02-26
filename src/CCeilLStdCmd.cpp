@@ -3204,17 +3204,16 @@ ClStdInputCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
  * ClStdPrintCommand
  *   Routine called when the 'print' command is entered.
  *
- *   This routine prints the value of each command
- *   separated expression specified followed by an
- *   optional new line. Each expression is separated from
- *   the next with a space.
+ *   This routine prints the value of each command *   separated expression
+ *   specified followed by an optional new line. Each expression is separated
+ *   from the next with a space.
  *
  * CALL:
  *   ClStdPrintCommand(ClLanguageCommand *command);
  *
  * INPUT:
- *   command : Structure containing details of the command
- *           : and arguments supplied by the user.
+ *   command : Structure containing details of the command and arguments
+ *           : supplied by the user.
  *
  * OUTPUT:
  *   None
@@ -3223,9 +3222,8 @@ ClStdInputCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
  *   None
  *
  * NOTES:
- *   If an argument starts with '@' then the subsequent
- *   str is taken as the name of a variable containing
- *   the file pointer to output to.
+ *   If an argument starts with '@' then the subsequent str is taken as the
+ *   name of a variable containing the file pointer to output to.
  *   If the command ends with a ',' the no newline is output.
  *
  *------------------------------------------------------------------*/
@@ -3233,9 +3231,6 @@ ClStdInputCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
 static void
 ClStdPrintCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 {
-  ClParserValuePtr value;
-  int              error_code;
-
   CL_LANGUAGE_TRACE("ClStdPrintCommand");
 
   const std::string &cargs = command->getArgs();
@@ -3261,6 +3256,8 @@ ClStdPrintCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
   bool value_output = false;
 
   for (uint i = 1; i <= num_args; i++) {
+    int error_code;
+
     std::string arg = args->getArg(i, &error_code);
 
     if (error_code != 0)
@@ -3281,7 +3278,7 @@ ClStdPrintCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
         goto done;
       }
 
-      value = ClParserInst->getVariableValue(name);
+      ClParserValuePtr value = ClParserInst->getVariableValue(name);
 
       long fp1;
 
@@ -3301,6 +3298,8 @@ ClStdPrintCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
     }
 
     ClParserExpr expr(arg);
+
+    ClParserValuePtr value;
 
     if      (! expr.exec(value)) {
       if (num_args == 1)
@@ -3343,41 +3342,31 @@ ClStdPrintCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
  * ClStdFormatCommand
  *   Routine called when the 'format' function is entered.
  *
- *   This routine takes the first value as the format str
- *   and then scans it for embedded control codes which are
- *   used in conjunction with any extra arguments supplied
- *   after the format str.
+ *   This routine takes the first value as the format str and then scans it
+ *   for embedded control codes which are used in conjunction with any extra
+ *   arguments supplied after the format str.
  *
- *   The style of the format str is identical to that used
- *   by the C function 'printf' without the 'p' and 'n'
- *   format codes. The number and type of the supplied
- *   arguments are checked and are ignored, and the embedded
- *   format code left as is, if the argument is the wrong
- *   type or is not present.
+ *   The style of the format str is identical to that used by the C function
+ *   'printf' without the 'p' and 'n' format codes. The number and type of the
+ *   supplied arguments are checked and are ignored, and the embedded format
+ *   code left as is, if the argument is the wrong type or is not present.
  *
  * CALL:
  *   ClParserValuePtr value =
- *     ClStdFormatCommand
- *      (ClParserValuePtr *, uint, void *, int &error_code);
+ *     ClStdFormatCommand(ClParserValuePtr *, uint, void *, int &error_code);
  *
  * INPUT:
- *   values     : The array of values supplied
- *              : when the function was called.
+ *   values     : The array of values supplied when the function was called.
  *
- *   num_values : The number of values supplied
- *              : when the function was called.
+ *   num_values : The number of values supplied when the function was called.
  *
- *   data       : The optional data specified
- *              : when the function was specified.
+ *   data       : The optional data specified when the function was specified.
  *
  * OUTPUT:
- *   error_code : Error Code to indicate whether
- *              : the function was successful.
- *              :  <0 : Function failed (function
- *              :     : specific error code).
+ *   error_code : Error Code to indicate whether the function was successful.
+ *              :  <0 : Function failed (function specific error code).
  *              :  =0 : Function successful.
- *              :  >0 : Function failed (CL
- *              :     : specific error code).
+ *              :  >0 : Function failed (CL specific error code).
  *
  * RETURNS:
  *   value      : The value of the function.

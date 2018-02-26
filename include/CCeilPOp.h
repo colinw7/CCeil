@@ -64,6 +64,8 @@ class ClParserOperatorMgr {
   bool initOperatorMap();
 };
 
+//---
+
 struct ClParserOperatorData {
   ClParserOperatorType      type;
   const char*               token         { nullptr };
@@ -72,6 +74,8 @@ struct ClParserOperatorData {
   CLParserOperatorAssociate associativity { CLParserOperatorAssociate::L_TO_R };
   uint                      types;
 };
+
+//---
 
 struct ClParserOpData {
   ClParserOperatorType      type;
@@ -82,10 +86,9 @@ struct ClParserOpData {
   uint                      types;
 };
 
-class ClParserOperator {
- private:
-  ClParserOpData data_;
+//---
 
+class ClParserOperator {
  protected:
   friend class ClParserOperatorMgr;
   friend class CRefPtr<ClParserOperator>;
@@ -114,6 +117,9 @@ class ClParserOperator {
   void print() const;
   void print(std::ostream &os) const;
   void debugPrint() const;
+
+ private:
+  ClParserOpData data_;
 };
 
 #endif

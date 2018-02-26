@@ -13,13 +13,6 @@ class ClParserTypeMgr {
   typedef std::map<std::string, ClParserTypePtr> TypeMap;
   typedef std::vector<TypeMap *>                 TypeMapArray;
 
-  ClParserTypePtr integer_type_;
-  ClParserTypePtr real_type_;
-  ClParserTypePtr string_type_;
-
-  TypeMap      *type_map_;
-  TypeMapArray  type_map_list_;
-
  public:
   ClParserTypeMgr();
  ~ClParserTypeMgr();
@@ -51,14 +44,19 @@ class ClParserTypeMgr {
  private:
   ClParserTypePtr addType(ClParserType *type);
   void            removeType(ClParserTypePtr type);
+
+ private:
+  ClParserTypePtr integer_type_;
+  ClParserTypePtr real_type_;
+  ClParserTypePtr string_type_;
+
+  TypeMap      *type_map_ { nullptr };
+  TypeMapArray  type_map_list_;
 };
 
-class ClParserType {
- private:
-  std::string          name_;
-  ClParserSubTypeArray sub_types_;
-  bool                 is_fixed_;
+//---
 
+class ClParserType {
  private:
   friend class ClParserTypeMgr;
   friend class CRefPtr<ClParserType>;
@@ -98,15 +96,16 @@ class ClParserType {
   bool isRealType() const;
   bool isStringType() const;
   bool isBuiltinType() const;
+
+ private:
+  std::string          name_;
+  ClParserSubTypeArray sub_types_;
+  bool                 is_fixed_ { false };
 };
 
-class ClParserSubType {
- private:
-  std::string       name_;
-  ClParserTypePtr   type_;
-  UIntVectorT       dims_;
-  ClParserValuePtr  value_;
+//---
 
+class ClParserSubType {
  public:
   ClParserSubType(const std::string &name, ClParserTypePtr type, uint *dims, uint num_dims);
   ClParserSubType(const std::string &name, ClParserTypePtr type, const UIntVectorT &dims);
@@ -123,6 +122,12 @@ class ClParserSubType {
 
  private:
   void createTypeValue();
+
+ private:
+  std::string       name_;
+  ClParserTypePtr   type_;
+  UIntVectorT       dims_;
+  ClParserValuePtr  value_;
 };
 
 #endif

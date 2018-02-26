@@ -830,6 +830,24 @@ tanh() const
 
 ClParserValuePtr
 ClParserList::
+norm() const
+{
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
+
+  return ClParserValuePtr();
+}
+
+ClParserValuePtr
+ClParserList::
+invnorm() const
+{
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
+
+  return ClParserValuePtr();
+}
+
+ClParserValuePtr
+ClParserList::
 toChar() const
 {
   ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);

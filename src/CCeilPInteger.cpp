@@ -1,4 +1,6 @@
 #include <CCeilPI.h>
+#include <CInvNorm.h>
+#include <boost/math/special_functions/erf.hpp>
 #include <cerrno>
 
 void
@@ -435,6 +437,30 @@ tanh() const
   double value = ::tanh(ClParserInst->toRadians(integer_));
 
   return ClParserValueMgrInst->createValue(value);
+}
+
+ClParserValuePtr
+ClParserInteger::
+norm() const
+{
+  double result = integer_;
+
+  result = 0.5*std::sqrt(2.0)*result;
+  result = 0.5*erfc(-result);
+
+  return ClParserValueMgrInst->createValue(result);
+}
+
+ClParserValuePtr
+ClParserInteger::
+invnorm() const
+{
+  double result = CInvNorm::calc(integer_);
+
+  if (IsPosInf(result) || IsNegInf(result))
+    SetNaN(result);
+
+  return ClParserValueMgrInst->createValue(result);
 }
 
 ClParserValuePtr

@@ -8,8 +8,11 @@ enum ClUserFnType {
   CL_PARSER_USERFN_TYPE_VARARGS = (1<<9)
 };
 
-typedef ClParserValuePtr (*ClParserUserFnProc)
-                          (ClParserValuePtr *, uint, void *, int *);
+//---
+
+typedef ClParserValuePtr (*ClParserUserFnProc)(ClParserValuePtr *, uint, void *, int *);
+
+//---
 
 struct ClUserFnData {
   const char         *name;
@@ -19,12 +22,11 @@ struct ClUserFnData {
   int                *num;
 };
 
+//---
+
 class ClParserUserFnMgr {
  private:
   typedef std::map<std::string,ClParserUserFnPtr> UserFnMap;
-
-  UserFnMap user_function_map_;
-  uint      ind_;
 
  public:
   ClParserUserFnMgr();
@@ -48,7 +50,13 @@ class ClParserUserFnMgr {
   ClParserUserFnPtr getUserFn(const std::string &name) const;
 
   void stringToTypes(const std::string &str, int *types, IntVectorT &arg_types);
+
+ private:
+  UserFnMap user_function_map_;
+  uint      ind_ { 0 };
 };
+
+//---
 
 class ClParserUserFn {
  private:
@@ -71,17 +79,6 @@ class ClParserUserFn {
 
     void term();
   };
-
-  static int             error_code_;
-  static ClParserUserFn *execUserFn_;
-
-  uint                ind_;
-  uint                type_;
-  std::string         name_;
-  std::vector<int>    arg_types_;
-  ClParserUserFnProc  proc_;
-  void               *data_;
-  ExecData            exec_data_;
 
  public:
   static int getErrorCode() { return error_code_; }
@@ -132,6 +129,18 @@ class ClParserUserFn {
  private:
   bool getArgsFail(int error_code) const;
   bool setArgsFail(int error_code) const;
+
+ private:
+  static int             error_code_;
+  static ClParserUserFn *execUserFn_;
+
+  uint                ind_ { 0 };
+  uint                type_ { 0 };
+  std::string         name_;
+  std::vector<int>    arg_types_;
+  ClParserUserFnProc  proc_;
+  void               *data_ { nullptr };
+  ExecData            exec_data_;
 };
 
 #endif

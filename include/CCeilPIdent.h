@@ -28,11 +28,6 @@ class ClParserIdentifier {
  public:
   typedef StringVectorT ScopeList;
 
- private:
-  ClParserIdentifierType type_;
-  std::string            name_;
-  ScopeList              scopes_;
-
  protected:
   friend class ClParserIdentifierMgr;
   friend class CRefPtr<ClParserIdentifier>;
@@ -104,6 +99,11 @@ class ClParserIdentifier {
   void print(std::ostream &os) const;
 
   void debugPrint() const;
+
+ private:
+  ClParserIdentifierType type_;
+  std::string            name_;
+  ScopeList              scopes_;
 };
 
 #endif

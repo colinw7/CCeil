@@ -1,5 +1,7 @@
 #include <CCeilPI.h>
 #include <COSNaN.h>
+#include <CInvNorm.h>
+#include <boost/math/special_functions/erf.hpp>
 #include <cerrno>
 
 void
@@ -548,6 +550,40 @@ tanh() const
     COSNaN::set_nan(&result);
   else
     result = ::tanh(ClParserInst->toRadians(real_));
+
+  return ClParserValueMgrInst->createValue(result);
+}
+
+ClParserValuePtr
+ClParserReal::
+norm() const
+{
+  double result = real_;
+
+  if (isNanValue())
+    COSNaN::set_nan(&result);
+  else {
+    result = 0.5*std::sqrt(2.0)*result;
+    result = 0.5*erfc(-result);
+  }
+
+  return ClParserValueMgrInst->createValue(result);
+}
+
+ClParserValuePtr
+ClParserReal::
+invnorm() const
+{
+  double result;
+
+  if (isNanValue())
+    COSNaN::set_nan(&result);
+  else {
+    result = CInvNorm::calc(real_);
+
+    if (IsPosInf(result) || IsNegInf(result))
+      SetNaN(result);
+  }
 
   return ClParserValueMgrInst->createValue(result);
 }

@@ -2240,6 +2240,20 @@ tanh() const
 
 ClParserValuePtr
 ClParserValue::
+norm() const
+{
+  return getObj()->norm();
+}
+
+ClParserValuePtr
+ClParserValue::
+invnorm() const
+{
+  return getObj()->invnorm();
+}
+
+ClParserValuePtr
+ClParserValue::
 toChar() const
 {
   return getObj()->toChar();

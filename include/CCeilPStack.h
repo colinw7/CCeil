@@ -32,9 +32,6 @@ class ClParserStackMgr {
  private:
   typedef std::vector<ClParserStackPtr> StackStack;
 
-  ClParserStackPtr current_stack_;
-  StackStack       stack_stack_;
-
  public:
   static ClParserStackMgr *getInstance();
 
@@ -129,18 +126,17 @@ class ClParserStackMgr {
   void setLastOperator();
 
   ClParserOperatorPtr getLastOperator();
+
+ private:
+  ClParserStackPtr current_stack_;
+  StackStack       stack_stack_;
 };
+
+//---
 
 class ClParserStack {
  public:
   typedef std::list<ClParserStackNode *> StackNodeList;
-
- private:
-  bool                    restart_;
-  bool                    in_bracket_;
-  ClParserOperatorPtr     last_operator_;
-  StackNodeList           stack_node_list_;
-  StackNodeList::iterator current_stack_node_;
 
  protected:
   friend class ClParserStackMgr;
@@ -208,7 +204,16 @@ class ClParserStack {
   void getVariables(char ***variables, uint *num_variables);
 
   static void freeVariables(char **variables, uint num_variables);
+
+ private:
+  bool                    restart_    { false };
+  bool                    in_bracket_ { false };
+  ClParserOperatorPtr     last_operator_;
+  StackNodeList           stack_node_list_;
+  StackNodeList::iterator current_stack_node_;
 };
+
+//---
 
 union ClParserStackNodeData {
   ClParserValuePtr        *value;
@@ -223,9 +228,6 @@ union ClParserStackNodeData {
 
 class ClParserStackNode {
  protected:
-  ClParserStackNodeType type_;
-  ClParserStackNodeData data_;
-
   friend class ClParserStack;
 
  public:
@@ -329,7 +331,13 @@ class ClParserStackNode {
   void print() const;
   void print(std::ostream &os) const;
   void debugPrint() const;
+
+ protected:
+  ClParserStackNodeType type_;
+  ClParserStackNodeData data_;
 };
+
+//---
 
 class ClParserStackAutoDebugPrint {
  public:

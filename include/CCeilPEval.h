@@ -20,7 +20,7 @@ class ClParserExpr {
  private:
   std::string      expression_;
   ClParserStackPtr stack_;
-  bool             compiled_;
+  bool             compiled_ { false };
 };
 
 //---

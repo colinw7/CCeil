@@ -887,6 +887,24 @@ tanh() const
 
 ClParserValuePtr
 ClParserStruct::
+norm() const
+{
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
+
+  return ClParserValuePtr();
+}
+
+ClParserValuePtr
+ClParserStruct::
+invnorm() const
+{
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
+
+  return ClParserValuePtr();
+}
+
+ClParserValuePtr
+ClParserStruct::
 toChar() const
 {
   ClParserStructPtr structure = dupStruct();

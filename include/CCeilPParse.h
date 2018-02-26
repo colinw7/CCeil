@@ -5,12 +5,6 @@
 #include <CCeilPValue.h>
 
 class ClParserParser {
- private:
-  ClParserParser *parent_;
-  CStrParse       parse_;
-  bool            assign_;
-  int             error_code_;
-
  public:
   explicit ClParserParser(const std::string &str) :
    parent_(NULL), parse_(str), assign_(false), error_code_(0) {
@@ -67,6 +61,12 @@ class ClParserParser {
   bool skipDictionary();
 
   void skipSpace();
+
+ private:
+  ClParserParser *parent_     { nullptr };
+  CStrParse       parse_;
+  bool            assign_     { false };
+  int             error_code_ { 0 };
 };
 
 #endif

@@ -19,6 +19,8 @@ enum class ClParserSortDirection {
   DESCENDING = 1
 };
 
+//---
+
 enum ClParserValueType {
   CL_PARSER_VALUE_TYPE_NONE       =     0,
   CL_PARSER_VALUE_TYPE_INTEGER    = (1<<0),
@@ -34,6 +36,8 @@ enum ClParserValueType {
   CL_PARSER_VALUE_TYPE_INPUT      = (1<<14),
   CL_PARSER_VALUE_TYPE_OUTPUT     = (1<<15)
 };
+
+//---
 
 #define CL_PARSER_OP_INLINE      (1<<12)
 #define CL_PARSER_OP_PUNCTUATION (1<<11)
@@ -101,6 +105,8 @@ enum ClParserOperatorType {
   CL_PARSER_OP_BIT_LSHIFT_EQUALS = CL_PARSER_OP_ASSIGNMENT + 10,
   CL_PARSER_OP_BIT_RSHIFT_EQUALS = CL_PARSER_OP_ASSIGNMENT + 11
 };
+
+//---
 
 enum class CLArgType {
   NONE     = -1,

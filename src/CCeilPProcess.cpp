@@ -643,6 +643,13 @@ ClParserProcessInternFn(ClParserInternFnPtr internfn, const ClParserValueArray &
         value = value->tanh();
         break;
 
+      case CLParserInternFnType::NORM:
+        value = value->norm();
+        break;
+      case CLParserInternFnType::INVNORM:
+        value = value->invnorm();
+        break;
+
       case CLParserInternFnType::CHAR_CONV:
         value = value->toChar();
         break;

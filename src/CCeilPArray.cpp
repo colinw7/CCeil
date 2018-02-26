@@ -2602,6 +2602,24 @@ tanh() const
 
 ClParserValuePtr
 ClParserArray::
+norm() const
+{
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
+
+  return ClParserValuePtr();
+}
+
+ClParserValuePtr
+ClParserArray::
+invnorm() const
+{
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
+
+  return ClParserValuePtr();
+}
+
+ClParserValuePtr
+ClParserArray::
 toChar() const
 {
   ClParserArrayPtr array = dupArray();

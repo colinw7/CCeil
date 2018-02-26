@@ -1255,6 +1255,24 @@ tanh() const
 
 ClParserValuePtr
 ClParserString::
+norm() const
+{
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
+
+  return ClParserValuePtr();
+}
+
+ClParserValuePtr
+ClParserString::
+invnorm() const
+{
+  ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
+
+  return ClParserValuePtr();
+}
+
+ClParserValuePtr
+ClParserString::
 toChar() const
 {
   std::string result(" ");

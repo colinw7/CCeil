@@ -30,6 +30,7 @@ enum class CLParserInternFnType {
   INDARR_S,
   INDEX,
   INT_CONV,
+  INVNORM,
   IS_NAN,
   IS_CTYPE,
   LEN,
@@ -38,6 +39,7 @@ enum class CLParserInternFnType {
   MAX,
   MIN,
   NDIM,
+  NORM,
   REAL_CONV,
   RINDEX,
   SIGN,
@@ -66,8 +68,6 @@ class ClParserInternFnMgr {
  private:
   typedef std::map<std::string,ClParserInternFnPtr> InternFnMap;
 
-  InternFnMap internfn_map_;
-
  public:
   ClParserInternFnMgr();
   ~ClParserInternFnMgr();
@@ -78,6 +78,9 @@ class ClParserInternFnMgr {
 
  private:
   void addInternFns();
+
+ private:
+  InternFnMap internfn_map_;
 };
 
 //---

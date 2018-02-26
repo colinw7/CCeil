@@ -7,9 +7,6 @@ class ClParserScopeMgr {
  private:
   typedef std::map<std::string,ClParserScopePtr> ScopeMap;
 
-  ClParserScope *parent_;
-  ScopeMap       scope_map_;
-
  public:
   ClParserScopeMgr(ClParserScope *parent=NULL) :
    parent_(parent) {
@@ -23,6 +20,10 @@ class ClParserScopeMgr {
 
  private:
   ClParserScopePtr createScope(ClParserScope *parent, const std::string &name);
+
+ private:
+  ClParserScope *parent_ { nullptr };
+  ScopeMap       scope_map_;
 };
 
 //------
@@ -32,6 +33,7 @@ class ClParserScope {
   friend class ClParserScopeMgr;
   friend class CRefPtr<ClParserScope>;
 
+ protected:
   ClParserScope(ClParser *parser, const std::string &name);
 
   ClParserScope(ClParserScope *parent, const std::string &name);

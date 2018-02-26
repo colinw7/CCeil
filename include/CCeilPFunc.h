@@ -10,8 +10,6 @@ class ClParserFuncMgr {
   typedef std::map<std::string,ClParserFuncPtr> FuncMap;
   typedef StringVectorT                         FuncArgList;
 
-  FuncMap function_list_;
-
  public:
   ClParserFuncMgr();
  ~ClParserFuncMgr();
@@ -42,14 +40,14 @@ class ClParserFuncMgr {
   static std::string readFunctionVariableName(const std::string &str, uint *i);
 
   void markFunctionArgs(ClParserFunc *func, ClParserStackNode *stack_node);
+
+ private:
+  FuncMap function_list_;
 };
 
-class ClParserFunc {
- private:
-  std::string      name_;
-  StringVectorT    args_;
-  ClParserStackPtr stack_;
+//---
 
+class ClParserFunc {
  protected:
   friend class ClParserFuncMgr;
   friend class CRefPtr<ClParserFunc>;
@@ -80,6 +78,11 @@ class ClParserFunc {
   void debugPrint() const;
 
   static bool isValidName(const std::string &name);
+
+ private:
+  std::string      name_;
+  StringVectorT    args_;
+  ClParserStackPtr stack_;
 };
 
 #endif
