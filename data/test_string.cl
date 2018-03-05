@@ -1,110 +1,110 @@
-"Hello"
+assert("Hello" == "Hello")
 
-+"a"
--"a"
-~"b"
+#+"a"
+#-"a"
+#~"b"
 
-"a" + "b"
-"abcde" - "bc"
-"abc" * 3
-"--%s--" % "c"
-"abbcccddde" / "c"
+assert("a" + "b" == "ab")
+assert("abcde" - "bc" == "ade")
+assert("abc" * 3 == "abcabcabc")
+assert("--%s--" % "c" == "--c--")
+assert("abbcccddde" / "c" == 3)
 "a" ** "b"
 
-"a" == "a"
-"a" ~= "a"
-"a" != "a"
-"a" <  "b"
-"a" <= "b"
-"a" >  "b"
-"a" >= "b"
+assert(("a" == "a") == 1)
+assert(("a" ~= "a") == 1)
+assert(("a" != "a") == 0)
+assert(("a" <  "b") == 1)
+assert(("a" <= "b") == 1)
+assert(("a" >  "b") == 0)
+assert(("a" >= "b") == 0)
 
-"d" & "f"
-"d" | "f"
-"d" ^ "f"
+#"d" & "f"
+#"d" | "f"
+#"d" ^ "f"
 
-"abcd" << 1
-"abcd" >> 3
+assert("abcd" << 1 == "bcda")
+assert("abcd" >> 3 == "bcda")
 
-cos("b")
-cos("1.2")
-sin("a")
-sin("1.2")
-tan("a")
-tan("1.2")
+#cos("b")
+assert(cos("1.2") ~= 0.362358)
+#sin("a")
+assert(sin("1.2") ~= 0.932039)
+#tan("a")
+assert(tan("1.2") ~= 2.572152)
 
-acos("a")
-acos("0.5")
-asin("a")
-asin("0.5")
-atan("a")
-atan("0.5")
-atan2("a", "b")
-atan2("1.2", 1.2)
+#acos("a")
+assert(acos("0.5") ~= 1.047198)
+#asin("a")
+assert(asin("0.5") ~= 0.523599)
+#atan("a")
+assert(atan("0.5") ~= 0.463648)
+#atan2("a", "b")
+assert(atan2("1.2", 1.2) ~= 0.785398)
 
-cosh("b")
-cosh("1.2")
-sinh("a")
-sinh("1.2")
-tanh("a")
-tanh("1.2")
+#cosh("b")
+assert(cosh("1.2") ~= 1.810656)
+#sinh("a")
+assert(sinh("1.2") ~= 1.509461)
+#tanh("a")
+assert(tanh("1.2") ~= 0.833655)
 
-exp("a")
-exp("1.2")
-log("a")
-log("1.2")
-log10("a")
-log10("1.2")
+#exp("a")
+assert(exp("1.2") ~= 3.320117)
+#log("a")
+assert(log("1.2") ~= 0.182322)
+#log10("a")
+assert(log10("1.2") ~= 0.079181)
 
-abs("abc")
-abs("-1.2")
-ceil("d")
-ceil("1.2")
-floor("a")
-floor("1.2")
-sign("a")
-sign("1.2")
+#abs("abc")
+assert(abs("-1.2") ~= 1.2)
+#ceil("d")
+assert(ceil("1.2") ~= 2.0)
+#floor("a")
+assert(floor("1.2") ~= 1.0)
+#sign("a")
+assert(sign("1.2") ~= 1.0)
 
-sqr("ab")
-sqr("1.2")
-sqrt("abcd")
-sqrt("1.2")
+#sqr("ab")
+assert(sqr("1.2") ~= 1.44)
+#sqrt("abcd")
+assert(sqrt("1.2") ~= 1.095445)
 
-char("a")
-int("b")
-int("45")
-int("a45")
-int("45a")
-real("a")
-real("1.23")
-string("abcde")
+assert(char("a") == "a")
+assert(int("b") == 0)
+assert(int("45") == 45)
+assert(int("a45") == 0)
+assert(int("45a") == 0)
+assert(real("a") != 0)
+assert(real("1.23") ~= 1.23)
+assert(string("abcde") == "abcde")
 
-arrayI("a")
-arrayR("a")
-arrayS("a")
-indarrI("a")
-indarrR("a")
+#arrayI("a")
+#arrayR("a")
+#arrayS("a")
+#indarrI("a")
+#indarrR("a")
 indarrS("a")
 
-len("abcde")
-index("abcdc","c")
-rindex("abca","a")
-max("abdec")
-min("dajd")
-isctype("a","print")
-tolower("AbC")
-toupper("aBc")
-sort("agdefb")
+assert(len("abcde") == 5)
+assert(index("abcdc","c") == 3)
+assert(rindex("abca","a") == 4)
+assert(max("abdec") == "e")
+assert(min("dajd") == "a")
+assert(isctype("a","print") == 1)
+assert(tolower("AbC") == "abc")
+assert(toupper("aBc") == "ABC")
+assert(sort("agdefb") == "abdefg")
 
-addr("a")
+#addr("a")
 #arrcat
-isNaN("aa")
-isNaN("")
-isNaN("NaN")
-dim("abc")
-ndim("ab")
+#isNaN("aa")
+#isNaN("")
+assert(isNaN("NaN") == 1)
+assert(dim("abc") == 1)
+assert(ndim("ab") == 1)
 #subarr
-sum("abcde")
+assert(sum("abcde") == 495)
 #typearr
-valtyp("aa")
+assert(valtyp("aa") == 4)
 #where
