@@ -41,6 +41,7 @@ class ClParserVarMgr {
   void deleteAllVariables();
 
   bool isVariable(const std::string &name) const;
+  bool isLocalVariable(const std::string &name) const;
 
   ClParserVarPtr getVariable(const std::string &name, bool create=false) const;
   ClParserValuePtr getVariableValue(const std::string &name) const;
@@ -55,7 +56,9 @@ class ClParserVarMgr {
  private:
   ClParserVarPtr addVariable(ClParserVar *var);
 
-  bool getVariableI(const std::string &name, ClParserVarPtr &var) const;
+  bool getVariableI(const std::string &name, ClParserVarPtr &var, bool parentScope=true) const;
+
+  ClParserVarPtr createVarI(const std::string &name, ClParserValuePtr value);
 
   void addStandardVariables();
 

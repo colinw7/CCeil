@@ -17,13 +17,6 @@ class ClLanguageLabelData;
 class ClLanguageCommandDef;
 
 class ClLanguageCommand {
- protected:
-  uint                   ident_;
-  void                  *data_;
-  std::string            args_;
-  ClLanguageCommandList  command_list_;
-  uint                   line_num_;
-
  public:
   ClLanguageCommand(uint ident, void *data=nullptr, const std::string &args="",
                     const ClLanguageCommandList &command_list=ClLanguageCommandList());
@@ -31,6 +24,8 @@ class ClLanguageCommand {
   virtual ~ClLanguageCommand();
 
   virtual void assign(const ClLanguageCommand &command);
+
+  virtual ClLanguageProc *getProcedure() const { return nullptr; }
 
   void *getData() const { return data_; }
 
@@ -63,7 +58,7 @@ class ClLanguageCommand {
 
   virtual std::string toName() const = 0;
 
-  const std::string &getArgs() const { return args_; }
+  virtual const std::string &getArgs() const { return args_; }
 
   const ClLanguageCommandList &getCommandList() const { return command_list_; }
 
@@ -75,7 +70,17 @@ class ClLanguageCommand {
   ClLanguageCommand(const ClLanguageCommand &command);
 
   const ClLanguageCommand &operator=(const ClLanguageCommand &command);
+
+ protected:
+  uint                   ident_     { 0 };
+  void                  *data_      { nullptr };
+  void                  *extraData_ { nullptr };
+  std::string            args_;
+  ClLanguageCommandList  command_list_;
+  uint                   line_num_  { 0 };
 };
+
+//---
 
 class ClLanguageSystemCommand : public ClLanguageCommand {
  public:
@@ -83,11 +88,13 @@ class ClLanguageSystemCommand : public ClLanguageCommand {
 
  ~ClLanguageSystemCommand();
 
-  void init() { }
-  void term() { }
+  void init() override { }
+  void term() override { }
 
-  std::string toName() const;
+  std::string toName() const override;
 };
+
+//---
 
 class ClLanguageProcCommand : public ClLanguageCommand {
  public:
@@ -95,13 +102,15 @@ class ClLanguageProcCommand : public ClLanguageCommand {
 
  ~ClLanguageProcCommand();
 
-  void init();
-  void term();
+  void init() override;
+  void term() override;
 
-  ClLanguageProc *getProcedure() const;
+  ClLanguageProc *getProcedure() const override;
 
-  std::string toName() const;
+  std::string toName() const override;
 };
+
+//---
 
 class ClLanguagePosProcCommand : public ClLanguageCommand {
  public:
@@ -109,15 +118,23 @@ class ClLanguagePosProcCommand : public ClLanguageCommand {
 
  ~ClLanguagePosProcCommand();
 
-  void assign(const ClLanguageCommand &command);
+  void assign(const ClLanguageCommand &command) override;
 
-  void init() { }
-  void term();
+  void init() override { }
+  void term() override;
 
-  std::string toName() const;
+  std::string toName() const override;
+
+  const std::string &getArgs() const override;
 
   const std::string &getLine() const;
+
+  ClLanguageProc *getProcedure() const override;
+
+  void setCommand(ClLanguageCommand *cmd);
 };
+
+//---
 
 class ClLanguageLabelCommand : public ClLanguageCommand {
  public:
@@ -125,13 +142,15 @@ class ClLanguageLabelCommand : public ClLanguageCommand {
 
  ~ClLanguageLabelCommand();
 
-  void init() { }
-  void term() { }
+  void init() override { }
+  void term() override { }
 
-  std::string toName() const;
+  std::string toName() const override;
 
   ClLanguageLabelData *getLabelData() const;
 };
+
+//---
 
 class ClLanguageExpressionCommand : public ClLanguageCommand {
  public:
@@ -139,13 +158,15 @@ class ClLanguageExpressionCommand : public ClLanguageCommand {
 
  ~ClLanguageExpressionCommand();
 
-  void assign(const ClLanguageCommand &command);
+  void assign(const ClLanguageCommand &command) override;
 
-  void init() { }
-  void term();
+  void init() override { }
+  void term() override;
 
-  std::string toName() const;
+  std::string toName() const override;
 };
+
+//---
 
 class ClLanguageLanguageCommand : public ClLanguageCommand {
  public:
@@ -153,11 +174,13 @@ class ClLanguageLanguageCommand : public ClLanguageCommand {
 
  ~ClLanguageLanguageCommand();
 
-  void init() { }
-  void term() { }
+  void init() override { }
+  void term() override { }
 
-  std::string toName() const;
+  std::string toName() const override;
 };
+
+//---
 
 class ClLanguageCommandDefCommand : public ClLanguageCommand {
  public:
@@ -166,10 +189,10 @@ class ClLanguageCommandDefCommand : public ClLanguageCommand {
 
  ~ClLanguageCommandDefCommand();
 
-  void init() { }
-  void term() { }
+  void init() override { }
+  void term() override { }
 
-  std::string toName() const;
+  std::string toName() const override;
 
   ClLanguageCommandDef *getCommandDef() const;
 };

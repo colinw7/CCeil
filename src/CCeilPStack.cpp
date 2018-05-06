@@ -68,8 +68,7 @@ unstackExpressionValues(int *error_code)
       break;
     }
 
-    if (! stack_node->isOperator() ||
-        ! stack_node->isOperator(CL_PARSER_OP_COMMA)) {
+    if (! stack_node->isOperator() || ! stack_node->isOperator(CL_PARSER_OP_COMMA)) {
       toPrev();
       break;
     }
@@ -305,9 +304,7 @@ unstackExpression(int *error_code)
 
       value_on_stack = true;
     }
-    else if (stack_node->isValue() ||
-             stack_node->isVarRef() ||
-             stack_node->isStructVarRef()) {
+    else if (stack_node->isValue() || stack_node->isVarRef() || stack_node->isStructVarRef()) {
       at_next = toNext();
 
       value_on_stack = true;
@@ -1346,8 +1343,7 @@ unstackUserFunction(int *error_code)
   uint num_arg_values = arg_value_list.size();
 
   if (userfn->isVarArgs()) {
-    if (userfn->getNumArgTypes() > 0 &&
-        num_arg_values < userfn->getNumArgTypes() - 1) {
+    if (userfn->getNumArgTypes() > 0 && num_arg_values < userfn->getNumArgTypes() - 1) {
       *error_code = int(ClErr::TOO_FEW_ARGUMENTS);
       return;
     }
@@ -1403,8 +1399,7 @@ unstackStructure(int *error_code)
   }
 
   if (! variable->getValue().isValid() ||
-      ! (variable->getValue()->isStructure() ||
-         variable->getValue()->isStructureArray())) {
+      ! (variable->getValue()->isStructure() || variable->getValue()->isStructureArray())) {
     *error_code = int(ClErr::INVALID_STRUCT_REF);
     return;
   }
@@ -1457,9 +1452,7 @@ unstackStructure(int *error_code)
 
   stack_node = getCurrentStackNode();
 
-  while (stack_node &&
-         stack_node->isIdentifier() &&
-         stack_node->getIdentifier()->isStructPart()) {
+  while (stack_node && stack_node->isIdentifier() && stack_node->getIdentifier()->isStructPart()) {
     pop(identifier);
 
     const std::string &name = identifier->getName();
@@ -1544,8 +1537,7 @@ unstackStructure(int *error_code)
     stack_node = getCurrentStackNode();
   }
 
-  if (! stack_node ||
-      ! stack_node->isIdentifier() ||
+  if (! stack_node || ! stack_node->isIdentifier() ||
       ! stack_node->getIdentifier()->isVariable()) {
     *error_code = int(ClErr::INVALID_STRUCT_REF);
     return;
@@ -1754,14 +1746,12 @@ unstackFunction(int *error_code)
 
     ClParserStackNode *stack_node = getCurrentStackNode();
 
-    if (stack_node->isOperator(CL_PARSER_OP_CLOSE_R_BRACKET) &&
-        i < num_args - 1) {
+    if (stack_node->isOperator(CL_PARSER_OP_CLOSE_R_BRACKET) && i < num_args - 1) {
       *error_code = int(ClErr::TOO_FEW_ARGUMENTS);
       return;
     }
 
-    if (stack_node->isOperator(CL_PARSER_OP_COMMA) &&
-        i == num_args - 1) {
+    if (stack_node->isOperator(CL_PARSER_OP_COMMA) && i == num_args - 1) {
       *error_code = int(ClErr::TOO_MANY_ARGUMENTS);
       return;
     }
@@ -1809,8 +1799,7 @@ stackFunctionStackNode(ClParserStackNode *stack_node, ClParserFuncValue *functio
 {
   ClParserValuePtr value;
 
-  if (stack_node->isIdentifier() &&
-      stack_node->getIdentifier()->isArgument()) {
+  if (stack_node->isIdentifier() && stack_node->getIdentifier()->isArgument()) {
     int num_args = function_value->function->getNumArgs();
 
     for (int i = 0; i < num_args; ++i) {
@@ -1962,8 +1951,7 @@ skipExpression(int *error_code)
         if (! stack_node)
           return;
 
-        while (! stack_node->isOperator() ||
-               ! stack_node->isOperator(CL_PARSER_OP_CLOSE_BRACE)) {
+        while (! stack_node->isOperator() || ! stack_node->isOperator(CL_PARSER_OP_CLOSE_BRACE)) {
           popStackNode();
 
           skipExpression(error_code);
@@ -1992,8 +1980,7 @@ skipExpression(int *error_code)
         if (! stack_node)
           return;
 
-        while (! stack_node->isOperator() ||
-               ! stack_node->isOperator(CL_PARSER_OP_CLOSE_DICT)) {
+        while (! stack_node->isOperator() || ! stack_node->isOperator(CL_PARSER_OP_CLOSE_DICT)) {
           popStackNode();
 
           skipExpression(error_code);
@@ -2037,9 +2024,7 @@ skipExpression(int *error_code)
         return;
       }
     }
-    else if (stack_node->isInternFn() ||
-             stack_node->isUserFn  () ||
-             stack_node->isType    ()) {
+    else if (stack_node->isInternFn() || stack_node->isUserFn() || stack_node->isType()) {
       popStackNode();
 
       stack_node = getCurrentStackNode();
@@ -2059,8 +2044,7 @@ skipExpression(int *error_code)
       if (! stack_node)
         return;
 
-      while (! stack_node->isOperator() ||
-             ! stack_node->isOperator(CL_PARSER_OP_CLOSE_R_BRACKET)) {
+      while (! stack_node->isOperator() || ! stack_node->isOperator(CL_PARSER_OP_CLOSE_R_BRACKET)) {
         popStackNode();
 
         skipExpression(error_code);
@@ -2076,13 +2060,10 @@ skipExpression(int *error_code)
 
       popStackNode();
     }
-    else if (stack_node->isValue() ||
-             stack_node->isVarRef() ||
-             stack_node->isStructVarRef()) {
+    else if (stack_node->isValue() || stack_node->isVarRef() || stack_node->isStructVarRef()) {
       popStackNode();
     }
-    else if (stack_node->isIdentifier() &&
-             stack_node->getIdentifier()->isStructPart()) {
+    else if (stack_node->isIdentifier() && stack_node->getIdentifier()->isStructPart()) {
       do {
         popStackNode();
 
@@ -2093,8 +2074,7 @@ skipExpression(int *error_code)
         if (! stack_node)
           return;
       }
-      while (stack_node->isIdentifier() &&
-             stack_node->getIdentifier()->isStructPart());
+      while (stack_node->isIdentifier() && stack_node->getIdentifier()->isStructPart());
 
       popStackNode();
 
@@ -2103,8 +2083,7 @@ skipExpression(int *error_code)
       if (! stack_node)
         return;
 
-      if (stack_node->isOperator() &&
-          stack_node->isOperator(CL_PARSER_OP_OPEN_S_BRACKET)) {
+      if (stack_node->isOperator() && stack_node->isOperator(CL_PARSER_OP_OPEN_S_BRACKET)) {
         popStackNode();
 
         skipExpression(error_code);
@@ -2135,8 +2114,7 @@ skipExpression(int *error_code)
         popStackNode();
       }
     }
-    else if (stack_node->isIdentifier() &&
-             stack_node->getIdentifier()->isVariable()) {
+    else if (stack_node->isIdentifier() && stack_node->getIdentifier()->isVariable()) {
       popStackNode();
 
       stack_node = getCurrentStackNode();
@@ -2144,8 +2122,7 @@ skipExpression(int *error_code)
       if (! stack_node)
         return;
 
-      if (stack_node->isOperator() &&
-          stack_node->isOperator(CL_PARSER_OP_OPEN_S_BRACKET)) {
+      if (stack_node->isOperator() && stack_node->isOperator(CL_PARSER_OP_OPEN_S_BRACKET)) {
         popStackNode();
 
         skipExpression(error_code);
@@ -2176,8 +2153,7 @@ skipExpression(int *error_code)
         popStackNode();
       }
     }
-    else if (stack_node->isIdentifier() &&
-             stack_node->getIdentifier()->isFunction()) {
+    else if (stack_node->isIdentifier() && stack_node->getIdentifier()->isFunction()) {
       popStackNode();
 
       stack_node = getCurrentStackNode();
@@ -2976,8 +2952,7 @@ bool
 ClParserStackNode::
 isOperator(ClParserOperatorType type)
 {
-  return (type_ == ClParserStackNodeType::OPERATOR &&
-          (*data_.op)->isType(type));
+  return (type_ == ClParserStackNodeType::OPERATOR && (*data_.op)->isType(type));
 }
 
 void

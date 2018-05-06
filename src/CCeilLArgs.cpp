@@ -284,8 +284,7 @@ termArgs()
     int num_integer_arrays = integer_array_stack_->size();
 
     while (num_integer_arrays--) {
-      void **integer_array =
-        (*integer_array_stack_)[num_integer_arrays];
+      void **integer_array = (*integer_array_stack_)[num_integer_arrays];
 
       integer_array_stack_->pop_back();
 
@@ -2117,8 +2116,7 @@ setIntegerArrayArg(int n, long *integers, uint *dims, uint num_dims, int *error_
   if (*error_code != 0)
     return;
 
-  ClParserValuePtr value =
-    ClParserValueMgrInst->createValue(dims, num_dims, integers);
+  ClParserValuePtr value = ClParserValueMgrInst->createValue(dims, num_dims, integers);
 
   if (! value.isValid())
     return;
@@ -2709,8 +2707,7 @@ readArgList(const std::string &str, int *pos, int end_char, std::string &text)
  *   The arguments are in the form <arg1>,<arg2>,...,<arg3>
  *
  * CALL:
- *   bool flag =
- *     skipArgList(const std::string &str, int &pos, int end_char);
+ *   bool flag = skipArgList(const std::string &str, int &pos, int end_char);
  *
  * INPUT:
  *   str      : String containing argument list.

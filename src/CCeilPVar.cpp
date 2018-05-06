@@ -37,8 +37,15 @@ ClParserVarPtr
 ClParserVarMgr::
 createVar(const std::string &name, ClParserValuePtr value)
 {
-  assert(! isVariable(name));
+  assert(! isLocalVariable(name));
 
+  return createVarI(name, value);
+}
+
+ClParserVarPtr
+ClParserVarMgr::
+createVarI(const std::string &name, ClParserValuePtr value)
+{
   ClParserVar *variable = new ClParserVar(name, value);
 
   return addVariable(variable);
@@ -192,6 +199,15 @@ isVariable(const std::string &name) const
   return getVariableI(name, var);
 }
 
+bool
+ClParserVarMgr::
+isLocalVariable(const std::string &name) const
+{
+  ClParserVarPtr var;
+
+  return getVariableI(name, var, false);
+}
+
 ClParserVarPtr
 ClParserVarMgr::
 getVariable(const std::string &name, bool create) const
@@ -209,7 +225,7 @@ getVariable(const std::string &name, bool create) const
 
 bool
 ClParserVarMgr::
-getVariableI(const std::string &name, ClParserVarPtr &var) const
+getVariableI(const std::string &name, ClParserVarPtr &var, bool parentScope) const
 {
   if (name == "")
     return false;
@@ -217,6 +233,7 @@ getVariableI(const std::string &name, ClParserVarPtr &var) const
   if (! ClParserVar::isValidName(name))
     return false;
 
+  // get in current scope
   VarMap::iterator p = varMap_->find(name);
 
   if (p != varMap_->end()) {
@@ -225,31 +242,36 @@ getVariableI(const std::string &name, ClParserVarPtr &var) const
     return true;
   }
 
+  // check parent scopes if allowed
   bool found = false;
 
-  int num = varMapStack_.size();
+  if (parentScope) {
+    int num = varMapStack_.size();
 
-  for (int i = num - 1; i >= 0; i--) {
-    VarMap *varMap = varMapStack_[i];
+    for (int i = num - 1; i >= 0; i--) {
+      VarMap *varMap = varMapStack_[i];
 
-    VarMap::iterator p = varMap->find(name);
+      VarMap::iterator p = varMap->find(name);
 
-    if (p != varMap->end()) {
-      var = (*p).second;
+      if (p != varMap->end()) {
+        var = (*p).second;
 
-      found = true;
+        found = true;
 
-      break;
+        break;
+      }
     }
   }
 
+  // not found in any scope so fail
   if (! found)
     return false;
 
+  // create variable in this scope
   if (var->getValue().isValid() && ! var->isGlobal()) {
     ClParserVarMgr *th = const_cast<ClParserVarMgr *>(this);
 
-    var = th->createVar(var->getName(), var->getValue());
+    var = th->createVarI(var->getName(), var->getValue());
   }
 
   return true;

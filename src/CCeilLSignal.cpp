@@ -57,8 +57,7 @@ termSignalProcs()
  *   Signal is raised.
  *
  * CALL:
- *   bool flag =
- *     setSignalCommand(const std::string &name, const std::string &command);
+ *   bool flag = setSignalCommand(const std::string &name, const std::string &command);
  *
  * INPUT:
  *   name    : Signal Name
@@ -122,8 +121,7 @@ setSignalCommand(const std::string &name, const std::string &command)
  *   Command or Routine.
  *
  * CALL:
- *   bool flag =
- *     raiseSignal(const std::string &name, const std::string &data);
+ *   bool flag = raiseSignal(const std::string &name, const std::string &data);
  *
  * INPUT:
  *   name : Signal Name
@@ -190,8 +188,7 @@ raiseSignal(const std::string &name, const std::string &data)
  *   Set the Routine to be called when the Named Signal is raised.
  *
  * CALL:
- *   bool flag =
- *     setSignalProc(const std::string &name, ClSignalHandler proc);
+ *   bool flag = setSignalProc(const std::string &name, ClSignalHandler proc);
  *
  * INPUT:
  *   name : Signal Name
@@ -369,8 +366,7 @@ handleSignal(int sig)
  *   the specified Signal Type.
  *
  * CALL:
- *   ClSignalCommand *signal_command =
- *     getSignalCommand(int type);
+ *   ClSignalCommand *signal_command = getSignalCommand(int type);
  *
  * INPUT:
  *   type           : Signal Type
@@ -439,8 +435,7 @@ signalNameToType(const std::string &name) const
  *   Get the Name of the specified Signal Type.
  *
  * CALL:
- *   std::string name =
- *     signalTypeToName(int type);
+ *   std::string name = signalTypeToName(int type);
  *
  * INPUT:
  *   type : Signal Type

@@ -21,6 +21,7 @@ assign(const ClLanguageCommand &command)
 {
   ident_        = command.ident_;
   data_         = command.data_;
+  extraData_    = command.extraData_;
   args_         = command.args_;
   command_list_ = command.command_list_;
   line_num_     = command.line_num_;
@@ -124,6 +125,8 @@ void
 ClLanguagePosProcCommand::
 assign(const ClLanguageCommand &command)
 {
+  assert(command.isPosProcedure());
+
   free((char *) data_);
 
   ClLanguageCommand::assign(command);
@@ -147,9 +150,39 @@ toName() const
 
 const std::string &
 ClLanguagePosProcCommand::
+getArgs() const
+{
+  if (! extraData_)
+    return ClLanguageCommand::getArgs();
+
+  return ((ClLanguageCommand *) extraData_)->getArgs();
+}
+
+const std::string &
+ClLanguagePosProcCommand::
 getLine() const
 {
   return args_;
+}
+
+ClLanguageProc *
+ClLanguagePosProcCommand::
+getProcedure() const
+{
+  if (! extraData_)
+    return nullptr;
+
+  return ((ClLanguageCommand *) extraData_)->getProcedure();
+}
+
+void
+ClLanguagePosProcCommand::
+setCommand(ClLanguageCommand *cmd)
+{
+  assert(! extraData_);
+
+  // TODO: ref count ?
+  extraData_ = cmd;
 }
 
 //----------

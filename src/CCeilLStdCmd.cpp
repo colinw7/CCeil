@@ -167,8 +167,7 @@ ClStdCommandsAdd()
  * INPUT:
  *   flag : Initialisation Type :-
  *        :   CL_MODULE_INIT_TYPE_INIT -
- *        :    First Time Initialisation, Commands and
- *        :    Variables are defined.
+ *        :    First Time Initialisation, Commands and Variables are defined.
  *        :   CL_MODULE_INIT_TYPE_REINIT -
  *        :    Reinitialisation, Variables are redefined.
  *
@@ -189,84 +188,75 @@ ClStdCommandsInit(ClModuleInitType flag, void *)
   int arg_types[10];
   int num_arg_types;
 
+  ClLanguageMgr *lmgr = ClLanguageMgrInst;
+
   if (flag != CL_MODULE_INIT_TYPE_REINIT) {
-    language_import_ident =
-      ClLanguageMgrInst->defineCommand("import", ClStdImportCommand);
+    language_import_ident = lmgr->defineCommand("import", ClStdImportCommand);
 
-    /******/
+    //---
 
-    ClLanguageMgrInst->defineCommand("new", ClStdNewCommand);
-    ClLanguageMgrInst->defineCommand("run", ClStdRunCommand);
+    lmgr->defineCommand("new", ClStdNewCommand);
+    lmgr->defineCommand("run", ClStdRunCommand);
 
-    /******/
+    //---
 
     /* Procedures and Functions */
 
-    ClLanguageMgrInst->defineBlockCommand("proc", "",
-      CL_BLOCK_TYPE_PROCEDURE_BLOCK, ClStdProcCommand);
+    lmgr->defineBlockCommand("proc", "", CL_BLOCK_TYPE_PROCEDURE_BLOCK, ClStdProcCommand);
+    lmgr->defineBlockCommand("func", "", CL_BLOCK_TYPE_PROCEDURE_BLOCK, ClStdFuncCommand);
 
-    ClLanguageMgrInst->defineBlockCommand("func", "",
-      CL_BLOCK_TYPE_PROCEDURE_BLOCK, ClStdFuncCommand);
-
-    /******/
+    //---
 
     /* Program Flow/Iteration Statements */
 
-    ClLanguageMgrInst->defineBlockCommand("for", "",
-      CL_BLOCK_TYPE_ITERATION_NO_ARGS_BLOCK, ClStdForCommand);
+    lmgr->defineBlockCommand("for"    , "", CL_BLOCK_TYPE_ITERATION_NO_ARGS_BLOCK,
+                             ClStdForCommand);
+    lmgr->defineBlockCommand("foreach", "", CL_BLOCK_TYPE_ITERATION_NO_ARGS_BLOCK,
+                             ClStdForEachCommand);
 
-    ClLanguageMgrInst->defineBlockCommand("foreach", "",
-      CL_BLOCK_TYPE_ITERATION_NO_ARGS_BLOCK, ClStdForEachCommand);
+    lmgr->defineBlockCommand("while", "", CL_BLOCK_TYPE_ITERATION_NO_ARGS_BLOCK,
+                             ClStdWhileCommand);
+    lmgr->defineBlockCommand("until", "", CL_BLOCK_TYPE_ITERATION_NO_ARGS_BLOCK,
+                             ClStdUntilCommand);
+    lmgr->defineBlockCommand("repeat", "", CL_BLOCK_TYPE_ITERATION_NO_ARGS_BLOCK,
+                             ClStdRepeatCommand);
 
-    ClLanguageMgrInst->defineBlockCommand("while", "",
-      CL_BLOCK_TYPE_ITERATION_NO_ARGS_BLOCK, ClStdWhileCommand);
+    lmgr->defineBlockCommand("if", "", CL_BLOCK_TYPE_NORMAL_NO_ARGS_BLOCK, ClStdIfCommand);
 
-    ClLanguageMgrInst->defineBlockCommand("until", "",
-      CL_BLOCK_TYPE_ITERATION_NO_ARGS_BLOCK, ClStdUntilCommand);
+    language_elseif_ident = lmgr->defineCommand("elseif", ClStdElseIfCommand);
+    language_else_ident   = lmgr->defineCommand("else"  , ClStdElseCommand  );
 
-    ClLanguageMgrInst->defineBlockCommand("repeat", "",
-      CL_BLOCK_TYPE_ITERATION_NO_ARGS_BLOCK, ClStdRepeatCommand);
-
-    ClLanguageMgrInst->defineBlockCommand("if", "",
-      CL_BLOCK_TYPE_NORMAL_NO_ARGS_BLOCK, ClStdIfCommand);
-
-    language_elseif_ident =
-      ClLanguageMgrInst->defineCommand("elseif", ClStdElseIfCommand);
-
-    language_else_ident =
-      ClLanguageMgrInst->defineCommand("else"  , ClStdElseCommand  );
-
-    /******/
+    //---
 
     /* Program Flow Statements */
 
-    ClLanguageMgrInst->defineCommand("goto"    , ClStdGotoCommand    );
-    ClLanguageMgrInst->defineCommand("break"   , ClStdBreakCommand   );
-    ClLanguageMgrInst->defineCommand("continue", ClStdContinueCommand);
-    ClLanguageMgrInst->defineCommand("return"  , ClStdReturnCommand  );
+    lmgr->defineCommand("goto"    , ClStdGotoCommand    );
+    lmgr->defineCommand("break"   , ClStdBreakCommand   );
+    lmgr->defineCommand("continue", ClStdContinueCommand);
+    lmgr->defineCommand("return"  , ClStdReturnCommand  );
 
-    /******/
+    //---
 
     /* Signal Handling Statements */
 
-    ClLanguageMgrInst->defineCommand("on"   , ClStdOnCommand   );
-    ClLanguageMgrInst->defineCommand("raise", ClStdRaiseCommand);
+    lmgr->defineCommand("on"   , ClStdOnCommand   );
+    lmgr->defineCommand("raise", ClStdRaiseCommand);
 
-    /******/
+    //---
 
     /* Definition Statements */
 
-    ClLanguageMgrInst->defineCommand("define", ClStdDefineCommand);
-    ClLanguageMgrInst->defineCommand("struct", ClStdStructCommand);
+    lmgr->defineCommand("define", ClStdDefineCommand);
+    lmgr->defineCommand("struct", ClStdStructCommand);
 
-    /******/
+    //---
 
     /* Input/Output Statements */
 
-    ClLanguageMgrInst->defineCommand("input", ClStdInputCommand);
-    ClLanguageMgrInst->defineCommand("print", ClStdPrintCommand);
+    lmgr->defineCommand("input", ClStdInputCommand);
+    lmgr->defineCommand("print", ClStdPrintCommand);
 
-    /******/
+    //---
 
     /* Format Function and Scan Command */
 
@@ -280,8 +270,7 @@ ClStdCommandsInit(ClModuleInitType flag, void *)
                                arg_types, num_arg_types, ClStdFormatCommand, 0);
 
     if (ClParserUserFn::getErrorCode() != 0) {
-      ClLanguageMgrInst->expressionError
-       (ClParserUserFn::getErrorCode(), "creating 'format' user function");
+      lmgr->expressionError(ClParserUserFn::getErrorCode(), "creating 'format' user function");
       return false;
     }
 
@@ -295,12 +284,11 @@ ClStdCommandsInit(ClModuleInitType flag, void *)
                                arg_types, num_arg_types, ClStdScanCommand, 0);
 
     if (ClParserUserFn::getErrorCode() != 0) {
-      ClLanguageMgrInst->expressionError
-       (ClParserUserFn::getErrorCode(), "creating 'scan' user function");
+      lmgr->expressionError(ClParserUserFn::getErrorCode(), "creating 'scan' user function");
       return false;
     }
 
-    /******/
+    //---
 
     /* System Access Command */
 
@@ -311,12 +299,11 @@ ClStdCommandsInit(ClModuleInitType flag, void *)
                                arg_types, num_arg_types, ClStdExecCommand, 0);
 
     if (ClParserUserFn::getErrorCode() != 0) {
-      ClLanguageMgrInst->expressionError
-       (ClParserUserFn::getErrorCode(), "creating 'exec' user function");
+      lmgr->expressionError(ClParserUserFn::getErrorCode(), "creating 'exec' user function");
       return false;
     }
 
-    /******/
+    //---
 
     /* Execute Expression String */
 
@@ -327,27 +314,26 @@ ClStdCommandsInit(ClModuleInitType flag, void *)
                                arg_types, num_arg_types, ClStdParseCommand, 0);
 
     if (ClParserUserFn::getErrorCode() != 0) {
-      ClLanguageMgrInst->expressionError
-       (ClParserUserFn::getErrorCode(), "creating 'parse' user function");
+      lmgr->expressionError(ClParserUserFn::getErrorCode(), "creating 'parse' user function");
       return false;
     }
 
-    /******/
+    //---
 
     /* Variables */
 
     if (ClParserInst->getDollarPrefix())
-      ClLanguageMgrInst->defineCommand("set", ClStdSetCommand);
+      lmgr->defineCommand("set", ClStdSetCommand);
 
-    /******/
+    //---
 
     /* Environment Variables */
 
-    ClLanguageMgrInst->defineCommand("getenv"  , ClStdGetEnvCommand  );
-    ClLanguageMgrInst->defineCommand("setenv"  , ClStdSetEnvCommand  );
-    ClLanguageMgrInst->defineCommand("unsetenv", ClStdUnSetEnvCommand);
+    lmgr->defineCommand("getenv"  , ClStdGetEnvCommand  );
+    lmgr->defineCommand("setenv"  , ClStdSetEnvCommand  );
+    lmgr->defineCommand("unsetenv", ClStdUnSetEnvCommand);
 
-    /******/
+    //---
 
     /* Random Numbers  */
 
@@ -357,8 +343,7 @@ ClStdCommandsInit(ClModuleInitType flag, void *)
                                arg_types, num_arg_types, ClStdRandCommand, 0);
 
     if (ClParserUserFn::getErrorCode() != 0) {
-      ClLanguageMgrInst->expressionError
-       (ClParserUserFn::getErrorCode(), "creating 'rand' user function");
+      lmgr->expressionError(ClParserUserFn::getErrorCode(), "creating 'rand' user function");
       return false;
     }
 
@@ -368,18 +353,17 @@ ClStdCommandsInit(ClModuleInitType flag, void *)
                                arg_types, num_arg_types, ClStdRRandCommand, 0);
 
     if (ClParserUserFn::getErrorCode() != 0) {
-      ClLanguageMgrInst->expressionError
-       (ClParserUserFn::getErrorCode(), "creating 'rrand' user function");
+      lmgr->expressionError(ClParserUserFn::getErrorCode(), "creating 'rrand' user function");
       return false;
     }
 
-    /******/
+    //---
 
     /* Set */
 
-    ClLanguageMgrInst->defineCommand("config", ClStdConfigCommand);
+    lmgr->defineCommand("config", ClStdConfigCommand);
 
-    /******/
+    //---
 
     /* Control Commands */
 
@@ -390,36 +374,34 @@ ClStdCommandsInit(ClModuleInitType flag, void *)
                                arg_types, num_arg_types, ClStdIsVarCommand, 0);
 
     if (ClParserUserFn::getErrorCode() != 0) {
-      ClLanguageMgrInst->expressionError
-       (ClParserUserFn::getErrorCode(), "creating 'isvar' user function");
+      lmgr->expressionError(ClParserUserFn::getErrorCode(), "creating 'isvar' user function");
       return false;
     }
 
-    ClLanguageMgrInst->defineCommand("undef" , ClStdUndefCommand );
-    ClLanguageMgrInst->defineCommand("whatis", ClStdWhatisCommand);
+    lmgr->defineCommand("undef" , ClStdUndefCommand );
+    lmgr->defineCommand("whatis", ClStdWhatisCommand);
 
-    /******/
+    //---
 
     /* Enquiry Commands */
 
-    ClLanguageMgrInst->defineCommand("help"  , ClStdHelpCommand);
-    ClLanguageMgrInst->defineCommand("status", ClStdStatusCommand);
+    lmgr->defineCommand("help"  , ClStdHelpCommand);
+    lmgr->defineCommand("status", ClStdStatusCommand);
 
-    /******/
+    //---
 
-    language_retall_ident =
-       ClLanguageMgrInst->defineCommand("retall", (ClLanguageCmdProc) 0);
+    language_retall_ident = lmgr->defineCommand("retall", (ClLanguageCmdProc) 0);
 
-    /******/
+    //---
 
-    ClLanguageMgrInst->defineCommand("exit", ClStdExitCommand);
+    lmgr->defineCommand("exit", ClStdExitCommand);
 
-    ClLanguageMgrInst->defineCommand("die", ClStdDieCommand);
+    lmgr->defineCommand("die", ClStdDieCommand);
 
-    /***********/
+    //---
 
   #ifdef CEIL_READLINE
-    ClLanguageMgrInst->defineCommand("history", ClStdHistoryCommand);
+    lmgr->defineCommand("history", ClStdHistoryCommand);
   #endif
   }
 
@@ -467,19 +449,21 @@ ClStdCommandsInit(ClModuleInitType flag, void *)
 static bool
 ClStdCommandsSet(const char *option, const char *args, void *)
 {
+  ClLanguageMgr *lmgr = ClLanguageMgrInst;
+
   if (option[0] == '\0') {
     CAngleType  angle_type = ClParserInst->getAngleType();
-    std::string prompt     = ClLanguageMgrInst->getPrompt();
+    std::string prompt     = lmgr->getPrompt();
     bool        math_fail  = ClParserInst->getMathFail();
     double      tolerance  = ClParserInst->getTolerance();
 
-    ClLanguageMgrInst->output("angle_type     %s\n"  , CUtil::toString(angle_type).c_str());
-    ClLanguageMgrInst->output("prompt         '%s'\n", prompt.c_str());
-    ClLanguageMgrInst->output("real_format    '%s'\n", ClParserInst->getRealFormat().c_str());
-    ClLanguageMgrInst->output("integer_format '%s'\n", ClParserInst->getIntegerFormat().c_str());
-    ClLanguageMgrInst->output("string_format  '%s'\n", ClParserInst->getStringFormat().c_str());
-    ClLanguageMgrInst->output("math_fail      %s\n"  , CStrUtil::toString(math_fail).c_str());
-    ClLanguageMgrInst->output("tolerance      %s\n"  , CStrUtil::toString(tolerance).c_str());
+    lmgr->output("angle_type     %s\n"  , CUtil::toString(angle_type).c_str());
+    lmgr->output("prompt         '%s'\n", prompt.c_str());
+    lmgr->output("real_format    '%s'\n", ClParserInst->getRealFormat().c_str());
+    lmgr->output("integer_format '%s'\n", ClParserInst->getIntegerFormat().c_str());
+    lmgr->output("string_format  '%s'\n", ClParserInst->getStringFormat().c_str());
+    lmgr->output("math_fail      %s\n"  , CStrUtil::toString(math_fail).c_str());
+    lmgr->output("tolerance      %s\n"  , CStrUtil::toString(tolerance).c_str());
 
     return true;
   }
@@ -492,7 +476,7 @@ ClStdCommandsSet(const char *option, const char *args, void *)
     if (angle_type != CANGLE_TYPE_NONE)
       ClParserInst->setAngleType(angle_type);
     else
-      ClLanguageMgrInst->error("invalid angle type '%s' for 'set %s'", args, option);
+      lmgr->error("invalid angle type '%s' for 'set %s'", args, option);
   }
   else if (CStrUtil::casecmp(option, "prompt") == 0) {
     char *prompt;
@@ -506,7 +490,7 @@ ClStdCommandsSet(const char *option, const char *args, void *)
 
     /* Set Prompt */
 
-    ClLanguageMgrInst->setPrompt(prompt);
+    lmgr->setPrompt(prompt);
 
     args1->termArgs();
 
@@ -535,7 +519,7 @@ ClStdCommandsSet(const char *option, const char *args, void *)
     if (rc)
       ClParserInst->setRealFormat(real_format);
     else
-      ClLanguageMgrInst->error("invalid format '%s' for 'set %s'", format, option);
+      lmgr->error("invalid format '%s' for 'set %s'", format, option);
 
     args1->termArgs();
 
@@ -566,7 +550,7 @@ ClStdCommandsSet(const char *option, const char *args, void *)
     if (rc)
       ClParserInst->setIntegerFormat(integer_format);
     else
-      ClLanguageMgrInst->error("invalid format '%s' for 'set %s'", format, option);
+      lmgr->error("invalid format '%s' for 'set %s'", format, option);
 
     args1->termArgs();
 
@@ -597,7 +581,7 @@ ClStdCommandsSet(const char *option, const char *args, void *)
     if (rc)
       ClParserInst->setStringFormat(string_format);
     else
-      ClLanguageMgrInst->error("invalid format '%s' for 'set %s'", format, option);
+      lmgr->error("invalid format '%s' for 'set %s'", format, option);
 
     args1->termArgs();
 
@@ -609,7 +593,7 @@ ClStdCommandsSet(const char *option, const char *args, void *)
     if (CStrUtil::isBool(args))
       ClParserInst->setMathFail(CStrUtil::toBool(args));
     else
-      ClLanguageMgrInst->error("invalid args '%s' for 'set %s'", args, option);
+      lmgr->error("invalid args '%s' for 'set %s'", args, option);
   }
   else if (CStrUtil::casecmp(option, "tolerance") == 0) {
     /* Set tolerance to real value */
@@ -617,7 +601,7 @@ ClStdCommandsSet(const char *option, const char *args, void *)
     double r = ClParserInst->getTolerance();
 
     if (! CStrUtil::toReal(args, &r)) {
-      ClLanguageMgrInst->error("invalid tolerance '%s' for 'set %s'", args, option);
+      lmgr->error("invalid tolerance '%s' for 'set %s'", args, option);
       return false;
     }
 
@@ -629,7 +613,7 @@ ClStdCommandsSet(const char *option, const char *args, void *)
     /* Get Debug Level */
 
     if (! CStrUtil::toInteger(args, &level)) {
-      ClLanguageMgrInst->error("invalid debug level '%s' for 'set %s'", args, option);
+      lmgr->error("invalid debug level '%s' for 'set %s'", args, option);
       return false;
     }
 
@@ -661,8 +645,7 @@ ClStdCommandsSet(const char *option, const char *args, void *)
  *   Provide Help for the Builtin Module.
  *
  * CALL:
- *   bool flag =
- *     ClStdCommandsHelp(const char *args);
+ *   bool flag = ClStdCommandsHelp(const char *args);
  *
  * INPUT:
  *   args : Additional Arguments passed to the Help Command.
@@ -791,16 +774,15 @@ ClStdCommandsHelp(const char *, void *)
  * ClStdImportCommand
  *   Routine called when the 'import' command is entered.
  *
- *   The routine imports the commands and variables for
- *   the named module or lists the available modules
- *   and their status if no module is defined.
+ *   The routine imports the commands and variables for the named module or
+ *   lists the available modules and their status if no module is defined.
  *
  * CALL:
  *   ClStdImportCommand(ClLanguageCommand *command);
  *
  * INPUT:
- *   command : Structure containing details of the command
- *           : and arguments supplied by the user.
+ *   command : Structure containing details of the command and arguments
+ *           : supplied by the user.
  *
  * OUTPUT:
  *   None
@@ -816,6 +798,8 @@ ClStdCommandsHelp(const char *, void *)
 static void
 ClStdImportCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
 {
+  ClLanguageMgr *lmgr = ClLanguageMgrInst;
+
   if (args->checkNumberOfArgs(0, 1) != 0)
     return;
 
@@ -830,7 +814,7 @@ ClStdImportCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
     bool flag = ClModuleMgrInst->importModule(name);
 
     if (! flag)
-      ClLanguageMgrInst->error("Failed to Import Module '%s'", name);
+      lmgr->error("Failed to Import Module '%s'", name);
   }
   else {
     StringVectorT modules;
@@ -840,12 +824,12 @@ ClStdImportCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
     int num_modules = modules.size();
 
     for (int i = 0; i < num_modules; i++) {
-      ClLanguageMgrInst->output("%s", modules[i].c_str());
+      lmgr->output("%s", modules[i].c_str());
 
       if (ClModuleMgrInst->isModuleLoaded(modules[i]))
-        ClLanguageMgrInst->output(" (loaded)");
+        lmgr->output(" (loaded)");
 
-      ClLanguageMgrInst->output("\n");
+      lmgr->output("\n");
     }
   }
 }
@@ -855,17 +839,16 @@ ClStdImportCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
  * ClStdNewCommand
  *   Routine called when the 'new' command is entered.
  *
- *   The routine ensures no arguments are entered and
- *   then deletes all variables, structures, procedures
- *   and functions. The standard variables, structures,
- *   procedures and functions are then re-added.
+ *   The routine ensures no arguments are entered and then deletes all
+ *   variables, structures, procedures and functions. The standard variables,
+ *   structures, procedures and functions are then re-added.
  *
  * CALL:
  *   ClStdNewCommand(ClLanguageCommand *command);
  *
  * INPUT:
- *   command : Structure containing details of the command
- *           : and arguments supplied by the user.
+ *   command : Structure containing details of the command and arguments
+ *           : supplied by the user.
  *
  * OUTPUT:
  *   None
@@ -883,6 +866,8 @@ ClStdNewCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
 {
   CL_LANGUAGE_TRACE("ClStdNewCommand");
 
+  ClLanguageMgr *lmgr = ClLanguageMgrInst;
+
   /* Check Args */
 
   if (args->checkNumberOfArgs(0, 0) != 0)
@@ -890,7 +875,7 @@ ClStdNewCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
 
   /* Reinitialise */
 
-  ClLanguageMgrInst->reinit();
+  lmgr->reinit();
 }
 
 /*------------------------------------------------------------------*
@@ -898,20 +883,18 @@ ClStdNewCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
  * ClStdRunCommand
  *   Routine called when the 'run' command is entered.
  *
- *   The routine ensures gets the comma separated list of
- *   strings after the command and treats each as the
- *   name of a file whose contents are language commands
- *   to be run.
+ *   The routine ensures gets the comma separated list of strings after the
+ *   command and treats each as the name of a file whose contents are language
+ *   commands to be run.
  *
- *   Each file is run in turn. If a specified file does
- *   not exist then it is ignored.
+ *   Each file is run in turn. If a specified file does not exist then it is ignored.
  *
  * CALL:
  *   ClStdRunCommand(ClLanguageCommand *command);
  *
  * INPUT:
- *   command : Structure containing details of the command
- *           : and arguments supplied by the user.
+ *   command : Structure containing details of the command and arguments supplied
+ *           : by the user.
  *
  * OUTPUT:
  *   None
@@ -927,11 +910,9 @@ ClStdNewCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
 static void
 ClStdRunCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
 {
-  std::string   file_name;
-  int           error_code;
-  StringVectorT file_names;
-
   CL_LANGUAGE_TRACE("ClStdRunCommand");
+
+  ClLanguageMgr *lmgr = ClLanguageMgrInst;
 
   /* Get Run's Arguments */
 
@@ -941,9 +922,12 @@ ClStdRunCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
   uint num_args = args->getNumArgs();
 
   /* Get the list of File Names to Run */
+  StringVectorT file_names;
 
   for (uint i = 1; i <= num_args; i++) {
-    file_name = args->getStringArg(i, &error_code);
+    int error_code;
+
+    std::string file_name = args->getStringArg(i, &error_code);
 
     if (error_code != 0)
       return;
@@ -955,11 +939,11 @@ ClStdRunCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
 
   for (uint i = 0; i < num_args; i++) {
     if (! CFile::isRegular(file_names[i])) {
-      ClLanguageMgrInst->error("'%s' is not a regular file", file_names[i].c_str());
+      lmgr->error("'%s' is not a regular file", file_names[i].c_str());
       continue;
     }
 
-    ClLanguageMgrInst->runFile(file_names[i]);
+    lmgr->runFile(file_names[i]);
   }
 }
 
@@ -969,20 +953,19 @@ ClStdRunCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
  *   Routine called when a 'proc ... endproc' block command
  *   is entered.
  *
- *   The name following the 'proc' is used as the name of
- *   the procedure and the subsequent round bracketed comma
- *   separated list of argument names is extracted and those
- *   starting with the '&' character are flagged as return
- *   variables. The list of language commands enclosed by the
- *   'proc ... endproc' pair are stored for later execution
- *   when the procedure name is specified as a command.
+ *   The name following the 'proc' is used as the name of the procedure and the
+ *   subsequent round bracketed comma separated list of argument names is
+ *   extracted and those starting with the '&' character are flagged as return
+ *   variables. The list of language commands enclosed by the 'proc ... endproc'
+ *   pair are stored for later execution when the procedure name is specified as
+ *   a command.
  *
  * CALL:
  *   ClStdProcCommand(ClLanguageCommand *command);
  *
  * INPUT:
- *   command : Structure containing details of the command and
- *           : arguments supplied by the user.
+ *   command : Structure containing details of the command and arguments supplied
+ *           : by the user.
  *
  * OUTPUT:
  *   None
@@ -998,18 +981,36 @@ ClStdRunCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
 static void
 ClStdProcCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 {
-  int                     i;
-  int                     num_args;
-  ClLanguageArgList       arg_list;
-  ClLanguageProcArg      *proc_arg;
-  ClLanguageProcArgArray  proc_args;
-  std::string             arg_string;
-  std::string             name_string;
-  ClParserFuncPtr         old_pfunction;
-  ClLanguageFunc         *old_lfunction;
-  ClLanguageProc         *old_procedure;
+  class ProcArgArray {
+   public:
+    ProcArgArray() { }
+
+   ~ProcArgArray() {
+     if (isAutoFree()) {
+       for (auto &arg : args_)
+         delete arg;
+     }
+    }
+
+    ClLanguageProcArgArray &args() { return args_; }
+
+    void push_back(ClLanguageProcArg *arg) {
+      args_.push_back(arg);
+    }
+
+    bool isAutoFree() const { return autoFree_; }
+    void setAutoFree(bool b) { autoFree_ = b; }
+
+   private:
+    ClLanguageProcArgArray args_;
+    bool                   autoFree_ { true };
+  };
+
+  //---
 
   CL_LANGUAGE_TRACE("ClStdProcCommand");
+
+  ClLanguageMgr *lmgr = ClLanguageMgrInst;
 
   const std::string &cargs = command->getArgs();
 
@@ -1019,24 +1020,24 @@ ClStdProcCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 
   CStrParse parse(cargs);
 
+  std::string name_string;
+
   if (! parse.readIdentifier(name_string)) {
-    ClLanguageMgrInst->syntaxError
-     ("'proc' procedure name must start with alphabetic or '_'");
-    goto fail;
+    lmgr->syntaxError("'proc' procedure name must start with alphabetic or '_'");
+    return;
   }
 
   /* Get Existing Procedure and Function */
 
-  old_procedure = ClLanguageProcMgrInst->lookupProc(name_string);
-  old_lfunction = ClLanguageFuncMgrInst->lookupFunc(name_string);
-  old_pfunction = ClParserInst->getFunction(name_string);
+  ClLanguageProc* old_procedure = ClLanguageProcMgrInst->lookupProc(name_string);
+  ClLanguageFunc* old_lfunction = ClLanguageFuncMgrInst->lookupFunc(name_string);
+  ClParserFuncPtr old_pfunction = ClParserInst->getFunction(name_string);
 
   /* Ensure Procedure Can be Deleted */
 
-  if (old_procedure != 0 && ! old_procedure->canDelete()) {
-    ClLanguageMgrInst->syntaxError
-     ("'proc' Existing procedure '%s' cannot be deleted", name_string.c_str());
-    goto fail;
+  if (old_procedure  && ! old_procedure->canDelete()) {
+    lmgr->syntaxError("'proc' Existing procedure '%s' cannot be deleted", name_string.c_str());
+    return;
   }
 
   /* Extract Argument List */
@@ -1044,21 +1045,21 @@ ClStdProcCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
   parse.skipSpace();
 
   if (! parse.isChar('(')) {
-    ClLanguageMgrInst->syntaxError
-     ("missing open brackets for 'proc' '%s' argument list", name_string.c_str());
-    goto fail;
+    lmgr->syntaxError("missing open brackets for 'proc' '%s' argument list", name_string.c_str());
+    return;
   }
 
   parse.skipChar();
 
   parse.skipSpace();
 
-  i = parse.getPos();
+  int i = parse.getPos();
+
+  std::string arg_string;
 
   if (! args->readArgList(cargs, &i, ')', arg_string)) {
-    ClLanguageMgrInst->syntaxError
-     ("missing close brackets for 'proc' '%s' argument list", name_string.c_str());
-    goto fail;
+    lmgr->syntaxError("missing close brackets for 'proc' '%s' argument list", name_string.c_str());
+    return;
   }
 
   parse.setPos(i);
@@ -1066,46 +1067,49 @@ ClStdProcCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
   parse.skipSpace();
 
   if (! parse.eof()) {
-    ClLanguageMgrInst->syntaxError
-     ("spurious characters '%s' after 'proc' '%s' argument list",
-      parse.getAt().c_str(), name_string.c_str());
-    goto fail;
+    lmgr->syntaxError("spurious characters '%s' after 'proc' '%s' argument list",
+                      parse.getAt().c_str(), name_string.c_str());
+    return;
   }
 
   /* Get List of Procedure's Arguments */
+  ProcArgArray proc_args;
+
+  ClLanguageArgList arg_list;
 
   args->stringToArgList(arg_string, &arg_list);
 
-  num_args = arg_list.size();
+  int num_args = arg_list.size();
 
   for (i = 0; i < num_args; i++) {
+    ClLanguageProcArg *proc_arg;
+
     if (arg_list[i][0] == '&')
       proc_arg = new ClLanguageProcArg(arg_list[i].substr(1), true);
     else
       proc_arg = new ClLanguageProcArg(arg_list[i], false);
 
     if (! ClParserVar::isValidName(proc_arg->getName())) {
-      ClLanguageMgrInst->syntaxError
-       ("invalid 'proc' '%s' argument name %d - '%s'",
-        name_string.c_str(), i + 1, proc_arg->getName().c_str());
+      lmgr->syntaxError("invalid 'proc' '%s' argument name %d - '%s'",
+                       name_string.c_str(), i + 1, proc_arg->getName().c_str());
 
       delete proc_arg;
 
-      goto fail;
+      return;
     }
 
     proc_args.push_back(proc_arg);
   }
 
-  /***********/
+  //---
 
   /* Remove existing language procedure, language function and
      parser function with the same name */
 
-  if (old_procedure != 0)
+  if (old_procedure)
     ClLanguageProcMgrInst->deleteProc(old_procedure->getName());
 
-  if (old_lfunction != 0) {
+  if (old_lfunction) {
     ClParserInst->removeUserFn(old_lfunction->getName());
 
     ClLanguageFuncMgrInst->deleteFunc(old_lfunction->getName());
@@ -1117,34 +1121,30 @@ ClStdProcCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
   /* Add Procedure to List */
 
   static_cast<void>(ClLanguageProcMgrInst->
-    createProc(name_string, proc_args, command_list));
+    createProc(name_string, proc_args.args(), command_list));
+
+  proc_args.setAutoFree(false);
 
   command->clearCommands();
-
- fail:
-  for (auto &proc_arg : proc_args)
-    delete proc_arg;
 }
 
 /*------------------------------------------------------------------*
  *
  * ClStdFuncCommand
- *   Routine called when a 'func ... endfunc' block command
- *   is entered.
+ *   Routine called when a 'func ... endfunc' block command is entered.
  *
- *   The name following the 'func' is used as the name of
- *   the procedure and the subsequent round bracketed comma
- *   separated list of argument names and types is extracted.
- *   The list of language commands enclosed by the
- *   'func ... endfunc' pair are stored for later execution
- *   when the function name is specified in an expression.
+ *   The name following the 'func' is used as the name of the procedure and
+ *   the subsequent round bracketed comma separated list of argument names and
+ *   types is extracted. The list of language commands enclosed by the
+ *   'func ... endfunc' pair are stored for later execution when the function name
+ *   is specified in an expression.
  *
  * CALL:
  *   ClStdFuncCommand(ClLanguageCommand *command);
  *
  * INPUT:
- *   command : Structure containing details of the command
- *           : and arguments supplied by the user.
+ *   command : Structure containing details of the command and arguments
+ *           : supplied by the user.
  *
  * OUTPUT:
  *   None
@@ -1160,20 +1160,20 @@ ClStdProcCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 static void
 ClStdFuncCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 {
-  int                     i;
-  int                     num_args;
-  ClLanguageArgList       arg_list;
-  ClLanguageFunc         *function;
-  ClLanguageFuncArg      *func_arg;
-  IntVectorT              arg_types;
-  ClLanguageFuncArgArray  func_args;
-  std::string             arg_string;
-  std::string             name_string;
-  ClParserFuncPtr         old_pfunction;
-  ClLanguageFunc         *old_lfunction;
-  ClLanguageProc         *old_procedure;
+  struct FuncArgs {
+   ~FuncArgs() {
+      for (auto &func_arg : args)
+        delete func_arg;
+    }
+
+    ClLanguageFuncArgArray args;
+  };
+
+  //---
 
   CL_LANGUAGE_TRACE("ClStdFuncCommand");
+
+  ClLanguageMgr *lmgr = ClLanguageMgrInst;
 
   const std::string &cargs = command->getArgs();
 
@@ -1183,24 +1183,24 @@ ClStdFuncCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 
   CStrParse parse(cargs);
 
+  std::string name_string;
+
   if (! parse.readIdentifier(name_string)) {
-    ClLanguageMgrInst->syntaxError
-     ("'func' function name must start with alphabetic or '_'");
-    goto fail;
+    lmgr->syntaxError("'func' function name must start with alphabetic or '_'");
+    return;
   }
 
   /* Get Existing Procedure and Function */
 
-  old_procedure = ClLanguageProcMgrInst->lookupProc(name_string);
-  old_lfunction = ClLanguageFuncMgrInst->lookupFunc(name_string);
-  old_pfunction = ClParserInst->getFunction(name_string);
+  ClLanguageProc* old_procedure = ClLanguageProcMgrInst->lookupProc(name_string);
+  ClLanguageFunc* old_lfunction = ClLanguageFuncMgrInst->lookupFunc(name_string);
+  ClParserFuncPtr old_pfunction = ClParserInst->getFunction(name_string);
 
   /* Ensure Procedure Can be Deleted */
 
   if (old_procedure != 0 && ! old_procedure->canDelete()) {
-    ClLanguageMgrInst->syntaxError
-     ("'func' Existing procedure '%s' cannot be deleted", name_string.c_str());
-    goto fail;
+    lmgr->syntaxError("'func' Existing procedure '%s' cannot be deleted", name_string.c_str());
+    return;
   }
 
   /* Extract Argument List */
@@ -1208,41 +1208,44 @@ ClStdFuncCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
   parse.skipSpace();
 
   if (! parse.isChar('(')) {
-    ClLanguageMgrInst->syntaxError
-     ("missing open brackets for 'func' '%s' argument list", name_string.c_str());
-    goto fail;
+    lmgr->syntaxError("missing open brackets for 'func' '%s' argument list", name_string.c_str());
+    return;
   }
 
   parse.skipChar();
 
   parse.skipSpace();
 
-  i = parse.getPos();
+  int pos = parse.getPos();
 
-  if (! args->readArgList(cargs, &i, ')', arg_string)) {
-    ClLanguageMgrInst->syntaxError
-     ("missing close brackets for 'func' '%s' argument list", name_string.c_str());
-    goto fail;
+  std::string arg_string;
+
+  if (! args->readArgList(cargs, &pos, ')', arg_string)) {
+    lmgr->syntaxError("missing close brackets for 'func' '%s' argument list", name_string.c_str());
+    return;
   }
 
-  parse.setPos(i);
+  parse.setPos(pos);
 
   parse.skipSpace();
 
   if (! parse.eof()) {
-    ClLanguageMgrInst->syntaxError
-     ("spurious characters '%s' after 'func' '%s' argument list",
-      parse.getAt().c_str(), name_string.c_str());
-    goto fail;
+    lmgr->syntaxError("spurious characters '%s' after 'func' '%s' argument list",
+                      parse.getAt().c_str(), name_string.c_str());
+    return;
   }
 
   /* Get List of Function's Arguments */
 
+  ClLanguageArgList arg_list;
+
   args->stringToArgList(arg_string, &arg_list);
 
-  num_args = arg_list.size();
+  int num_args = arg_list.size();
 
-  for (i = 0; i < num_args; i++) {
+  FuncArgs funcArgs;
+
+  for (int i = 0; i < num_args; i++) {
     std::string name = arg_list[i];
 
     //uint len = name.size();
@@ -1254,25 +1257,20 @@ ClStdFuncCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
     int num_words = words.size();
 
     if (num_words != 1 && num_words != 2) {
-      ClLanguageMgrInst->syntaxError
-       ("invalid 'func' '%s' argument name %d", name_string.c_str(), i + 1, name.c_str());
+      lmgr->syntaxError("invalid 'func' '%s' argument name %d",
+                        name_string.c_str(), i + 1, name.c_str());
     }
 
     ClParserValueType type;
 
-    if      (words[0] == "int")
-      type = CL_PARSER_VALUE_TYPE_INTEGER;
-    else if (words[0] == "real")
-      type = CL_PARSER_VALUE_TYPE_REAL;
-    else if (words[0] == "string")
-      type = CL_PARSER_VALUE_TYPE_STRING;
-    else if (words[0] == "array")
-      type = CL_PARSER_VALUE_TYPE_ARRAY;
+    if      (words[0] == "int"   ) type = CL_PARSER_VALUE_TYPE_INTEGER;
+    else if (words[0] == "real"  ) type = CL_PARSER_VALUE_TYPE_REAL;
+    else if (words[0] == "string") type = CL_PARSER_VALUE_TYPE_STRING;
+    else if (words[0] == "array" ) type = CL_PARSER_VALUE_TYPE_ARRAY;
     else {
-      ClLanguageMgrInst->syntaxError
-       ("invalid 'func' '%s' argument type %d - '%s'", name_string.c_str(), i + 1, name.c_str());
-
-      goto fail;
+      lmgr->syntaxError("invalid 'func' '%s' argument type %d - '%s'",
+                        name_string.c_str(), i + 1, name.c_str());
+      return;
     }
 
     if (num_words > 1 && words[1][0] == '&') {
@@ -1285,24 +1283,21 @@ ClStdFuncCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 
     if (words[1].size() == 0 || ! ClParserVar::isValidName(words[1])) {
       if (words[1].size() == 0)
-        ClLanguageMgrInst->syntaxError
-         ("missing 'func' '%s' argument name %d", name_string.c_str(), i + 1);
+        lmgr->syntaxError("missing 'func' '%s' argument name %d", name_string.c_str(), i + 1);
       else
-        ClLanguageMgrInst->syntaxError
-         ("invalid 'func' '%s' argument name %d - '%s'",
-          name_string.c_str(), i + 1, name.c_str());
-
-      goto fail;
+        lmgr->syntaxError("invalid 'func' '%s' argument name %d - '%s'",
+                          name_string.c_str(), i + 1, name.c_str());
+      return;
     }
 
     name = words[1];
 
-    func_arg = new ClLanguageFuncArg(name, type);
+    ClLanguageFuncArg *func_arg = new ClLanguageFuncArg(name, type);
 
-    func_args.push_back(func_arg);
+    funcArgs.args.push_back(func_arg);
   }
 
-  /***********/
+  //---
 
   /* Remove existing language procedure, language function and
      parser function with the same name */
@@ -1321,12 +1316,14 @@ ClStdFuncCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 
   /* Add Function to List */
 
-  function = ClLanguageFuncMgrInst->
-    createFunc(name_string, func_args, command_list);
+  ClLanguageFunc *function =
+    ClLanguageFuncMgrInst->createFunc(name_string, funcArgs.args, command_list);
 
   command->clearCommands();
 
   /* Define Function to Parser */
+
+  IntVectorT arg_types;
 
   for (uint i = 0; i < function->getNumArgs(); i++)
     arg_types.push_back(function->getArg(i).getType());
@@ -1334,10 +1331,6 @@ ClStdFuncCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
   ClParserInst->createUserFn(function->getName(),
                              CL_PARSER_USERFN_TYPE_STD, arg_types,
                              ClLanguageRunFunction, (void *) function);
-
- fail:
-  for (auto &func_arg : func_args)
-    delete func_arg;
 }
 
 /*------------------------------------------------------------------*
@@ -1379,6 +1372,8 @@ ClStdForCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 {
   CL_LANGUAGE_TRACE("ClStdForCommand");
 
+  ClLanguageMgr *lmgr = ClLanguageMgrInst;
+
   const std::string &cargs = command->getArgs();
 
   /*
@@ -1394,7 +1389,7 @@ ClStdForCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
   parse.skipSpace();
 
   if (! parse.isChar('(')) {
-    ClLanguageMgrInst->syntaxError("missing open brackets for 'for' expression list");
+    lmgr->syntaxError("missing open brackets for 'for' expression list");
     return;
   }
 
@@ -1407,7 +1402,7 @@ ClStdForCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
   std::string for_expr1;
 
   if (! args->readArgList(cargs, &i, ';', for_expr1)) {
-    ClLanguageMgrInst->syntaxError("missing condition expression in 'for' expression list");
+    lmgr->syntaxError("missing condition expression in 'for' expression list");
     return;
   }
 
@@ -1420,8 +1415,7 @@ ClStdForCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
   std::string for_expr2;
 
   if (! args->readArgList(cargs, &i, ';', for_expr2)) {
-    ClLanguageMgrInst->syntaxError
-     ("missing condition expression in 'for' expression list");
+    lmgr->syntaxError("missing condition expression in 'for' expression list");
     return;
   }
 
@@ -1434,8 +1428,7 @@ ClStdForCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
   std::string for_expr3;
 
   if (! args->readArgList(cargs, &i, ')', for_expr3)) {
-    ClLanguageMgrInst->syntaxError
-     ("missing iteration expression in 'for' expression list");
+    lmgr->syntaxError("missing iteration expression in 'for' expression list");
     return;
   }
 
@@ -1444,12 +1437,12 @@ ClStdForCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
   parse.skipSpace();
 
   if (! parse.eof()) {
-    ClLanguageMgrInst->syntaxError
-     ("spurious characters '%s' after 'for' expression list", parse.getAt().c_str());
+    lmgr->syntaxError("spurious characters '%s' after 'for' expression list",
+                      parse.getAt().c_str());
     return;
   }
 
-  /*************/
+  //---
 
   ClParserValuePtr value;
 
@@ -1458,36 +1451,34 @@ ClStdForCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
   ClParserExpr expr1(for_expr1);
 
   if (! expr1.exec(value)) {
-    ClLanguageMgrInst->expressionError(ClErr::INVALID_EXPRESSION,
-      "'for' expression 1 - '%s'", for_expr1.c_str());
+    lmgr->expressionError(ClErr::INVALID_EXPRESSION, "'for' expression 1 - '%s'",
+                          for_expr1.c_str());
     return;
   }
   else if (! value.isValid()) {
-    ClLanguageMgrInst->syntaxError
-     ("undefined 'for' expression 1 - '%s'", for_expr1.c_str());
+    lmgr->syntaxError("undefined 'for' expression 1 - '%s'", for_expr1.c_str());
     return;
   }
 
-  /*************/
+  //---
 
   /* Process While Expression and Check Result */
 
   ClParserExpr expr2(for_expr2);
 
   if      (! expr2.exec(value)) {
-    ClLanguageMgrInst->expressionError(ClErr::INVALID_EXPRESSION,
-      "'for' expression 2 - '%s'", for_expr2.c_str());
+    lmgr->expressionError(ClErr::INVALID_EXPRESSION, "'for' expression 2 - '%s'",
+                          for_expr2.c_str());
     return;
   }
   else if (! value.isValid()) {
-    ClLanguageMgrInst->syntaxError
-     ("undefined 'for' expression 2 - '%s'", for_expr2.c_str());
+    lmgr->syntaxError("undefined 'for' expression 2 - '%s'", for_expr2.c_str());
     return;
   }
 
   bool flag = value->toBool();
 
-  /*************/
+  //---
 
   /*
    * While Expression is True :-
@@ -1500,35 +1491,33 @@ ClStdForCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
     if (ClLanguageBlockDataMgrInst->processBlockCommands())
       return;
 
-    /************/
+    //---
 
     /* Process Iterate Expression */
 
     ClParserExpr expr3(for_expr3);
 
     if      (! expr3.exec(value)) {
-      ClLanguageMgrInst->expressionError(ClErr::INVALID_EXPRESSION,
-        "'for' expression 3 - '%s'", for_expr3.c_str());
+      lmgr->expressionError(ClErr::INVALID_EXPRESSION, "'for' expression 3 - '%s'",
+                            for_expr3.c_str());
       return;
     }
     else if (! value.isValid()) {
-      ClLanguageMgrInst->syntaxError
-       ("undefined 'for' expression 3 - '%s'", for_expr3.c_str());
+      lmgr->syntaxError("undefined 'for' expression 3 - '%s'", for_expr3.c_str());
       return;
     }
 
-    /*************/
+    //---
 
     /* Process While Expression and Check Result */
 
     if      (! expr2.exec(value)) {
-      ClLanguageMgrInst->expressionError
-       (ClErr::INVALID_EXPRESSION, "'for' expression 2 - '%s'", for_expr2.c_str());
+      lmgr->expressionError(ClErr::INVALID_EXPRESSION, "'for' expression 2 - '%s'",
+                            for_expr2.c_str());
       return;
     }
     else if (! value.isValid()) {
-      ClLanguageMgrInst->syntaxError
-       ("undefined 'for' expression 2 - '%s'", for_expr2.c_str());
+      lmgr->syntaxError("undefined 'for' expression 2 - '%s'", for_expr2.c_str());
       return;
     }
 
@@ -1574,6 +1563,8 @@ ClStdForEachCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 {
   CL_LANGUAGE_TRACE("ClStdForEachCommand");
 
+  ClLanguageMgr *lmgr = ClLanguageMgrInst;
+
   const std::string &cargs = command->getArgs();
 
   /* Get Variable Name */
@@ -1597,8 +1588,7 @@ ClStdForEachCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
   parse.readNonSpace(var_name);
 
   if (! ClParserVar::isValidName(var_name)) {
-    ClLanguageMgrInst->syntaxError
-      ("invalid 'foreach' variable name '%s'", var_name.c_str());
+    lmgr->syntaxError("invalid 'foreach' variable name '%s'", var_name.c_str());
     return;
   }
 
@@ -1607,8 +1597,7 @@ ClStdForEachCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
   parse.skipSpace();
 
   if (! parse.isChar('(')) {
-    ClLanguageMgrInst->syntaxError
-      ("missing open brackets for 'foreach' expression");
+    lmgr->syntaxError("missing open brackets for 'foreach' expression");
     return;
   }
 
@@ -1621,8 +1610,7 @@ ClStdForEachCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
   std::string arg_string;
 
   if (! args->readArgList(cargs, &i, ')', arg_string)) {
-    ClLanguageMgrInst->syntaxError
-      ("missing close brackets for 'foreach' expression");
+    lmgr->syntaxError("missing close brackets for 'foreach' expression");
     return;
   }
 
@@ -1631,8 +1619,8 @@ ClStdForEachCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
   parse.skipSpace();
 
   if (! parse.eof()) {
-    ClLanguageMgrInst->syntaxError
-      ("spurious characters '%s' after 'foreach' expression", parse.getAt().c_str());
+    lmgr->syntaxError("spurious characters '%s' after 'foreach' expression",
+                      parse.getAt().c_str());
     return;
   }
 
@@ -1643,14 +1631,13 @@ ClStdForEachCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
   uint num_args = arg_list.size();
 
   if (num_args != 1) {
-    ClLanguageMgrInst->syntaxError
-      ("'foreach' requires a single expression - %d found", num_args);
+    lmgr->syntaxError("'foreach' requires a single expression - %d found", num_args);
     return;
   }
 
   std::string expression = arg_list[0];
 
-  /*************/
+  //---
 
   /* Process Expression */
 
@@ -1659,17 +1646,16 @@ ClStdForEachCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
   ClParserValuePtr value;
 
   if      (! expr.exec(value)) {
-    ClLanguageMgrInst->expressionError(ClErr::INVALID_EXPRESSION,
-      "'foreach' expression 1 - '%s'", expression.c_str());
+    lmgr->expressionError(ClErr::INVALID_EXPRESSION, "'foreach' expression 1 - '%s'",
+                          expression.c_str());
     return;
   }
   else if (! value.isValid()) {
-    ClLanguageMgrInst->syntaxError
-      ("undefined 'foreach' expression 1 - '%s'", expression.c_str());
+    lmgr->syntaxError("undefined 'foreach' expression 1 - '%s'", expression.c_str());
     return;
   }
 
-  /*************/
+  //---
 
   ClParserValueArray values;
 
@@ -1677,7 +1663,7 @@ ClStdForEachCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 
   uint num_values = values.size();
 
-  /*************/
+  //---
 
   /* Set Variable to each Array Value and Process Commands */
 
@@ -1686,14 +1672,14 @@ ClStdForEachCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 
     ClParserVarPtr variable = ClParserInst->createVar(var_name, values[i]);
 
-    /************/
+    //---
 
     /* Process Command List */
 
     if (ClLanguageBlockDataMgrInst->processBlockCommands())
       return;
 
-    /************/
+    //---
 
     if (lvalue) {
       int error_code;
@@ -1701,8 +1687,8 @@ ClStdForEachCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
       ClParserInst->assignSubscriptValue(expression, i + 1, variable->getValue(), &error_code);
 
       if (error_code != 0) {
-        ClLanguageMgrInst->expressionError(error_code,
-          "'foreach' failed to update value '%s'", expression.c_str());
+        lmgr->expressionError(error_code, "'foreach' failed to update value '%s'",
+                              expression.c_str());
         return;
       }
     }
@@ -1712,24 +1698,21 @@ ClStdForEachCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 /*------------------------------------------------------------------*
  *
  * ClStdWhileCommand
- *   Routine called when a 'while ... endwhile' block command
- *   is entered.
+ *   Routine called when a 'while ... endwhile' block command is entered.
  *
- *   The expression contained in round brackets is extracted
- *   and the list of language commands enclosed by the
- *   'while ... endwhile' pair are continually executed
- *   while the expression evaluates to a non-zero integer.
+ *   The expression contained in round brackets is extracted and the list of
+ *   language commands enclosed by the 'while ... endwhile' pair are continually
+ *   executed while the expression evaluates to a non-zero integer.
  *
- *   Any break commands exit the loop, any continue commands
- *   skip any remaining loop commands, and any gotos which
- *   jump outside the loop terminate it.
+ *   Any break commands exit the loop, any continue commands skip any remaining
+ *   loop commands, and any gotos which jump outside the loop terminate it.
  *
  * CALL:
  *   ClStdWhileCommand(ClLanguageCommand *command);
  *
  * INPUT:
- *   command : Structure containing details of the command
- *           : and arguments supplied by the user.
+ *   command : Structure containing details of the command and arguments supplied
+ *           : by the user.
  *
  * OUTPUT:
  *   None
@@ -1745,15 +1728,9 @@ ClStdForEachCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 static void
 ClStdWhileCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 {
-  int               i;
-  bool              flag;
-  std::string       line;
-  ClParserValuePtr  value;
-  int               num_args;
-  ClLanguageArgList arg_list;
-  std::string       expression;
-
   CL_LANGUAGE_TRACE("ClStdWhileCommand");
+
+  ClLanguageMgr *lmgr = ClLanguageMgrInst;
 
   const std::string &cargs = command->getArgs();
 
@@ -1764,7 +1741,7 @@ ClStdWhileCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
   parse.skipSpace();
 
   if (! parse.isChar('(')) {
-    ClLanguageMgrInst->syntaxError("missing open brackets for 'while' expression");
+    lmgr->syntaxError("missing open brackets for 'while' expression");
     return;
   }
 
@@ -1772,54 +1749,61 @@ ClStdWhileCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 
   parse.skipSpace();
 
-  i = parse.getPos();
+  int pos = parse.getPos();
 
-  if (! args->readArgList(cargs, &i, ')', line)) {
-    ClLanguageMgrInst->syntaxError("missing close brackets for 'while' expression");
+  std::string line;
+
+  if (! args->readArgList(cargs, &pos, ')', line)) {
+    lmgr->syntaxError("missing close brackets for 'while' expression");
     return;
   }
 
-  parse.setPos(i);
+  parse.setPos(pos);
 
   parse.skipSpace();
 
   if (! parse.eof()) {
-    ClLanguageMgrInst->syntaxError("spurious characters '%s' after 'while' expression",
-                                   parse.getAt().c_str());
+    lmgr->syntaxError("spurious characters '%s' after 'while' expression", parse.getAt().c_str());
     return;
   }
+
+  ClLanguageArgList arg_list;
 
   args->stringToArgList(line, &arg_list);
 
-  num_args = arg_list.size();
+  int num_args = arg_list.size();
 
   if (num_args != 1) {
-    ClLanguageMgrInst->syntaxError("'while' requires a single expression - %d found", num_args);
+    lmgr->syntaxError("'while' requires a single expression - %d found", num_args);
     return;
   }
 
-  expression = arg_list[0];
+  std::string expression = arg_list[0];
 
-  /*************/
+  //---
+
+  bool flag = false;
 
   do {
     /* Process Expression and Check Result */
 
     ClParserExpr expr(expression);
 
+    ClParserValuePtr value;
+
     if      (! expr.exec(value)) {
-      ClLanguageMgrInst->expressionError(ClErr::INVALID_EXPRESSION, "'while' expression - '%s'",
-                                         expression.c_str());
+      lmgr->expressionError(ClErr::INVALID_EXPRESSION, "'while' expression - '%s'",
+                            expression.c_str());
       return;
     }
     else if (! value.isValid()) {
-      ClLanguageMgrInst->syntaxError("undefined 'while' expression - '%s'", expression.c_str());
+      lmgr->syntaxError("undefined 'while' expression - '%s'", expression.c_str());
       return;
     }
 
     flag = value->toBool();
 
-    /*************/
+    //---
 
     /* If Expression is True Process Command List */
 
@@ -1834,24 +1818,21 @@ ClStdWhileCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 /*------------------------------------------------------------------*
  *
  * ClStdUntilCommand
- *   Routine called when a 'until ... enduntil' block command
- *   is entered.
+ *   Routine called when a 'until ... enduntil' block command is entered.
  *
- *   The expression contained in round brackets is extracted
- *   and the list of language commands enclosed by the
- *   'until ... enduntil' pair are continually executed
- *   until the expression evaluates to a zero integer.
+ *   The expression contained in round brackets is extracted and the list of
+ *   language commands enclosed by the 'until ... enduntil' pair are continually
+ *   executed until the expression evaluates to a zero integer.
  *
- *   Any break commands exit the loop, any continue commands
- *   skip any remaining loop commands, and any gotos which
- *   jump outside the loop terminate it.
+ *   Any break commands exit the loop, any continue commands skip any remaining
+ *   loop commands, and any gotos which jump outside the loop terminate it.
  *
  * CALL:
  *   ClStdUntilCommand(ClLanguageCommand *command);
  *
  * INPUT:
- *   command : Structure containing details of the command
- *           : and arguments supplied by the user.
+ *   command : Structure containing details of the command and arguments supplied
+ *           : by the user.
  *
  * OUTPUT:
  *   None
@@ -1867,15 +1848,9 @@ ClStdWhileCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 static void
 ClStdUntilCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 {
-  int               i;
-  bool              flag;
-  std::string       line;
-  ClParserValuePtr  value;
-  int               num_args;
-  ClLanguageArgList arg_list;
-  std::string       expression;
-
   CL_LANGUAGE_TRACE("ClStdUntilCommand");
+
+  ClLanguageMgr *lmgr = ClLanguageMgrInst;
 
   const std::string &cargs = command->getArgs();
 
@@ -1886,8 +1861,7 @@ ClStdUntilCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
   parse.skipSpace();
 
   if (! parse.isChar('(')) {
-    ClLanguageMgrInst->syntaxError
-     ("missing open brackets for 'until' expression");
+    lmgr->syntaxError("missing open brackets for 'until' expression");
     return;
   }
 
@@ -1895,37 +1869,40 @@ ClStdUntilCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 
   parse.skipSpace();
 
-  i = parse.getPos();
+  int pos = parse.getPos();
 
-  if (! args->readArgList(cargs, &i, ')', line)) {
-    ClLanguageMgrInst->syntaxError
-     ("missing close brackets for 'until' expression");
+  std::string line;
+
+  if (! args->readArgList(cargs, &pos, ')', line)) {
+    lmgr->syntaxError("missing close brackets for 'until' expression");
     return;
   }
 
-  parse.setPos(i);
+  parse.setPos(pos);
 
   parse.skipSpace();
 
   if (! parse.eof()) {
-    ClLanguageMgrInst->syntaxError
-     ("spurious characters '%s' after 'until' expression", parse.getAt().c_str());
+    lmgr->syntaxError("spurious characters '%s' after 'until' expression", parse.getAt().c_str());
     return;
   }
+
+  ClLanguageArgList arg_list;
 
   args->stringToArgList(line, &arg_list);
 
-  num_args = arg_list.size();
+  int num_args = arg_list.size();
 
   if (num_args != 1) {
-    ClLanguageMgrInst->syntaxError
-     ("'until' requires a single expression - %d found", num_args);
+    lmgr->syntaxError("'until' requires a single expression - %d found", num_args);
     return;
   }
 
-  expression = arg_list[0];
+  std::string expression = arg_list[0];
 
-  /*************/
+  //---
+
+  bool flag = false;
 
   do {
     /* Process Command List */
@@ -1933,20 +1910,21 @@ ClStdUntilCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
     if (ClLanguageBlockDataMgrInst->processBlockCommands())
       return;
 
-    /*************/
+    //---
 
     /* Process Expression and Check Result */
 
     ClParserExpr expr(expression);
 
+    ClParserValuePtr value;
+
     if      (! expr.exec(value)) {
-      ClLanguageMgrInst->expressionError(ClErr::INVALID_EXPRESSION,
-        "'until' expression - '%s'", expression.c_str());
+      lmgr->expressionError(ClErr::INVALID_EXPRESSION, "'until' expression - '%s'",
+                            expression.c_str());
       return;
     }
     else if (! value.isValid()) {
-      ClLanguageMgrInst->syntaxError
-       ("undefined 'until' expression - '%s'", expression.c_str());
+      lmgr->syntaxError("undefined 'until' expression - '%s'", expression.c_str());
       return;
     }
 
@@ -1958,18 +1936,15 @@ ClStdUntilCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 /*------------------------------------------------------------------*
  *
  * ClStdRepeatCommand
- *   Routine called when a 'repeat ... endrepeat' block
- *   command is entered.
+ *   Routine called when a 'repeat ... endrepeat' block command is entered.
  *
- *   The expression contained in round brackets is extracted
- *   and executed to provide an integer count of the number
- *   of times the loop is to be executed. The list of language
- *   enclosed by the 'repeat ... endrepeat' pair are executed
+ *   The expression contained in round brackets is extracted and executed to
+ *   provide an integer count of the number of times the loop is to be executed.
+ *   The list of language enclosed by the 'repeat ... endrepeat' pair are executed
  *   the specified number of times.
  *
- *   Any break commands exit the loop, any continue commands
- *   skip any remaining loop commands, and any gotos which
- *   jump outside the loop terminate it.
+ *   Any break commands exit the loop, any continue commands skip any remaining
+ *   loop commands, and any gotos which jump outside the loop terminate it.
  *
  * CALL:
  *   ClStdRepeatCommand(ClLanguageCommand *command);
@@ -1992,15 +1967,9 @@ ClStdUntilCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 static void
 ClStdRepeatCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 {
-  int               i;
-  std::string       line;
-  long              count;
-  ClParserValuePtr  value;
-  int               num_args;
-  ClLanguageArgList arg_list;
-  std::string       expression;
-
   CL_LANGUAGE_TRACE("ClStdRepeatCommand");
+
+  ClLanguageMgr *lmgr = ClLanguageMgrInst;
 
   const std::string &cargs = command->getArgs();
 
@@ -2011,8 +1980,7 @@ ClStdRepeatCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
   parse.skipSpace();
 
   if (! parse.isChar('(')) {
-    ClLanguageMgrInst->syntaxError
-     ("missing open brackets for 'repeat' expression");
+    lmgr->syntaxError("missing open brackets for 'repeat' expression");
     return;
   }
 
@@ -2020,65 +1988,69 @@ ClStdRepeatCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 
   parse.skipSpace();
 
-  i = parse.getPos();
+  int pos = parse.getPos();
 
-  if (! args->readArgList(cargs, &i, ')', line)) {
-    ClLanguageMgrInst->syntaxError
-     ("missing close brackets for 'repeat' expression");
+  std::string line;
+
+  if (! args->readArgList(cargs, &pos, ')', line)) {
+    lmgr->syntaxError("missing close brackets for 'repeat' expression");
     return;
   }
 
-  parse.setPos(i);
+  parse.setPos(pos);
 
   parse.skipSpace();
 
   if (! parse.eof()) {
-    ClLanguageMgrInst->syntaxError
-     ("spurious characters '%s' after 'repeat' expression", parse.getAt().c_str());
+    lmgr->syntaxError("spurious characters '%s' after 'repeat' expression", parse.getAt().c_str());
     return;
   }
+
+  ClLanguageArgList arg_list;
 
   args->stringToArgList(line, &arg_list);
 
-  num_args = arg_list.size();
+  int num_args = arg_list.size();
 
   if (num_args != 1) {
-    ClLanguageMgrInst->syntaxError
-     ("'repeat' requires a single expression - %d found", num_args);
+    lmgr->syntaxError("'repeat' requires a single expression - %d found", num_args);
     return;
   }
 
-  expression = arg_list[0];
+  std::string expression = arg_list[0];
 
-  /*************/
+  //---
 
   ClParserExpr expr(expression);
 
+  ClParserValuePtr value;
+
   if      (! expr.exec(value)) {
-    ClLanguageMgrInst->expressionError(ClErr::INVALID_EXPRESSION,
-      "'repeat' expression - '%s'", expression.c_str());
+    lmgr->expressionError(ClErr::INVALID_EXPRESSION, "'repeat' expression - '%s'",
+                          expression.c_str());
     return;
   }
   else if (! value.isValid()) {
-    ClLanguageMgrInst->syntaxError
-     ("undefined 'repeat' expression - '%s'", expression.c_str());
+    lmgr->syntaxError("undefined 'repeat' expression - '%s'", expression.c_str());
     return;
   }
 
+  long count;
+
   if (! value->integerValue(&count)) {
-    ClLanguageMgrInst->expressionError
-     (ClErr::INVALID_CONVERSION, "'repeat' expression - '%s'", expression.c_str());
+    lmgr->expressionError(ClErr::INVALID_CONVERSION, "'repeat' expression - '%s'",
+                          expression.c_str());
     return;
   }
 
   if (count < 1) {
-    ClLanguageMgrInst->syntaxError("invalid count %d for 'repeat'", count);
+    lmgr->syntaxError("invalid count %d for 'repeat'", count);
     return;
   }
 
-  /*************/
+  //---
 
-  for (i = 0; i < count; i++) {
+  for (int i = 0; i < count; i++) {
     /* Process Command List */
 
     if (ClLanguageBlockDataMgrInst->processBlockCommands())
@@ -2089,35 +2061,30 @@ ClStdRepeatCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 /*------------------------------------------------------------------*
  *
  * ClStdIfCommand
- *   Routine called when a 'if ... endif' block command
- *   is entered.
+ *   Routine called when a 'if ... endif' block command is entered.
  *
- *   The block of commands enclosed by the 'if ... endif'
- *   may contain 'elseif' and 'else' commands.
+ *   The block of commands enclosed by the 'if ... endif' may contain
+ *   'elseif' and 'else' commands.
  *
- *   The expression contained in round brackets is extracted
- *   and evaluated. If the expression results in a non-zero
- *   integer then the enclosed commands up to any embedded
- *   'elseif' or 'else' commands are executed. If the
- *   expression results in a zero integer then the enclosed
- *   commands up to any embedded 'elseif' or 'else' commands
- *   are skipped. If the command is an 'elseif' then the
- *   command is effectively treated as an 'if' and the
- *   execution starts again from the current position in the
- *   enclosed command list. If the command is an 'else' then
- *   the remaining enclosed commands are executed.
+ *   The expression contained in round brackets is extracted and evaluated.
+ *   If the expression results in a non-zero integer then the enclosed commands
+ *   up to any embedded 'elseif' or 'else' commands are executed. If the
+ *   expression results in a zero integer then the enclosed commands up to
+ *   any embedded 'elseif' or 'else' commands are skipped. If the command is
+ *   an 'elseif' then the command is effectively treated as an 'if' and the
+ *   execution starts again from the current position in the enclosed command list.
+ *   If the command is an 'else' then the remaining enclosed commands are executed.
  *
- *   Any break commands exit the block but remain in force
- *   for any parent block. Any continue commands exit the
- *   block but remain in force for any parent block. Any
- *   goto commands outside the block exit it.
+ *   Any break commands exit the block but remain in force for any parent block.
+ *   Any continue commands exit the block but remain in force for any parent block.
+ *   Any goto commands outside the block exit it.
  *
  * CALL:
  *   ClStdIfCommand(ClLanguageCommand *command);
  *
  * INPUT:
- *   command : Structure containing details of the command
- *           : and arguments supplied by the user.
+ *   command : Structure containing details of the command : and arguments
+ *           : supplied by the user.
  *
  * OUTPUT:
  *   None
@@ -2133,14 +2100,17 @@ ClStdRepeatCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 static void
 ClStdIfCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 {
-  int               i;
-  bool              flag;
-  std::string       line;
-  ClParserValuePtr  value;
-  int               num_args;
-  ClLanguageArgList arg_list;
-  std::string       expression;
-  int               num_commands;
+  struct Commands {
+    ~Commands() {
+      delete [] commands;
+    }
+
+    ClLanguageCommand **commands = nullptr;
+  };
+
+  //---
+
+  ClLanguageMgr *lmgr = ClLanguageMgrInst;
 
   CL_LANGUAGE_TRACE("ClStdIfCommand");
 
@@ -2150,8 +2120,6 @@ ClStdIfCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 
   ClLanguageCommandList command_list1;
 
-  ClLanguageCommand **commands = 0;
-
   /* Extract If Expression */
 
   CStrParse parse(cargs);
@@ -2159,78 +2127,79 @@ ClStdIfCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
   parse.skipSpace();
 
   if (! parse.isChar('(')) {
-    ClLanguageMgrInst->syntaxError
-     ("missing open brackets for 'if' expression");
-    goto fail;
+    lmgr->syntaxError("missing open brackets for 'if' expression");
+    return;
   }
 
   parse.skipChar();
 
   parse.skipSpace();
 
-  i = parse.getPos();
+  int pos = parse.getPos();
 
-  if (! args->readArgList(cargs, &i, ')', line)) {
-    ClLanguageMgrInst->syntaxError
-     ("missing close brackets for 'if' expression");
-    goto fail;
+  std::string line;
+
+  if (! args->readArgList(cargs, &pos, ')', line)) {
+    lmgr->syntaxError("missing close brackets for 'if' expression");
+    return;
   }
 
-  parse.setPos(i);
+  parse.setPos(pos);
 
   parse.skipSpace();
 
   if (! parse.eof()) {
-    ClLanguageMgrInst->syntaxError
-     ("spurious characters '%s' after 'if' expression", parse.getAt().c_str());
-    goto fail;
+    lmgr->syntaxError("spurious characters '%s' after 'if' expression", parse.getAt().c_str());
+    return;
   }
+
+  ClLanguageArgList arg_list;
 
   args->stringToArgList(line, &arg_list);
 
-  num_args = arg_list.size();
+  int num_args = arg_list.size();
 
   if (num_args != 1) {
-    ClLanguageMgrInst->syntaxError
-     ("'if' requires a single expression - %d found", num_args);
-    goto fail;
+    lmgr->syntaxError("'if' requires a single expression - %d found", num_args);
+    return;
   }
 
-  expression = arg_list[0];
+  std::string expression = arg_list[0];
 
-  /*************/
+  //---
 
   /* Process Expression and Check Result */
 
-  {
   ClParserExpr expr(expression);
 
+  ClParserValuePtr value;
+
   if      (! expr.exec(value)) {
-    ClLanguageMgrInst->expressionError(ClErr::INVALID_EXPRESSION,
-      "'if' expression - '%s'", expression.c_str());
-    goto fail;
+    lmgr->expressionError(ClErr::INVALID_EXPRESSION, "'if' expression - '%s'", expression.c_str());
+    return;
   }
   else if (! value.isValid()) {
-    ClLanguageMgrInst->syntaxError
-     ("undefined 'if' expression - '%s'", expression.c_str());
-    goto fail;
+    lmgr->syntaxError("undefined 'if' expression - '%s'", expression.c_str());
+    return;
   }
 
-  flag = value->toBool();
-  }
+  bool flag = value->toBool();
 
-  /*************/
+  //---
 
   /* If Expression is True Process Command List */
 
-  ClLanguageMgrInst->commandListToArray(command_list, &commands, &num_commands);
+  Commands commands;
+  int      num_commands;
 
-  for (i = 0; i < num_commands; i++) {
-    if      (commands[i]->isIdent(language_elseif_ident)) {
+  lmgr->commandListToArray(command_list, &commands.commands, &num_commands);
+
+  for (int i = 0; i < num_commands; i++) {
+    if      (commands.commands[i]->isIdent(language_elseif_ident)) {
       if (flag)
         break;
 
-      const std::string &args1 = commands[i]->getArgs();
+      const std::string &args1 = commands.commands[i]->getArgs();
 
       /* Extract Else If Expression */
 
@@ -2239,31 +2208,31 @@ ClStdIfCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
       parse.skipSpace();
 
       if (! parse.isChar('(')) {
-        ClLanguageMgrInst->syntaxError
-         ("missing open brackets for 'elseif' expression");
-        goto fail;
+        lmgr->syntaxError("missing open brackets for 'elseif' expression");
+        return;
       }
 
       parse.skipChar();
 
       parse.skipSpace();
 
-      i = parse.getPos();
+      int pos = parse.getPos();
 
-      if (! args->readArgList(cargs, &i, ')', line)) {
-        ClLanguageMgrInst->syntaxError
-         ("missing close brackets for 'elseif' expression");
-        goto fail;
+      std::string line;
+
+      if (! args->readArgList(args1, &pos, ')', line)) {
+        lmgr->syntaxError("missing close brackets for 'elseif' expression");
+        return;
       }
 
-      parse.setPos(i);
+      parse.setPos(pos);
 
       parse.skipSpace();
 
       if (! parse.eof()) {
-        ClLanguageMgrInst->syntaxError
-         ("spurious characters '%s' after 'elseif' expression", parse.getAt().c_str());
-        goto fail;
+        lmgr->syntaxError("spurious characters '%s' after 'elseif' expression",
+                          parse.getAt().c_str());
+        return;
       }
 
       args->stringToArgList(line, &arg_list);
@@ -2271,73 +2240,69 @@ ClStdIfCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
       num_args = arg_list.size();
 
       if (num_args != 1) {
-        ClLanguageMgrInst->syntaxError
-         ("'elseif' requires a single expression - %d found", num_args);
-        goto fail;
+        lmgr->syntaxError("'elseif' requires a single expression - %d found", num_args);
+        return;
       }
 
-      expression = arg_list[0];
+      std::string expression = arg_list[0];
 
-      /*************/
+      //---
 
       /* Process Expression and Check Result */
 
       ClParserExpr expr(expression);
 
+      ClParserValuePtr value;
+
       if      (! expr.exec(value)) {
-        ClLanguageMgrInst->expressionError(ClErr::INVALID_EXPRESSION,
-          "'elseif' expression - '%s'", expression.c_str());
-        goto fail;
+        lmgr->expressionError(ClErr::INVALID_EXPRESSION, "'elseif' expression - '%s'",
+                              expression.c_str());
+        return;
       }
       else if (! value.isValid()) {
-        ClLanguageMgrInst->syntaxError
-         ("undefined 'elseif' expression - '%s'", expression.c_str());
-        goto fail;
+        lmgr->syntaxError("undefined 'elseif' expression - '%s'", expression.c_str());
+        return;
       }
 
       flag = value->toBool();
     }
-    else if (commands[i]->isIdent(language_else_ident)) {
+    else if (commands.commands[i]->isIdent(language_else_ident)) {
       if (flag)
         break;
 
-      const std::string &args1 = commands[i]->getArgs();
+      const std::string &args1 = commands.commands[i]->getArgs();
 
       CStrParse parse(args1);
 
       parse.skipSpace();
 
       if (! parse.eof()) {
-        ClLanguageMgrInst->syntaxError
-         ("spurious characters '%s' after 'else' expression", parse.getAt().c_str());
-        goto fail;
+        lmgr->syntaxError("spurious characters '%s' after 'else' expression",
+                          parse.getAt().c_str());
+        return;
       }
 
       flag = true;
     }
     else {
       if (flag)
-        command_list1.push_back(commands[i]);
+        command_list1.push_back(commands.commands[i]);
     }
   }
 
   ClLanguageBlockDataMgrInst->setBlockCommands(command_list1);
 
   ClLanguageBlockDataMgrInst->processBlockCommands();
-
- fail:
-  delete [] commands;
 }
 
 /*------------------------------------------------------------------*
  *
  * ClStdElseIfCommand
- *   Routine called when the 'elseif' command is entered
- *   outside of an 'if ... endif' block.
+ *   Routine called when the 'elseif' command is entered outside of an
+ *   'if ... endif' block.
  *
- *   If the 'elseif' command is encountered outside
- *   an 'if ... endif' block (which processes it manually)
- *   then it is a syntax error.
+ *   If the 'elseif' command is encountered outside an 'if ... endif' block
+ *  (which processes it manually) then it is a syntax error.
  *
  * CALL:
  *   ClStdElseIfCommand(ClLanguageCommand *command);
@@ -2362,27 +2327,28 @@ ClStdElseIfCommand(ClLanguageCommand *, ClLanguageArgs *, void *)
 {
   CL_LANGUAGE_TRACE("ClStdElseIfCommand");
 
+  ClLanguageMgr *lmgr = ClLanguageMgrInst;
+
   /* Else If can only be processed inside If Command List */
 
-  ClLanguageMgrInst->syntaxError("'elseif' outside 'if' block");
+  lmgr->syntaxError("'elseif' outside 'if' block");
 }
 
 /*------------------------------------------------------------------*
  *
  * ClStdElseCommand
- *   Routine called when the 'else' command is entered
- *   outside of an 'if ... endif' block.
+ *   Routine called when the 'else' command is entered outside of an
+ *   'if ... endif' block.
  *
- *   If the 'else' command is encountered outside
- *   an 'if ... endif' block (which processes it manually)
- *   then it is a syntax error.
+ *   If the 'else' command is encountered outside an 'if ... endif' block
+ *   (which processes it manually) then it is a syntax error.
  *
  * CALL:
  *   ClStdElseCommand(ClLanguageCommand *command);
  *
  * INPUT:
- *   command : Structure containing details of the command
- *           : and arguments supplied by the user.
+ *   command : Structure containing details of the command and arguments
+ *           : supplied by the user.
  *
  * OUTPUT:
  *   None
@@ -2400,9 +2366,11 @@ ClStdElseCommand(ClLanguageCommand *, ClLanguageArgs *, void *)
 {
   CL_LANGUAGE_TRACE("ClStdElseCommand");
 
+  ClLanguageMgr *lmgr = ClLanguageMgrInst;
+
   /* Else can only be processed inside If Command List */
 
-  ClLanguageMgrInst->syntaxError("'else' outside 'if' block");
+  lmgr->syntaxError("'else' outside 'if' block");
 }
 
 /*------------------------------------------------------------------*
@@ -2410,19 +2378,17 @@ ClStdElseCommand(ClLanguageCommand *, ClLanguageArgs *, void *)
  * ClStdGotoCommand
  *   Routine called when the 'goto' command is entered.
  *
- *   The name after the goto is extracted and we ensure
- *   that we are in a block command (otherwise there will
- *   be no saved label to goto). The label data for the
- *   corresponding label is found (if defined) and the
- *   goto details are stored in global variables ready
- *   for the parent block command to handle.
+ *   The name after the goto is extracted and we ensure that we are in a block
+ *   command (otherwise there will be no saved label to goto). The label data for
+ *   the corresponding label is found (if defined) and the goto details are stored
+ *   in global variables ready for the parent block command to handle.
  *
  * CALL:
  *   ClStdGotoCommand(ClLanguageCommand *command);
  *
  * INPUT:
- *   command : Structure containing details of the command
- *           : and arguments supplied by the user.
+ *   command : Structure containing details of the command and arguments supplied
+ *           : by the user.
  *
  * OUTPUT:
  *   None
@@ -2431,10 +2397,10 @@ ClStdElseCommand(ClLanguageCommand *, ClLanguageArgs *, void *)
  *   None
  *
  * NOTES:
- *   Sets goto flag  to 'true', goto name to the label name and
- *   goto depth to the depth at which the label appears. The parent
- *   block command should check the level and terminate if it is lower
- *   than the current level or perform the goto if at the same level.
+ *   Sets goto flag  to 'true', goto name to the label name and goto depth to the
+ *   depth at which the label appears. The parent block command should check the
+ *   level and terminate if it is lower than the current level or perform the goto
+ *   if at the same level.
  *
  *------------------------------------------------------------------*/
 
@@ -2446,6 +2412,8 @@ ClStdGotoCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
   ClLanguageLabelData *label_data;
 
   CL_LANGUAGE_TRACE("ClStdGotoCommand");
+
+  ClLanguageMgr *lmgr = ClLanguageMgrInst;
 
   /* Get Goto's Arguments */
 
@@ -2460,28 +2428,25 @@ ClStdGotoCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
     return;
 
   if (! ClParserVar::isValidName(arg)) {
-    ClLanguageMgrInst->syntaxError
-      ("invalid 'goto' label name '%s'", arg.c_str());
+    lmgr->syntaxError("invalid 'goto' label name '%s'", arg.c_str());
     return;
   }
 
   /* Check that we are in a Block Command */
 
-  if (ClLanguageMgrInst->getDepth() == 0) {
-    ClLanguageMgrInst->syntaxError
-      ("'goto' not allowed outside block command");
+  if (lmgr->getDepth() == 0) {
+    lmgr->syntaxError("'goto' not allowed outside block command");
     return;
   }
 
   label_data = ClLanguageLabelDataMgrInst->getCurrentLabelData(arg);
 
   if (! label_data) {
-    ClLanguageMgrInst->syntaxError
-     ("'goto' label '%s' not known in current scope", arg.c_str());
+    lmgr->syntaxError("'goto' label '%s' not known in current scope", arg.c_str());
     return;
   }
 
-  ClLanguageMgrInst->getGoto().set(label_data->getName(), label_data->getDepth());
+  lmgr->getGoto().set(label_data->getName(), label_data->getDepth());
 }
 
 /*------------------------------------------------------------------*
@@ -2489,16 +2454,15 @@ ClStdGotoCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
  * ClStdBreakCommand
  *   Routine called when the 'break' command is entered.
  *
- *   The routine ensures no arguments are supplied and
- *   sets a global variable ready for the parent block
- *   command to handle.
+ *   The routine ensures no arguments are supplied and sets a global variable
+ *   ready for the parent block command to handle.
  *
  * CALL:
  *   ClStdBreakCommand(ClLanguageCommand *command);
  *
  * INPUT:
- *   command : Structure containing details of the command
- *           : and arguments supplied by the user.
+ *   command : Structure containing details of the command and arguments
+ *           : supplied by the user.
  *
  * OUTPUT:
  *   None
@@ -2518,6 +2482,8 @@ ClStdBreakCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
 {
   CL_LANGUAGE_TRACE("ClStdBreakCommand");
 
+  ClLanguageMgr *lmgr = ClLanguageMgrInst;
+
   /* Check Args */
 
   if (args->checkNumberOfArgs(0, 0) != 0)
@@ -2525,7 +2491,7 @@ ClStdBreakCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
 
   /* Set Break Flag */
 
-  ClLanguageMgrInst->setBreakFlag(true);
+  lmgr->setBreakFlag(true);
 }
 
 /*------------------------------------------------------------------*
@@ -2533,9 +2499,9 @@ ClStdBreakCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
  * ClStdContinueCommand
  *   Routine called when the 'continue' command is entered.
  *
- *   The routine ensures no arguments are supplied and
- *   that we are in a block command. It then sets a global
- *   variable ready for the parent block command to handle.
+ *   The routine ensures no arguments are supplied and that we are in a block
+ *   command. It then sets a global variable ready for the parent block command
+ *   to handle.
  *
  * CALL:
  *   ClStdContinueCommand(ClLanguageCommand *command);
@@ -2562,6 +2528,8 @@ ClStdContinueCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
 {
   CL_LANGUAGE_TRACE("ClStdContinueCommand");
 
+  ClLanguageMgr *lmgr = ClLanguageMgrInst;
+
   /* Check Args */
 
   if (args->checkNumberOfArgs(0, 0) != 0)
@@ -2569,14 +2537,14 @@ ClStdContinueCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
 
   /* Check that we are in a Block Command */
 
-  if (ClLanguageMgrInst->getDepth() == 0) {
-    ClLanguageMgrInst->syntaxError("'continue' not allowed outside block command");
+  if (lmgr->getDepth() == 0) {
+    lmgr->syntaxError("'continue' not allowed outside block command");
     return;
   }
 
   /* Set Continue Flag */
 
-  ClLanguageMgrInst->setContinueFlag(true);
+  lmgr->setContinueFlag(true);
 }
 
 /*------------------------------------------------------------------*
@@ -2613,6 +2581,8 @@ ClStdReturnCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
 {
   CL_LANGUAGE_TRACE("ClStdReturnCommand");
 
+  ClLanguageMgr *lmgr = ClLanguageMgrInst;
+
   /* Check Args */
 
   if (args->checkNumberOfArgs(0, 0) != 0)
@@ -2620,14 +2590,14 @@ ClStdReturnCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
 
   /* Check that we are in a Block Command */
 
-  if (ClLanguageMgrInst->getDepth() == 0) {
-    ClLanguageMgrInst->syntaxError("'return' not allowed outside block command");
+  if (lmgr->getDepth() == 0) {
+    lmgr->syntaxError("'return' not allowed outside block command");
     return;
   }
 
   /* Set Return Flag */
 
-  ClLanguageMgrInst->setReturnFlag(true);
+  lmgr->setReturnFlag(true);
 }
 
 /*------------------------------------------------------------------*
@@ -2635,9 +2605,8 @@ ClStdReturnCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
  * ClStdOnCommand
  *   Routine called when the 'on' command is entered.
  *
- *   When the specified signal type occurs the specified
- *   command is executed. If no command is specified
- *   then signal handling reverts to its default action.
+ *   When the specified signal type occurs the specified command is executed.
+ *   If no command is specified then signal handling reverts to its default action.
  *
  *   Signal Types :-
  *     syntax     : Syntax Error (Internal Signal)
@@ -2677,6 +2646,8 @@ ClStdOnCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
 
   CL_LANGUAGE_TRACE("ClStdOnCommand");
 
+  ClLanguageMgr *lmgr = ClLanguageMgrInst;
+
   const std::string &cargs = command->getArgs();
 
   /*-------------------*/
@@ -2696,8 +2667,8 @@ ClStdOnCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
   parse.readNonSpace(command1);
 
   if (! parse.eof()) {
-    ClLanguageMgrInst->syntaxError
-     ("spurious characters '%s' at end of 'on' expression", parse.getAt().c_str());
+    lmgr->syntaxError("spurious characters '%s' at end of 'on' expression",
+                      parse.getAt().c_str());
     return;
   }
 
@@ -2706,7 +2677,7 @@ ClStdOnCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
   flag = ClSignalMgrInst->setSignalCommand(type, command1);
 
   if (! flag)
-    ClLanguageMgrInst->error("invalid signal type '%s'", type.c_str());
+    lmgr->error("invalid signal type '%s'", type.c_str());
 }
 
 /*------------------------------------------------------------------*
@@ -2714,8 +2685,8 @@ ClStdOnCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
  * ClStdRaiseCommand
  *   Routine called when the 'raise' command is entered.
  *
- *   The routine raises the specified signal calling
- *   its associated command or routine.
+ *   The routine raises the specified signal calling its associated command
+ *   or routine.
  *
  * CALL:
  *   ClStdRaiseCommand(ClLanguageCommand *command);
@@ -2744,6 +2715,8 @@ ClStdRaiseCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
 
   CL_LANGUAGE_TRACE("ClStdRaiseCommand");
 
+  ClLanguageMgr *lmgr = ClLanguageMgrInst;
+
   const std::string &cargs = command->getArgs();
 
   /*-------------------*/
@@ -2765,8 +2738,8 @@ ClStdRaiseCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
   parse.readNonSpace(data);
 
   if (! parse.eof()) {
-    ClLanguageMgrInst->syntaxError
-     ("spurious characters '%s' at end of 'raise' expression", parse.getAt().c_str());
+    lmgr->syntaxError("spurious characters '%s' at end of 'raise' expression",
+                      parse.getAt().c_str());
     return;
   }
 
@@ -2775,7 +2748,7 @@ ClStdRaiseCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
   flag = ClSignalMgrInst->raiseSignal(type, data);
 
   if (! flag)
-    ClLanguageMgrInst->error("invalid signal type '%s'", type.c_str());
+    lmgr->error("invalid signal type '%s'", type.c_str());
 }
 
 /*------------------------------------------------------------------*
@@ -2783,9 +2756,8 @@ ClStdRaiseCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
  * ClStdDefineCommand
  *   Routine called when the 'define' command is entered.
  *
- *   This routine allows the user to define a simple
- *   function consisting of a single expression whose
- *   input variables are set to the values supplied
+ *   This routine allows the user to define a simple function consisting of
+ *   a single expression whose input variables are set to the values supplied
  *   when the function is invoked.
  *
  * CALL:
@@ -2818,6 +2790,8 @@ ClStdDefineCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
 
   CL_LANGUAGE_TRACE("ClStdDefineCommand");
 
+  ClLanguageMgr *lmgr = ClLanguageMgrInst;
+
   const std::string &cargs = command->getArgs();
 
   /* Extract Procedure Name */
@@ -2825,8 +2799,7 @@ ClStdDefineCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
   CStrParse parse(cargs);
 
   if (! parse.readIdentifier(name_string)) {
-    ClLanguageMgrInst->syntaxError
-     ("'define' function name must start with alphabetic or '_'");
+    lmgr->syntaxError("'define' function name must start with alphabetic or '_'");
     return;
   }
 
@@ -2838,8 +2811,7 @@ ClStdDefineCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
   /* Ensure Procedure Can be Deleted */
 
   if (old_procedure != 0 && ! old_procedure->canDelete()) {
-    ClLanguageMgrInst->syntaxError
-     ("'define' Existing procedure '%s' cannot be deleted", name_string.c_str());
+    lmgr->syntaxError("'define' Existing procedure '%s' cannot be deleted", name_string.c_str());
     return;
   }
 
@@ -2848,7 +2820,7 @@ ClStdDefineCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
   p = cargs.find('=');
 
   if (p == std::string::npos) {
-    ClLanguageMgrInst->syntaxError("missing equals sign for 'define'");
+    lmgr->syntaxError("missing equals sign for 'define'");
     return;
   }
 
@@ -2864,8 +2836,7 @@ ClStdDefineCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
   ClParserInst->createFunc(cargs, rhs, &error_code);
 
   if (error_code != 0) {
-    ClLanguageMgrInst->expressionError
-     (error_code, "'define' '%s' = '%s'", lhs.c_str(), rhs.c_str());
+    lmgr->expressionError(error_code, "'define' '%s' = '%s'", lhs.c_str(), rhs.c_str());
 
     /* Restore Language Function's Parser User Function if failed
        to define Parser Function */
@@ -2905,9 +2876,8 @@ ClStdDefineCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
  * ClStdStructCommand
  *   Routine called when the 'struct' command is entered.
  *
- *   This routine allows the user to define a structure
- *   consisting of a name and a type name list enclosed
- *   in curly brackets.
+ *   This routine allows the user to define a structure consisting of a name
+ *   and a type name list enclosed in curly brackets.
  *
  * CALL:
  *   ClStdStructCommand(ClLanguageCommand *command);
@@ -2936,6 +2906,8 @@ ClStdStructCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
 
   CL_LANGUAGE_TRACE("ClStdStructCommand");
 
+  ClLanguageMgr *lmgr = ClLanguageMgrInst;
+
   const std::string &cargs = command->getArgs();
 
   /* Extract Structure Name */
@@ -2945,15 +2917,14 @@ ClStdStructCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
   parse.skipSpace();
 
   if (! parse.readIdentifier(structure_name)) {
-    ClLanguageMgrInst->syntaxError("missing structure name for 'struct'");
+    lmgr->syntaxError("missing structure name for 'struct'");
     return;
   }
 
   parse.skipSpace();
 
   if (! parse.isChar('{')) {
-    ClLanguageMgrInst->syntaxError
-     ("missing open curly brace for 'struct' '%s'", structure_name.c_str());
+    lmgr->syntaxError("missing open curly brace for 'struct' '%s'", structure_name.c_str());
     return;
   }
 
@@ -2966,14 +2937,12 @@ ClStdStructCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
   CStrUtil::stripSpaces(type_arg_list);
 
   if (type_arg_list == "") {
-    ClLanguageMgrInst->syntaxError
-      ("missing open type/argument list for 'struct' '%s'", structure_name.c_str());
+    lmgr->syntaxError("missing open type/argument list for 'struct' '%s'", structure_name.c_str());
     return;
   }
 
   if (! parse.isChar('}')) {
-    ClLanguageMgrInst->syntaxError
-     ("missing close curly brace for 'struct' '%s'", structure_name.c_str());
+    lmgr->syntaxError("missing close curly brace for 'struct' '%s'", structure_name.c_str());
     return;
   }
 
@@ -2983,8 +2952,8 @@ ClStdStructCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
     ClParserInst->createType(structure_name, type_arg_list);
   }
   catch (int error_code) {
-    ClLanguageMgrInst->expressionError
-     (error_code, "'struct' '%s' { '%s' }", structure_name.c_str(), type_arg_list.c_str());
+    lmgr->expressionError(error_code, "'struct' '%s' { '%s' }",
+                          structure_name.c_str(), type_arg_list.c_str());
   }
 }
 
@@ -2993,12 +2962,10 @@ ClStdStructCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
  * ClStdInputCommand
  *   Routine called when the 'input' command is entered.
  *
- *   This routine outputs the specified prompt str
- *   and waits for the user to enter some text. If the
- *   variable specified as the second argument starts
- *   with a '$' then the text is assigned directly to
- *   the variable (name minus the dollar) otherwise the
- *   text is treated as an expression and is evaluated
+ *   This routine outputs the specified prompt str and waits for the user to
+ *   enter some text. If the variable specified as the second argument starts
+ *   with a '$' then the text is assigned directly to the variable (name minus
+ *   the dollar) otherwise the text is treated as an expression and is evaluated
  *   and the resultant value assigned to the variable.
  *
  * CALL:
@@ -3026,13 +2993,15 @@ ClStdStructCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
 static void
 ClStdInputCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
 {
+  CL_LANGUAGE_TRACE("ClStdInputCommand");
+
+  ClLanguageMgr *lmgr = ClLanguageMgrInst;
+
   int         evaluate;
   std::string variable;
   std::string variable1;
   int         arg_offset;
   std::string prompt_string;
-
-  CL_LANGUAGE_TRACE("ClStdInputCommand");
 
   /* Check Number of Arguments */
 
@@ -3058,7 +3027,7 @@ ClStdInputCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
     CStrUtil::stripSpaces(name);
 
     if (! ClParserVar::isValidName(name)) {
-      ClLanguageMgrInst->syntaxError("invalid 'input' file variable %s", arg.c_str());
+      lmgr->syntaxError("invalid 'input' file variable %s", arg.c_str());
       return;
     }
 
@@ -3067,8 +3036,7 @@ ClStdInputCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
     long fp1;
 
     if (! value->integerValue(&fp1)) {
-      ClLanguageMgrInst->expressionError
-       (ClErr::INVALID_CONVERSION, "'input' file variable '%s'", name.c_str());
+      lmgr->expressionError(ClErr::INVALID_CONVERSION, "'input' file variable '%s'", name.c_str());
       return;
     }
 
@@ -3110,22 +3078,21 @@ ClStdInputCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
   }
 
   if (! ClParserInst->isValidAssignString(variable1)) {
-    ClLanguageMgrInst->syntaxError
-     ("'input' argument 2 (invalid variable name '%s')", variable1.c_str());
+    lmgr->syntaxError("'input' argument 2 (invalid variable name '%s')", variable1.c_str());
     return;
   }
 
   /* Prompt User for Input */
 
-  ClLanguageMgrInst->output("%s", prompt_string.c_str());
+  lmgr->output("%s", prompt_string.c_str());
 
   std::string line;
 
 #ifdef CEIL_READLINE
   if (fp == stdin) {
-    ClLanguageMgrInst->getReadLine().setPrompt("");
+    lmgr->getReadLine().setPrompt("");
 
-    line = ClLanguageMgrInst->getReadLine().readLine();
+    line = lmgr->getReadLine().readLine();
   }
   else {
     CFile file(fp);
@@ -3142,13 +3109,13 @@ ClStdInputCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
 
   /* Handle User Interrupt */
 
-  if (line == "" || ClLanguageMgrInst->checkAbort()) {
+  if (line == "" || lmgr->checkAbort()) {
     if (ClSignalMgrInst->checkSignalCommand(SIGINT)) {
       if (line == "")
         ClSignalMgrInst->raiseSignal("interrupt", "");
     }
     else
-      ClLanguageMgrInst->error("** Interrupt ** input abandoned");
+      lmgr->error("** Interrupt ** input abandoned");
 
     goto set_value;
   }
@@ -3172,8 +3139,7 @@ ClStdInputCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
     ClParserInst->assignValue(variable1, value, &error_code);
 
     if (error_code != 0) {
-      ClLanguageMgrInst->expressionError
-       (error_code, "'input' argument 2 - '%s'", line.c_str());
+      lmgr->expressionError(error_code, "'input' argument 2 - '%s'", line.c_str());
       return;
     }
   }
@@ -3192,8 +3158,7 @@ ClStdInputCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
     ClParserInst->assignValue(variable1, value, &error_code);
 
     if (error_code != 0) {
-      ClLanguageMgrInst->expressionError
-       (error_code, "'input' argument 2 - '%s'", line.c_str());
+      lmgr->expressionError(error_code, "'input' argument 2 - '%s'", line.c_str());
       return;
     }
   }
@@ -3233,6 +3198,8 @@ ClStdPrintCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 {
   CL_LANGUAGE_TRACE("ClStdPrintCommand");
 
+  ClLanguageMgr *lmgr = ClLanguageMgrInst;
+
   const std::string &cargs = command->getArgs();
 
   uint len = cargs.size();
@@ -3244,7 +3211,7 @@ ClStdPrintCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 
   /*-------------*/
 
-  FILE *fp      = ClLanguageMgrInst->setOutputFp(0);
+  FILE *fp      = lmgr->setOutputFp(0);
   FILE *save_fp = fp;
 
   /* Get Print's Arguments */
@@ -3273,8 +3240,7 @@ ClStdPrintCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
       CStrUtil::stripSpaces(name);
 
       if (! ClParserVar::isValidName(name)) {
-        ClLanguageMgrInst->syntaxError
-         ("invalid 'print' file variable %s", arg.c_str());
+        lmgr->syntaxError("invalid 'print' file variable %s", arg.c_str());
         goto done;
       }
 
@@ -3283,14 +3249,14 @@ ClStdPrintCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
       long fp1;
 
       if (! value->integerValue(&fp1)) {
-        ClLanguageMgrInst->expressionError
-         (ClErr::INVALID_CONVERSION, "'print' file variable '%s'", name.c_str());
+        lmgr->expressionError(ClErr::INVALID_CONVERSION, "'print' file variable '%s'",
+                              name.c_str());
         goto done;
       }
 
       fp = (FILE *) fp1;
 
-      ClLanguageMgrInst->setOutputFp(fp);
+      lmgr->setOutputFp(fp);
 
       value_output = false;
 
@@ -3303,25 +3269,22 @@ ClStdPrintCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 
     if      (! expr.exec(value)) {
       if (num_args == 1)
-        ClLanguageMgrInst->expressionError(ClErr::INVALID_EXPRESSION,
-          "'print' expression '%s'", arg.c_str());
+        lmgr->expressionError(ClErr::INVALID_EXPRESSION, "'print' expression '%s'", arg.c_str());
       else
-        ClLanguageMgrInst->expressionError(ClErr::INVALID_EXPRESSION,
-          "'print' expression %d - '%s'", i, arg.c_str());
+        lmgr->expressionError(ClErr::INVALID_EXPRESSION, "'print' expression %d - '%s'",
+                              i, arg.c_str());
       goto done;
     }
     else if (! value.isValid()) {
       if (num_args == 1)
-        ClLanguageMgrInst->syntaxError
-         ("undefined 'print' expression '%s'", arg.c_str());
+        lmgr->syntaxError("undefined 'print' expression '%s'", arg.c_str());
       else
-        ClLanguageMgrInst->syntaxError
-         ("undefined 'print' expression %d - '%s'", i, arg.c_str());
+        lmgr->syntaxError("undefined 'print' expression %d - '%s'", i, arg.c_str());
       goto done;
     }
 
     if (value_output)
-      ClLanguageMgrInst->output(" ");
+      lmgr->output(" ");
 
     value->print();
 
@@ -3330,11 +3293,11 @@ ClStdPrintCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 
  done:
   if (newline)
-    ClLanguageMgrInst->output("\n");
+    lmgr->output("\n");
 
   fflush(fp);
 
-  ClLanguageMgrInst->setOutputFp(save_fp);
+  lmgr->setOutputFp(save_fp);
 }
 
 /*------------------------------------------------------------------*
@@ -3381,19 +3344,21 @@ ClStdFormatCommand(ClParserValuePtr *values, uint num_values, void *, int *error
 {
   CL_LANGUAGE_TRACE("ClStdFormatCommand");
 
+  ClLanguageMgr *lmgr = ClLanguageMgrInst;
+
   *error_code = 0;
 
   ClParserValuePtr value;
 
   if (num_values <= 0) {
-    ClLanguageMgrInst->syntaxError("'format' requires at least 1 value");
+    lmgr->syntaxError("'format' requires at least 1 value");
     return ClParserValuePtr();
   }
 
   std::string format_string;
 
   if (! values[0]->stringValue(format_string)) {
-    ClLanguageMgrInst->expressionError(ClErr::INVALID_CONVERSION, "'format' argument 1");
+    lmgr->expressionError(ClErr::INVALID_CONVERSION, "'format' argument 1");
     return ClParserValuePtr();
   }
 
@@ -3564,18 +3529,15 @@ ClStdFormatCommand(ClParserValuePtr *values, uint num_values, void *, int *error
  * ClStdScanCommand
  *   Routine called when the 'scan' function is entered.
  *
- *   The routine extracts values for the supplied str
- *   using the supplied template. The resultant values
- *   are store in the variables specified by the
- *   remaining arguments.
+ *   The routine extracts values for the supplied str using the supplied template.
+ *   The resultant values are store in the variables specified by the remaining
+ *   arguments.
  *
- *   The style of the template is identical to that used
- *   by the C function 'scanf'.
+ *   The style of the template is identical to that used by the C function 'scanf'.
  *
  * CALL:
  *   ClParserValuePtr value =
- *     ClStdFormatCommand
- *       (ClParserValuePtr *, uint, void *, int &error_code);
+ *     ClStdFormatCommand(ClParserValuePtr *, uint, void *, int &error_code);
  *
  * INPUT:
  *   values     : The array of values supplied
@@ -3607,52 +3569,62 @@ ClStdFormatCommand(ClParserValuePtr *values, uint num_values, void *, int *error
 static ClParserValuePtr
 ClStdScanCommand(ClParserValuePtr *values, uint num_values, void *, int *error_code)
 {
-  uint        i, len1, len2;
-  char*       addrs[20];
-  int         codes[20];
-  uint        num_addrs = 0;
-  uint        num_scanned;
-  std::string source_string;
-  std::string format_string;
-  std::string format_string1;
+  struct Addrs {
+   ~Addrs() {
+      for (uint i = 0; i < num_addrs; i++)
+        delete addrs[i];
+    }
+
+    char* addrs[20];
+    int   codes[20];
+    uint  num_addrs = 0;
+  };
 
   CL_LANGUAGE_TRACE("ClStdScanCommand");
+
+  ClLanguageMgr *lmgr = ClLanguageMgrInst;
 
   *error_code = -1;
 
   ClParserValuePtr value;
 
-  /*-----------------*/
+  //---
 
   if (num_values < 2) {
-    ClLanguageMgrInst->syntaxError("'scan' requires at least 2 values");
-    goto fail;
+    lmgr->syntaxError("'scan' requires at least 2 values");
+    return value;
   }
 
-  /*-----------------*/
+  //---
 
   /* Get Source and Format Strings */
 
+  std::string source_string;
+
   if (! values[0]->stringValue(source_string)) {
-    ClLanguageMgrInst->expressionError(ClErr::INVALID_CONVERSION, "'scan' argument 1");
-    goto fail;
+    lmgr->expressionError(ClErr::INVALID_CONVERSION, "'scan' argument 1");
+    return value;
   }
+
+  std::string format_string;
 
   if (! values[1]->stringValue(format_string)) {
-    ClLanguageMgrInst->expressionError(ClErr::INVALID_CONVERSION, "'scan' argument 2");
-    goto fail;
+    lmgr->expressionError(ClErr::INVALID_CONVERSION, "'scan' argument 2");
+    return value;
   }
 
-  /*-----------------*/
+  //---
 
-  num_addrs = 0;
+  Addrs addrs;
 
-  i = 0;
+  addrs.num_addrs = 0;
 
-  len1 = source_string.size();
-  len2 = format_string.size();
+  uint i = 0;
 
-  format_string1 = "";
+  uint len1 = source_string.size();
+  uint len2 = format_string.size();
+
+  std::string format_string1 = "";
 
   while (i < len2) {
     switch (format_string[i]) {
@@ -3690,8 +3662,8 @@ ClStdScanCommand(ClParserValuePtr *values, uint num_values, void *, int *error_c
             format_string3 += format_string[i++];
 
           if (i >= len2) {
-            ClLanguageMgrInst->syntaxError("Missing ']' in scan");
-            goto fail;
+            lmgr->syntaxError("Missing ']' in scan");
+            return value;
           }
 
           format_string3 += format_string[i++];
@@ -3708,12 +3680,12 @@ ClStdScanCommand(ClParserValuePtr *values, uint num_values, void *, int *error_c
           format_string3 += format_code;
         }
 
-        if (num_addrs >= 20) {
-          ClLanguageMgrInst->syntaxError("Too many values to scan (> 20)");
-          goto fail;
+        if (addrs.num_addrs >= 20) {
+          lmgr->syntaxError("Too many values to scan (> 20)");
+          return value;
         }
 
-        codes[num_addrs] = format_code;
+        addrs.codes[addrs.num_addrs] = format_code;
 
         switch (format_code) {
           case 'd':
@@ -3721,36 +3693,36 @@ ClStdScanCommand(ClParserValuePtr *values, uint num_values, void *, int *error_c
           case 'o':
           case 'u':
           case 'x':
-            addrs[num_addrs] = (char *) new long;
+            addrs.addrs[addrs.num_addrs] = (char *) new long;
             break;
           case 'c':
             if (len1 > 255)
-              addrs[num_addrs] = new char [len1];
+              addrs.addrs[addrs.num_addrs] = new char [len1];
             else
-              addrs[num_addrs] = new char [256];
+              addrs.addrs[addrs.num_addrs] = new char [256];
 
             break;
           case 's':
             if (len1 > 255)
-              addrs[num_addrs] = new char [len1];
+              addrs.addrs[addrs.num_addrs] = new char [len1];
             else
-              addrs[num_addrs] = new char [256];
+              addrs.addrs[addrs.num_addrs] = new char [256];
 
             break;
           case 'e':
           case 'f':
           case 'g':
-            addrs[num_addrs] = (char *) new double;
+            addrs.addrs[addrs.num_addrs] = (char *) new double;
             break;
           case 'p':
-            addrs[num_addrs] = (char *) new char *;
+            addrs.addrs[addrs.num_addrs] = (char *) new char *;
             break;
           case 'n':
-            addrs[num_addrs] = (char *) new int;
+            addrs.addrs[addrs.num_addrs] = (char *) new int;
             break;
         }
 
-        num_addrs++;
+        addrs.num_addrs++;
 
         format_string1 += format_string2;
 
@@ -3764,51 +3736,52 @@ ClStdScanCommand(ClParserValuePtr *values, uint num_values, void *, int *error_c
     }
   }
 
-  if (num_values - 2 != num_addrs) {
-    ClLanguageMgrInst->syntaxError(
-      "invalid no. of args (%d) to scan into - need %d", num_values - 2, num_addrs);
-    goto fail;
+  if (num_values - 2 != addrs.num_addrs) {
+    lmgr->syntaxError("invalid no. of args (%d) to scan into - need %d",
+                      num_values - 2, addrs.num_addrs);
+    return value;
   }
 
-  for (i = num_addrs; i < 20; i++) {
-    codes[i] = '\0';
-    addrs[i] = 0;
+  for (i = addrs.num_addrs; i < 20; i++) {
+    addrs.codes[i] = '\0';
+    addrs.addrs[i] = 0;
   }
 
-  num_scanned = sscanf(source_string.c_str(), format_string1.c_str(),
-                       addrs[ 0], addrs[ 1], addrs[ 2], addrs[ 3], addrs[ 4],
-                       addrs[ 5], addrs[ 6], addrs[ 7], addrs[ 8], addrs[ 9],
-                       addrs[10], addrs[11], addrs[12], addrs[13], addrs[14],
-                       addrs[15], addrs[16], addrs[17], addrs[18], addrs[19]);
+  uint num_scanned =
+    sscanf(source_string.c_str(), format_string1.c_str(),
+           addrs.addrs[ 0], addrs.addrs[ 1], addrs.addrs[ 2], addrs.addrs[ 3],
+           addrs.addrs[ 4], addrs.addrs[ 5], addrs.addrs[ 6], addrs.addrs[ 7],
+           addrs.addrs[ 8], addrs.addrs[ 9], addrs.addrs[10], addrs.addrs[11],
+           addrs.addrs[12], addrs.addrs[13], addrs.addrs[14], addrs.addrs[15],
+           addrs.addrs[16], addrs.addrs[17], addrs.addrs[18], addrs.addrs[19]);
 
 /*
-  if (num_scanned != num_addrs) {
-    ClLanguageMgrInst->syntaxError("Failed to scan %d values, only %d found",
-                                    num_addrs, num_scanned);
-    goto fail;
+  if (num_scanned != addrs.num_addrs) {
+    lmgr->syntaxError("Failed to scan %d values, only %d found", addrs.num_addrs, num_scanned);
+    return value;
   }
 */
 
   for (i = 0; i < num_scanned; i++) {
-    switch (codes[i]) {
+    switch (addrs.codes[i]) {
       case 'd': case 'i': case 'o': case 'u': case 'x':
-        value = ClParserValueMgrInst->createValue(*((long *) addrs[i]));
+        value = ClParserValueMgrInst->createValue(*((long *) addrs.addrs[i]));
 
         break;
       case 'c': case 's':
-        value = ClParserValueMgrInst->createValue((char *) addrs[i]);
+        value = ClParserValueMgrInst->createValue((char *) addrs.addrs[i]);
 
         break;
       case 'e': case 'f': case 'g':
-        value = ClParserValueMgrInst->createValue(*((double *) addrs[i]));
+        value = ClParserValueMgrInst->createValue(*((double *) addrs.addrs[i]));
 
         break;
       case 'p':
-        value = ClParserValueMgrInst->createValue((long) addrs[i]);
+        value = ClParserValueMgrInst->createValue((long) addrs.addrs[i]);
 
         break;
       case 'n':
-        value = ClParserValueMgrInst->createValue((long) *((int *) addrs[i]));
+        value = ClParserValueMgrInst->createValue((long) *((int *) addrs.addrs[i]));
 
         break;
     }
@@ -3820,10 +3793,6 @@ ClStdScanCommand(ClParserValuePtr *values, uint num_values, void *, int *error_c
 
   *error_code = 0;
 
- fail:
-  for (uint i = 0; i < num_addrs; i++)
-    delete addrs[i];
-
   return value;
 }
 
@@ -3832,15 +3801,13 @@ ClStdScanCommand(ClParserValuePtr *values, uint num_values, void *, int *error_c
  * ClStdExecCommand
  *   Routine called when the 'exec' function is entered.
  *
- *   This routine executes a command and stores the
- *   resultant output in a str array value (one element
- *   for each output line from the command). The command is
- *   specifed as the single argument.
+ *   This routine executes a command and stores the resultant output in a string
+ *   array value (one element for each output line from the command). The command
+ *   is specifed as the single argument.
  *
  * CALL:
  *   ClParserValuePtr value =
- *     ClStdExecCommand
- *      (ClParserValuePtr *, uint, void *, int &error_code);
+ *     ClStdExecCommand(ClParserValuePtr *, uint, void *, int &error_code);
  *
  * INPUT:
  *   values     : The array of values supplied
@@ -3885,12 +3852,14 @@ ClStdExecCommand(ClParserValuePtr *values, uint, void *, int *error_code)
 
   CL_LANGUAGE_TRACE("ClStdExecCommand");
 
+  ClLanguageMgr *lmgr = ClLanguageMgrInst;
+
   *error_code = 0;
 
   ClParserValuePtr value;
 
   if (! values[0]->stringValue(command)) {
-    ClLanguageMgrInst->expressionError(ClErr::INVALID_CONVERSION, "'exec'");
+    lmgr->expressionError(ClErr::INVALID_CONVERSION, "'exec'");
     goto fail;
   }
 
@@ -3899,8 +3868,7 @@ ClStdExecCommand(ClParserValuePtr *values, uint, void *, int *error_code)
   if (! COSProcess::executeCommand(command, output, &command_state)) {
     *error_code = -1;
 
-    ClLanguageMgrInst->syntaxError
-      ("'exec' command '%s' failed", command.c_str());
+    lmgr->syntaxError("'exec' command '%s' failed", command.c_str());
 
     goto fail;
   }
@@ -3938,14 +3906,12 @@ ClStdExecCommand(ClParserValuePtr *values, uint, void *, int *error_code)
  * ClStdParseCommand
  *   Routine called when the 'parse' function is entered.
  *
- *   This routine executes a str as an expression and
- *   returns the resultant value. The expression str is
- *   specifed as the single argument.
+ *   This routine executes a str as an expression and returns the resultant value.
+ *   The expression str is specifed as the single argument.
  *
  * CALL:
  *   ClParserValuePtr value =
- *     ClStdParseCommand
- *       (ClParserValuePtr *, uint, void *, int &error_code);
+ *     ClStdParseCommand(ClParserValuePtr *, uint, void *, int &error_code);
  *
  * INPUT:
  *   values     : The array of values supplied
@@ -3981,20 +3947,21 @@ ClStdParseCommand(ClParserValuePtr *values, uint, void *, int *error_code)
 
   CL_LANGUAGE_TRACE("ClStdParseCommand");
 
+  ClLanguageMgr *lmgr = ClLanguageMgrInst;
+
   *error_code = 0;
 
   ClParserValuePtr value;
 
   if (! values[0]->stringValue(command)) {
-    ClLanguageMgrInst->expressionError(ClErr::INVALID_CONVERSION, "'parse'");
+    lmgr->expressionError(ClErr::INVALID_CONVERSION, "'parse'");
     return ClParserValuePtr();
   }
 
   ClParserExpr expr(command);
 
   if (! expr.exec(value)) {
-    ClLanguageMgrInst->expressionError(ClErr::INVALID_EXPRESSION,
-      "'parse' expression '%s'", command.c_str());
+    lmgr->expressionError(ClErr::INVALID_EXPRESSION, "'parse' expression '%s'", command.c_str());
     return ClParserValuePtr();
   }
 
@@ -4006,11 +3973,9 @@ ClStdParseCommand(ClParserValuePtr *values, uint, void *, int *error_code)
  * ClStdSetCommand
  *   Routine called when the 'setenv' command is entered.
  *
- *   This routine sets the value of the specified
- *   environment variable. The environment variable
- *   name is specified as a str in the first argument
- *   and the str to which the environment is set
- *   is specified as the second argument.
+ *   This routine sets the value of the specified environment variable. The
+ *   environment variable name is specified as a str in the first argument
+ *   and the str to which the environment is set is specified as the second argument.
  *
  * CALL:
  *   ClStdSetCommand(ClLanguageCommand *command);
@@ -4035,6 +4000,8 @@ ClStdSetCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
 {
   CL_LANGUAGE_TRACE("ClStdSetCommand");
 
+  ClLanguageMgr *lmgr = ClLanguageMgrInst;
+
   // Get set's Arguments
   const std::string &cargs = command->getArgs();
 
@@ -4044,7 +4011,7 @@ ClStdSetCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
   std::string name;
 
   if (! parse.readIdentifier(name)) {
-    ClLanguageMgrInst->syntaxError("'set' invalid variable name");
+    lmgr->syntaxError("'set' invalid variable name");
     return;
   }
 
@@ -4069,8 +4036,7 @@ ClStdSetCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
   ClParserValuePtr value;
 
   if (! expr.exec(value)) {
-    ClLanguageMgrInst->expressionError(ClErr::INVALID_EXPRESSION,
-      "'set' expression '%s'", valueStr.c_str());
+    lmgr->expressionError(ClErr::INVALID_EXPRESSION, "'set' expression '%s'", valueStr.c_str());
     return;
   }
 
@@ -4083,15 +4049,13 @@ ClStdSetCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
  * ClStdGetEnvCommand
  *   Routine called when the 'getenv' command is entered.
  *
- *   This routine gets the value of the specified
- *   environment variable. The environment variable
- *   name is specified as a str in the second argument
- *   and the variable name to which the environment
- *   variable's value str is assigned is specified
- *   as the first argument.
+ *   This routine gets the value of the specified environment variable. The
+ *   environment variable name is specified as a str in the second argument
+ *   and the variable name to which the environment variable's value str is
+ *   assigned is specified as the first argument.
  *
- *   If the environment variable is not set then the
- *   variable's value is set to the empty str "".
+ *   If the environment variable is not set then the variable's value is set
+ *   to the empty str "".
  *
  * CALL:
  *   ClStdGetEnvCommand(ClLanguageCommand *command);
@@ -4203,9 +4167,8 @@ ClStdSetEnvCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
  * ClStdUnSetEnvCommand
  *   Routine called when the 'unsetenv' command is entered.
  *
- *   This routine removes the specified environment variable.
- *   The environment variable name is specified as a str
- *   in the single argument.
+ *   This routine removes the specified environment variable. The environment
+ *   variable name is specified as a str in the single argument.
  *
  * CALL:
  *   ClStdUnSetEnvCommand(ClLanguageCommand *command);
@@ -4254,9 +4217,8 @@ ClStdUnSetEnvCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
 /*------------------------------------------------------------------*
  *
  * ClStdConfigCommand
- *   Routine called when the 'config' command is entered.
- *   This routine calls the set method for any specified
- *   module.
+ *   Routine called when the 'config' command is entered. This routine calls the
+ *   set method for any specified module.
  *
  * CALL:
  *   ClStdConfigCommand(ClLanguageCommand *command);
@@ -4280,6 +4242,8 @@ static void
 ClStdConfigCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
 {
   CL_LANGUAGE_TRACE("ClStdConfigCommand");
+
+  ClLanguageMgr *lmgr = ClLanguageMgrInst;
 
   const std::string &cargs = command->getArgs();
 
@@ -4324,9 +4288,8 @@ ClStdConfigCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
   bool flag = ClModuleMgrInst->execModuleSet(module, option, args1);
 
   if (! flag)
-    ClLanguageMgrInst->error("'config' failed for module '%s' "
-                             "option '%s' args '%s'", module.c_str(),
-                             option.c_str(), args1.c_str());
+    lmgr->error("'config' failed for module '%s' option '%s' args '%s'", module.c_str(),
+                option.c_str(), args1.c_str());
 }
 
 // Routine called when the 'rand' function is entered.
@@ -4337,6 +4300,8 @@ static ClParserValuePtr
 ClStdRandCommand(ClParserValuePtr *values, uint num_values, void *, int *error_code)
 {
   CL_LANGUAGE_TRACE("ClStdRandCommand");
+
+  ClLanguageMgr *lmgr = ClLanguageMgrInst;
 
   *error_code = 0;
 
@@ -4351,7 +4316,7 @@ ClStdRandCommand(ClParserValuePtr *values, uint num_values, void *, int *error_c
     long seed;
 
     if (! values[0]->integerValue(&seed)) {
-      ClLanguageMgrInst->expressionError(ClErr::INVALID_CONVERSION, "'rand'");
+      lmgr->expressionError(ClErr::INVALID_CONVERSION, "'rand'");
       return ClParserValuePtr();
     }
 
@@ -4374,6 +4339,8 @@ ClStdRRandCommand(ClParserValuePtr *values, uint num_values, void *, int *error_
 {
   CL_LANGUAGE_TRACE("ClStdRRandCommand");
 
+  ClLanguageMgr *lmgr = ClLanguageMgrInst;
+
   *error_code = 0;
 
   ClParserValuePtr value;
@@ -4387,7 +4354,7 @@ ClStdRRandCommand(ClParserValuePtr *values, uint num_values, void *, int *error_
     long seed;
 
     if (! values[0]->integerValue(&seed)) {
-      ClLanguageMgrInst->expressionError(ClErr::INVALID_CONVERSION, "'rrand'");
+      lmgr->expressionError(ClErr::INVALID_CONVERSION, "'rrand'");
       return ClParserValuePtr();
     }
 
@@ -4406,13 +4373,12 @@ ClStdRRandCommand(ClParserValuePtr *values, uint num_values, void *, int *error_
  * ClStdIsVarCommand
  *   Routine called when the 'isvar' function is entered.
  *
- *   This routine returns whether a variable of the specified
- *   name has been defined or not.
+ *   This routine returns whether a variable of the specified name has been
+ *   defined or not.
  *
  * CALL:
  *   ClParserValuePtr value =
- *     ClStdIsVarCommand
- *       (ClParserValuePtr *, uint, void *, int &error_code);
+ *     ClStdIsVarCommand(ClParserValuePtr *, uint, void *, int &error_code);
  *
  * INPUT:
  *   values     : The array of values supplied
@@ -4446,12 +4412,14 @@ ClStdIsVarCommand(ClParserValuePtr *values, uint, void *, int *error_code)
 {
   CL_LANGUAGE_TRACE("ClStdIsVarCommand");
 
+  ClLanguageMgr *lmgr = ClLanguageMgrInst;
+
   *error_code = 0;
 
   std::string name;
 
   if (! values[0]->stringValue(name)) {
-    ClLanguageMgrInst->expressionError(ClErr::INVALID_CONVERSION, "'is_var'");
+    lmgr->expressionError(ClErr::INVALID_CONVERSION, "'is_var'");
     return ClParserValuePtr();
   }
 
@@ -4467,9 +4435,8 @@ ClStdIsVarCommand(ClParserValuePtr *values, uint, void *, int *error_code)
  * ClStdUndefCommand
  *   Routine called when the 'undef' command is entered.
  *
- *   Undefines the associate procedure, function, structure
- *   type or variable associated with each of the list of
- *   specified identifiers.
+ *   Undefines the associate procedure, function, structure type or variable
+ *   associated with each of the list of specified identifiers.
  *
  * CALL:
  *   ClStdUndefCommand(ClLanguageCommand *command);
@@ -4499,6 +4466,8 @@ ClStdUndefCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
 
   CL_LANGUAGE_TRACE("ClStdUndefCommand");
 
+  ClLanguageMgr *lmgr = ClLanguageMgrInst;
+
   /* Get Undef's Arguments */
 
   if (args->checkNumberOfArgs(1, -1) != 0)
@@ -4520,15 +4489,13 @@ ClStdUndefCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
       if (! variable->isNoDelete())
         ClParserInst->removeVariable(arg);
       else
-        ClLanguageMgrInst->syntaxError
-         ("variable '%s' cannot be deleted", arg.c_str());
+        lmgr->syntaxError("variable '%s' cannot be deleted", arg.c_str());
     }
     else if (ClParserInst->isFunction(arg)) {
       ClParserInst->removeFunction(arg);
     }
     else if (ClParserInst->isInternFn(arg)) {
-      ClLanguageMgrInst->syntaxError
-       ("'undef' cannot undefine internal function '%s'", arg.c_str());
+      lmgr->syntaxError("'undef' cannot undefine internal function '%s'", arg.c_str());
     }
     else if (ClParserInst->isType(arg)) {
       ClParserInst->deleteType(arg);
@@ -4537,8 +4504,7 @@ ClStdUndefCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
       if (procedure->canDelete())
         ClLanguageProcMgrInst->deleteProc(arg);
       else
-        ClLanguageMgrInst->syntaxError
-         ("'undef' procedure '%s' cannot be undefined", arg.c_str());
+        lmgr->syntaxError("'undef' procedure '%s' cannot be undefined", arg.c_str());
     }
     else if ((function = ClLanguageFuncMgrInst->lookupFunc(arg)) != 0) {
       ClParserInst->removeUserFn(arg);
@@ -4546,8 +4512,7 @@ ClStdUndefCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
       ClLanguageFuncMgrInst->deleteFunc(arg);
     }
     else
-      ClLanguageMgrInst->syntaxError
-       ("'undef' identifier '%s' is undefined", arg.c_str());
+      lmgr->syntaxError("'undef' identifier '%s' is undefined", arg.c_str());
   }
 }
 
@@ -4556,8 +4521,8 @@ ClStdUndefCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
  * ClStdWhatisCommand
  *   Routine called when the 'whatis' command is entered.
  *
- *   Prints a description of the objects associated with
- *   each of the specified identifiers.
+ *   Prints a description of the objects associated with each of the specified
+ *   identifiers.
  *
  * CALL:
  *   ClStdWhatisCommand(ClLanguageCommand *command);
@@ -4582,6 +4547,8 @@ ClStdWhatisCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
 {
   CL_LANGUAGE_TRACE("ClStdWhatisCommand");
 
+  ClLanguageMgr *lmgr = ClLanguageMgrInst;
+
   /* Get Whatis's Arguments */
 
   if (args->checkNumberOfArgs(1, -1) != 0)
@@ -4604,7 +4571,7 @@ ClStdWhatisCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
     ClLanguageProc *procedure;
 
     if ((procedure = ClLanguageProcMgrInst->lookupProc(arg)) != 0) {
-      ClLanguageMgrInst->output("Procedure ");
+      lmgr->output("Procedure ");
 
       procedure->print();
 
@@ -4615,66 +4582,66 @@ ClStdWhatisCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
 
     bool end_name;
 
-    ClLanguageCommandDef *command_def = ClLanguageMgrInst->getCommandDef(scope, arg, &end_name);
+    ClLanguageCommandDef *command_def = lmgr->getCommandDef(scope, arg, &end_name);
 
     if      (command_def != 0) {
       if (command_def->getEndName() != "") {
         if (! end_name)
-          ClLanguageMgrInst->output("Start Block Command %s\n", arg.c_str());
+          lmgr->output("Start Block Command %s\n", arg.c_str());
         else
-          ClLanguageMgrInst->output("End Block Command %s\n", arg.c_str());
+          lmgr->output("End Block Command %s\n", arg.c_str());
       }
       else
-        ClLanguageMgrInst->output("Command %s\n", arg.c_str());
+        lmgr->output("Command %s\n", arg.c_str());
     }
     else if (ClParserInst->isVariable(arg)) {
       ClParserValuePtr value = ClParserInst->getVariableValue(arg);
 
       if      (value->isReal())
-        ClLanguageMgrInst->output("real: ");
+        lmgr->output("real: ");
       else if (value->isInteger())
-        ClLanguageMgrInst->output("int: ");
+        lmgr->output("int: ");
       else if (value->isString())
-        ClLanguageMgrInst->output("string: ");
+        lmgr->output("string: ");
       else if (value->isList())
-        ClLanguageMgrInst->output("list: ");
+        lmgr->output("list: ");
       else if (value->isDictionary())
-        ClLanguageMgrInst->output("dictionary: ");
+        lmgr->output("dictionary: ");
       else if (value->isStructure())
-        ClLanguageMgrInst->output("structure: ");
+        lmgr->output("structure: ");
       else if (value->isRealArray())
-        ClLanguageMgrInst->output("real array: ");
+        lmgr->output("real array: ");
       else if (value->isIntegerArray())
-        ClLanguageMgrInst->output("integer array: ");
+        lmgr->output("integer array: ");
       else if (value->isStringArray())
-        ClLanguageMgrInst->output("str array: ");
+        lmgr->output("str array: ");
       else if (value->isListArray())
-        ClLanguageMgrInst->output("list array: ");
+        lmgr->output("list array: ");
       else if (value->isDictionaryArray())
-        ClLanguageMgrInst->output("dictionary array: ");
+        lmgr->output("dictionary array: ");
       else if (value->isStructureArray())
-        ClLanguageMgrInst->output("structure array: ");
+        lmgr->output("structure array: ");
 
-      ClLanguageMgrInst->output("%s=", arg.c_str());
+      lmgr->output("%s=", arg.c_str());
 
       value->print();
 
-      ClLanguageMgrInst->output("\n");
+      lmgr->output("\n");
     }
     else if (ClParserInst->isFunction(arg)) {
       ClParserFuncPtr function = ClParserInst->getFunction(arg);
 
-      ClLanguageMgrInst->output("Function: ");
+      lmgr->output("Function: ");
 
       function->print();
 
-      ClLanguageMgrInst->output("\n");
+      lmgr->output("\n");
     }
     else if (ClParserInst->isInternFn(arg)) {
-      ClLanguageMgrInst->output("Internal Function: %s\n", arg.c_str());
+      lmgr->output("Internal Function: %s\n", arg.c_str());
     }
     else if (ClParserInst->isUserFn(arg)) {
-      ClLanguageMgrInst->output("User Function: %s\n", arg.c_str());
+      lmgr->output("User Function: %s\n", arg.c_str());
     }
     else if (ClParserInst->isType(arg)) {
       ClParserTypePtr type = ClParserInst->getType(arg);
@@ -4687,36 +4654,36 @@ ClStdWhatisCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
       ClParserValuePtr value;
 
       if (! expr.exec(value)) {
-        ClLanguageMgrInst->output("Undefined: %s\n", arg.c_str());
+        lmgr->output("Undefined: %s\n", arg.c_str());
         continue;
       }
 
       if      (value->isReal())
-        ClLanguageMgrInst->output("real");
+        lmgr->output("real");
       else if (value->isInteger())
-        ClLanguageMgrInst->output("int");
+        lmgr->output("int");
       else if (value->isString())
-        ClLanguageMgrInst->output("string");
+        lmgr->output("string");
       else if (value->isList())
-        ClLanguageMgrInst->output("list");
+        lmgr->output("list");
       else if (value->isDictionary())
-        ClLanguageMgrInst->output("dictionary");
+        lmgr->output("dictionary");
       else if (value->isStructure())
-        ClLanguageMgrInst->output("structure");
+        lmgr->output("structure");
       else if (value->isRealArray())
-        ClLanguageMgrInst->output("real array");
+        lmgr->output("real array");
       else if (value->isIntegerArray())
-        ClLanguageMgrInst->output("integer array");
+        lmgr->output("integer array");
       else if (value->isStringArray())
-        ClLanguageMgrInst->output("str array");
+        lmgr->output("str array");
       else if (value->isListArray())
-        ClLanguageMgrInst->output("list array");
+        lmgr->output("list array");
       else if (value->isDictionaryArray())
-        ClLanguageMgrInst->output("dictionary array");
+        lmgr->output("dictionary array");
       else if (value->isStructureArray())
-        ClLanguageMgrInst->output("structure array");
+        lmgr->output("structure array");
 
-      ClLanguageMgrInst->output("\n");
+      lmgr->output("\n");
     }
   }
 }
@@ -4726,9 +4693,8 @@ ClStdWhatisCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
  * ClStdStatusCommand
  *   Routine called when the 'list' command is entered.
  *
- *   Prints a list of all the currently defined objects
- *   of the specified type or all the currently defined
- *   objects of all types if no argument is supplied.
+ *   Prints a list of all the currently defined objects of the specified type
+ *   or all the currently defined objects of all types if no argument is supplied.
  *
  *   Types :-
  *     variables  : Variables
@@ -4757,9 +4723,11 @@ ClStdWhatisCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
 static void
 ClStdStatusCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
 {
-  const char *type;
-
   CL_LANGUAGE_TRACE("ClStdStatusCommand");
+
+  ClLanguageMgr *lmgr = ClLanguageMgrInst;
+
+  const char *type;
 
   /* Check Args */
 
@@ -4792,23 +4760,23 @@ ClStdStatusCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
   else if (CStrUtil::casecmp(type, "structures") == 0)
     ClParserInst->printAllTypes();
   else if (CStrUtil::casecmp(type, "all") == 0) {
-    ClLanguageMgrInst->output("Variables :-\n\n");
+    lmgr->output("Variables :-\n\n");
 
     ClParserInst->printAllVariables();
 
-    ClLanguageMgrInst->output("\nProcedures :-\n\n");
+    lmgr->output("\nProcedures :-\n\n");
 
     ClParserInst->printAllFunctions();
 
     ClLanguageProcMgrInst->printProcs();
     ClLanguageFuncMgrInst->printFuncs();
 
-    ClLanguageMgrInst->output("\nStructures :-\n\n");
+    lmgr->output("\nStructures :-\n\n");
 
     ClParserInst->printAllTypes();
   }
   else
-    ClLanguageMgrInst->syntaxError("Unknown type '%s' for 'list'", type);
+    lmgr->syntaxError("Unknown type '%s' for 'list'", type);
 }
 
 /*------------------------------------------------------------------*
@@ -4816,9 +4784,8 @@ ClStdStatusCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
  * ClStdHelpCommand
  *   Routine called when the 'help' command is entered.
  *
- *   This routine outputs help for the optional subject
- *   str using the current help procedure. By default
- *   this will display a list of language commands.
+ *   This routine outputs help for the optional subject str using the current
+ *   help procedure. By default this will display a list of language commands.
  *
  * CALL:
  *   ClStdHelpCommand(ClLanguageCommand *command);
@@ -4843,10 +4810,12 @@ ClStdHelpCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
 {
   CL_LANGUAGE_TRACE("ClStdHelpCommand");
 
+  ClLanguageMgr *lmgr = ClLanguageMgrInst;
+
   const std::string &cargs = command->getArgs();
 
   if (cargs == "") {
-    ClLanguageMgrInst->output("Help available for :-\n\n");
+    lmgr->output("Help available for :-\n\n");
 
     StringVectorT modules;
 
@@ -4858,10 +4827,10 @@ ClStdHelpCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
       if (! ClModuleMgrInst->isModuleLoaded(modules[i]))
         continue;
 
-      ClLanguageMgrInst->output("  %s\n", modules[i].c_str());
+      lmgr->output("  %s\n", modules[i].c_str());
     }
 
-    ClLanguageMgrInst->output("\n");
+    lmgr->output("\n");
 
     return;
   }
@@ -4902,9 +4871,9 @@ ClStdHelpCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
     fp = fopen(file.c_str(), "w");
 
     if (fp != 0)
-      old_fp = ClLanguageMgrInst->setOutputFp(fp);
+      old_fp = lmgr->setOutputFp(fp);
     else
-      ClLanguageMgrInst->error("invalid file '%s'", file.c_str());
+      lmgr->error("invalid file '%s'", file.c_str());
   }
 
   /*-------*/
@@ -4919,24 +4888,23 @@ ClStdHelpCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
   /* Print Out Help using current Help Procedure */
 
   {
-    ClLanguageHelpProc help_proc = ClLanguageMgrInst->getHelpProc();
+    ClLanguageHelpProc help_proc = lmgr->getHelpProc();
 
     if (help_proc != 0) {
       (*help_proc)(subject.c_str(), args1.c_str());
-
       goto done;
     }
   }
 
   /*-------*/
 
-  ClLanguageMgrInst->error("No help for '%s'", subject.c_str());
+  lmgr->error("No help for '%s'", subject.c_str());
 
   /*-------*/
 
  done:
   if (file != "" && fp != 0)
-    ClLanguageMgrInst->setOutputFp(old_fp);
+    lmgr->setOutputFp(old_fp);
 }
 
 /*------------------------------------------------------------------*
@@ -4944,9 +4912,8 @@ ClStdHelpCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
  * ClStdExitCommand
  *   Routine called when the 'exit' command is entered.
  *
- *   This routine sets a flag to indicate that the run
- *   of the current file or command line interface should
- *   be terminated.
+ *   This routine sets a flag to indicate that the run of the current file or
+ *   command line interface should be terminated.
  *
  * CALL:
  *   ClStdExitCommand(ClLanguageCommand *command);
@@ -4972,6 +4939,8 @@ ClStdExitCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
 {
   CL_LANGUAGE_TRACE("ClStdExitCommand");
 
+  ClLanguageMgr *lmgr = ClLanguageMgrInst;
+
   /* Check Args */
 
   if (args->checkNumberOfArgs(0, 1) != 0)
@@ -4988,9 +4957,9 @@ ClStdExitCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
 
   /* Set Exit Flag and Exit Code */
 
-  ClLanguageMgrInst->setExitFlag(true);
+  lmgr->setExitFlag(true);
 
-  ClLanguageMgrInst->setExitCode(code);
+  lmgr->setExitCode(code);
 }
 
 static void
@@ -5021,6 +4990,8 @@ ClStdHistoryCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
 {
   CL_LANGUAGE_TRACE("ClStdHistoryCommand");
 
+  ClLanguageMgr *lmgr = ClLanguageMgrInst;
+
   /* Check Args */
 
   if (args->checkNumberOfArgs(0, 0) != 0)
@@ -5028,12 +4999,12 @@ ClStdHistoryCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
 
   std::vector<CReadLineHistoryEntry> entries;
 
-  ClLanguageMgrInst->getReadLine().getHistoryEntries(entries);
+  lmgr->getReadLine().getHistoryEntries(entries);
 
   int num_entries = entries.size();
 
   for (int i = 0; i < num_entries; ++i)
-    ClLanguageMgrInst->output("%d: %s\n", entries[i].line_num, entries[i].line.c_str());
+    lmgr->output("%d: %s\n", entries[i].line_num, entries[i].line.c_str());
 }
 #endif
 

@@ -2,10 +2,6 @@
 #define CL_L_PROC_H
 
 class ClLanguageProcArg {
- private:
-  std::string name_;
-  bool        returned_;
-
  public:
   ClLanguageProcArg(const std::string &name, bool returned) :
    name_(name), returned_(returned) {
@@ -14,18 +10,21 @@ class ClLanguageProcArg {
   const std::string &getName() const { return name_; }
 
   bool isReturned() const { return returned_; }
+
+ private:
+  std::string name_;
+  bool        returned_ { false };
 };
+
+//---
 
 class ClLanguageProc;
 
 #define ClLanguageProcMgrInst ClLanguageProcMgr::getInstance()
 
 class ClLanguageProcMgr {
- private:
-  typedef std::map<std::string, ClLanguageProc *> ProcMap;
-  typedef std::vector<ClLanguageProcArg *>        ProcArgList;
-
-  ProcMap proc_map_;
+ public:
+  typedef std::vector<ClLanguageProcArg *> ProcArgList;
 
  public:
   static ClLanguageProcMgr *getInstance() {
@@ -47,17 +46,24 @@ class ClLanguageProcMgr {
   void printProcs() const;
 
   void deleteProcs();
+
+ private:
+  ClLanguageProcMgr() { }
+
+  ClLanguageProcMgr(const ClLanguageProcMgr &);
+  ClLanguageProcMgr &operator=(const ClLanguageProcMgr &);
+
+ private:
+  typedef std::map<std::string, ClLanguageProc *> ProcMap;
+
+  ProcMap proc_map_;
 };
+
+//------
 
 class ClLanguageProc {
  public:
   typedef std::vector<ClLanguageProcArg *> ArgList;
-
- private:
-  std::string           name_;
-  ArgList               args_;
-  ClLanguageCommandList command_list_;
-  int                   ref_count_;
 
  private:
   friend class ClLanguageProcMgr;
@@ -72,7 +78,11 @@ class ClLanguageProc {
 
   uint getNumArgs() const { return args_.size(); }
 
-  const ClLanguageProcArg &getArg(uint i) const { return *args_[i]; }
+  const ClLanguageProcArg &getArg(uint i) const {
+    assert(i < args_.size());
+
+    return *args_[i];
+  }
 
   const ClLanguageCommandList &getCommandList() const { return command_list_; }
 
@@ -82,6 +92,16 @@ class ClLanguageProc {
 
   void incRef() { ++ref_count_; }
   void defRef() { --ref_count_; }
+
+ private:
+  ClLanguageProc(const ClLanguageProc &);
+  ClLanguageProc &operator=(const ClLanguageProc &);
+
+ private:
+  std::string           name_;
+  ArgList               args_;
+  ClLanguageCommandList command_list_;
+  int                   ref_count_ { 0 };
 };
 
 #endif

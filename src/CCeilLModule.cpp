@@ -215,8 +215,7 @@ isModuleLoaded(const std::string &name) const
  *   Call a module's set method for the specified option and its value.
  *
  * CALL:
- *   bool flag =
- *     execModuleSet(const std::string &name, char *option, char *args);
+ *   bool flag = execModuleSet(const std::string &name, char *option, char *args);
  *
  * INPUT:
  *   name   : Name of Module
@@ -251,8 +250,7 @@ execModuleSet(const std::string &name, const std::string &option, const std::str
  *   Call a module's help method.
  *
  * CALL:
- *   bool flag =
- *     execModuleHelp(const std::string &name, const std::string &args);
+ *   bool flag = execModuleHelp(const std::string &name, const std::string &args);
  *
  * INPUT:
  *   name : Name of Module
@@ -429,8 +427,7 @@ termModule(const std::string &name)
  *   supported).
  *
  * CALL:
- *   bool flag =
- *     importExternalModule(const std::string &name);
+ *   bool flag = importExternalModule(const std::string &name);
  *
  * INPUT:
  *   name : Module Name.
@@ -523,8 +520,7 @@ importExternalModule(const std::string &/*name*/)
  *   called 'cl_<name>.so'.
  *
  * CALL:
- *   std::string filename =
- *     moduleSearchLib(const std::string &envname, const std::string &name);
+ *   std::string filename = moduleSearchLib(const std::string &envname, const std::string &name);
  *
  * INPUT:
  *   envname  : Environment Variable Name.
@@ -586,8 +582,7 @@ moduleSearchLib(const std::string &envname, const std::string &name)
  *   Get the Module Data Structure for the Named Module.
  *
  * CALL:
- *   ClModule *module =
- *     getModule(const std::string &name);
+ *   ClModule *module = getModule(const std::string &name);
  *
  * INPUT:
  *   name   : Module Name.
