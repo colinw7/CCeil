@@ -154,7 +154,7 @@ class ClLanguageArgParser {
   int                pos_    { 0 };
   int                len_    { 0 };
   std::string        buffer_;
-  std::vector<int> inBrackets_;
+  std::vector<int>   inBrackets_;
 };
 
 // Initialise Environment for Processing the Arguments
