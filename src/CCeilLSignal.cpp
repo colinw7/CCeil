@@ -90,7 +90,7 @@ setSignalCommand(const std::string &name, const std::string &command)
       if (! signal_command->proc)
         signal_command->old_proc = COSSignal::getSignalHandler(type);
 
-        COSSignal::addSignalHandler(type, proc);
+      COSSignal::addSignalHandler(type, proc);
 
       signal_command->proc = proc;
     }
