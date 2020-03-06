@@ -251,10 +251,10 @@ getVariableI(const std::string &name, ClParserVarPtr &var, bool parentScope) con
     for (int i = num - 1; i >= 0; i--) {
       VarMap *varMap = varMapStack_[i];
 
-      VarMap::iterator p = varMap->find(name);
+      VarMap::iterator pv = varMap->find(name);
 
-      if (p != varMap->end()) {
-        var = (*p).second;
+      if (pv != varMap->end()) {
+        var = (*pv).second;
 
         found = true;
 
@@ -316,11 +316,11 @@ printAllVariables() const
   for (int i = num - 1; i >= 0; i--) {
     parser_->output("\n");
 
-    VarMap::iterator p1 = varMapStack_[i]->begin();
-    VarMap::iterator p2 = varMapStack_[i]->end  ();
+    VarMap::iterator pt1 = varMapStack_[i]->begin();
+    VarMap::iterator pt2 = varMapStack_[i]->end  ();
 
-    for ( ; p1 != p2; ++p1)
-      (*p1).second->print();
+    for ( ; pt1 != pt2; ++pt1)
+      (*pt1).second->print();
   }
 }
 
@@ -620,13 +620,13 @@ setValue(ClParserValuePtr new_value)
 
         array->toIntegers(subscripts);
 
-        uint num_subscripts = subscripts.size();
+        uint num_ssubscripts = subscripts.size();
 
         if      (array1->isType(CL_PARSER_VALUE_TYPE_STRING)) {
-          if (i < num_subscripts - 1) {
+          if (i < num_ssubscripts - 1) {
             ClParserValuePtr value1 = array1->getSubscriptValue(subscripts);
 
-            uint num_subscripts1 = num_subscripts - i - 1;
+            uint num_subscripts1 = num_ssubscripts - i - 1;
 
             ClParserValueArray subscripts1;
 
@@ -650,10 +650,10 @@ setValue(ClParserValuePtr new_value)
           }
         }
         else if (array1->isType(CL_PARSER_VALUE_TYPE_LIST)) {
-          if (i < num_subscripts - 1) {
+          if (i < num_ssubscripts - 1) {
             ClParserValuePtr value1 = array1->getSubscriptValue(subscripts);
 
-            uint num_subscripts1 = num_subscripts - i - 1;
+            uint num_subscripts1 = num_ssubscripts - i - 1;
 
             ClParserValueArray subscripts1;
 
@@ -675,10 +675,10 @@ setValue(ClParserValuePtr new_value)
           }
         }
         else if (array1->getType() == CL_PARSER_VALUE_TYPE_DICTIONARY) {
-          if (i < num_subscripts - 1) {
+          if (i < num_ssubscripts - 1) {
             ClParserValuePtr value1 = array1->getSubscriptValue(subscripts);
 
-            uint num_subscripts1 = num_subscripts - i - 1;
+            uint num_subscripts1 = num_ssubscripts - i - 1;
 
             ClParserValueArray subscripts1;
 
@@ -700,10 +700,10 @@ setValue(ClParserValuePtr new_value)
           }
         }
         else if (array1->getType() == CL_PARSER_VALUE_TYPE_STRUCTURE) {
-          if (i < num_subscripts - 1) {
+          if (i < num_ssubscripts - 1) {
             ClParserValuePtr value1 = array1->getSubscriptValue(subscripts);
 
-            uint num_subscripts1 = num_subscripts - i - 1;
+            uint num_subscripts1 = num_ssubscripts - i - 1;
 
             ClParserValueArray subscripts1;
 

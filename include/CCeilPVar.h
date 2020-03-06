@@ -206,6 +206,7 @@ class ClParserVarRef {
 
   virtual void print() const;
   virtual void print(std::ostream &) const;
+
   virtual void debugPrint() const;
 
   friend std::ostream &operator<<(std::ostream &os, const ClParserVarRef &th) {
@@ -239,15 +240,16 @@ class ClParserStructVarRef : public ClParserVarRef {
   ClParserStructVarRef *dup() const;
 
  public:
-  bool setValue(ClParserValuePtr value);
+  bool setValue(ClParserValuePtr value) override;
 
-  bool getValue(ClParserValuePtr &value) const;
+  bool getValue(ClParserValuePtr &value) const override;
 
   void addName(const std::string &name);
 
-  void print() const;
-  void print(std::ostream &) const;
-  void debugPrint() const;
+  void print() const override;
+  void print(std::ostream &) const override;
+
+  void debugPrint() const override;
 
   friend std::ostream &operator<<(std::ostream &os, const ClParserStructVarRef &th) {
     th.print(os);

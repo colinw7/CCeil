@@ -1099,32 +1099,32 @@ ClParserProcessAddrCommand(const ClParserValueArray &values, int *error_code)
       return value;
     }
 
-    ClParserValuePtr value = ClParserInst->getVariableValue(name);
+    ClParserValuePtr value1 = ClParserInst->getVariableValue(name);
 
-    if (! value.isValid()) {
+    if (! value1.isValid()) {
       ClParserInst->signalError(error_code, ClErr::INVALID_TYPE_FOR_OPERATOR);
-      return value;
+      return value1;
     }
 
-    if      (value->isType(CL_PARSER_VALUE_TYPE_REAL)) {
-      const double *real = value->getReal()->getValueP();
+    if      (value1->isType(CL_PARSER_VALUE_TYPE_REAL)) {
+      const double *real = value1->getReal()->getValueP();
 
       address = (char *) real;
     }
-    else if (value->isType(CL_PARSER_VALUE_TYPE_INTEGER)) {
-      const long *integer = value->getInteger()->getValueP();
+    else if (value1->isType(CL_PARSER_VALUE_TYPE_INTEGER)) {
+      const long *integer = value1->getInteger()->getValueP();
 
       address = (char *) integer;
     }
-    else if (value->isType(CL_PARSER_VALUE_TYPE_STRING)) {
-      const char *str = value->getString()->getCharP();
+    else if (value1->isType(CL_PARSER_VALUE_TYPE_STRING)) {
+      const char *str = value1->getString()->getCharP();
 
       address = (char *) str;
     }
-    else if (value->isType(CL_PARSER_VALUE_TYPE_ARRAY)) {
+    else if (value1->isType(CL_PARSER_VALUE_TYPE_ARRAY)) {
       UIntVectorT dims;
 
-      ClParserArrayPtr array1 = value->getArray();
+      ClParserArrayPtr array1 = value1->getArray();
 
       if      (array1->isType(CL_PARSER_VALUE_TYPE_REAL)) {
         double *reals;

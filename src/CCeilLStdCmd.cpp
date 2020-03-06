@@ -1667,10 +1667,10 @@ ClStdForEachCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 
   /* Set Variable to each Array Value and Process Commands */
 
-  for (uint i = 0; i < num_values; i++) {
+  for (uint iv = 0; iv < num_values; iv++) {
     /* Set Variable Value */
 
-    ClParserVarPtr variable = ClParserInst->createVar(var_name, values[i]);
+    ClParserVarPtr variable = ClParserInst->createVar(var_name, values[iv]);
 
     //---
 
@@ -1684,7 +1684,7 @@ ClStdForEachCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
     if (lvalue) {
       int error_code;
 
-      ClParserInst->assignSubscriptValue(expression, i + 1, variable->getValue(), &error_code);
+      ClParserInst->assignSubscriptValue(expression, iv + 1, variable->getValue(), &error_code);
 
       if (error_code != 0) {
         lmgr->expressionError(error_code, "'foreach' failed to update value '%s'",
@@ -2172,18 +2172,18 @@ ClStdIfCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 
   ClParserExpr expr(expression);
 
-  ClParserValuePtr value;
+  ClParserValuePtr evalue;
 
-  if      (! expr.exec(value)) {
+  if      (! expr.exec(evalue)) {
     lmgr->expressionError(ClErr::INVALID_EXPRESSION, "'if' expression - '%s'", expression.c_str());
     return;
   }
-  else if (! value.isValid()) {
+  else if (! evalue.isValid()) {
     lmgr->syntaxError("undefined 'if' expression - '%s'", expression.c_str());
     return;
   }
 
-  bool flag = value->toBool();
+  bool flag = evalue->toBool();
 
   //---
 
@@ -2203,39 +2203,39 @@ ClStdIfCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 
       /* Extract Else If Expression */
 
-      CStrParse parse(args1);
+      CStrParse parse1(args1);
 
-      parse.skipSpace();
+      parse1.skipSpace();
 
-      if (! parse.isChar('(')) {
+      if (! parse1.isChar('(')) {
         lmgr->syntaxError("missing open brackets for 'elseif' expression");
         return;
       }
 
-      parse.skipChar();
+      parse1.skipChar();
 
-      parse.skipSpace();
+      parse1.skipSpace();
 
-      int pos = parse.getPos();
+      int pos1 = parse1.getPos();
 
-      std::string line;
+      std::string line1;
 
-      if (! args->readArgList(args1, &pos, ')', line)) {
+      if (! args->readArgList(args1, &pos1, ')', line1)) {
         lmgr->syntaxError("missing close brackets for 'elseif' expression");
         return;
       }
 
-      parse.setPos(pos);
+      parse1.setPos(pos1);
 
-      parse.skipSpace();
+      parse1.skipSpace();
 
-      if (! parse.eof()) {
+      if (! parse1.eof()) {
         lmgr->syntaxError("spurious characters '%s' after 'elseif' expression",
-                          parse.getAt().c_str());
+                          parse1.getAt().c_str());
         return;
       }
 
-      args->stringToArgList(line, &arg_list);
+      args->stringToArgList(line1, &arg_list);
 
       num_args = arg_list.size();
 
@@ -2244,27 +2244,27 @@ ClStdIfCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
         return;
       }
 
-      std::string expression = arg_list[0];
+      std::string expression0 = arg_list[0];
 
       //---
 
       /* Process Expression and Check Result */
 
-      ClParserExpr expr(expression);
+      ClParserExpr expr0(expression0);
 
-      ClParserValuePtr value;
+      ClParserValuePtr evalue0;
 
-      if      (! expr.exec(value)) {
+      if      (! expr0.exec(evalue0)) {
         lmgr->expressionError(ClErr::INVALID_EXPRESSION, "'elseif' expression - '%s'",
-                              expression.c_str());
+                              expression0.c_str());
         return;
       }
-      else if (! value.isValid()) {
-        lmgr->syntaxError("undefined 'elseif' expression - '%s'", expression.c_str());
+      else if (! evalue0.isValid()) {
+        lmgr->syntaxError("undefined 'elseif' expression - '%s'", expression0.c_str());
         return;
       }
 
-      flag = value->toBool();
+      flag = evalue0->toBool();
     }
     else if (commands.commands[i]->isIdent(language_else_ident)) {
       if (flag)
@@ -2272,13 +2272,13 @@ ClStdIfCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 
       const std::string &args1 = commands.commands[i]->getArgs();
 
-      CStrParse parse(args1);
+      CStrParse parse1(args1);
 
-      parse.skipSpace();
+      parse1.skipSpace();
 
-      if (! parse.eof()) {
+      if (! parse1.eof()) {
         lmgr->syntaxError("spurious characters '%s' after 'else' expression",
-                          parse.getAt().c_str());
+                          parse1.getAt().c_str());
         return;
       }
 
@@ -3263,11 +3263,11 @@ ClStdPrintCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
       continue;
     }
 
-    ClParserExpr expr(arg);
+    ClParserExpr expr1(arg);
 
     ClParserValuePtr value;
 
-    if      (! expr.exec(value)) {
+    if      (! expr1.exec(value)) {
       if (num_args == 1)
         lmgr->expressionError(ClErr::INVALID_EXPRESSION, "'print' expression '%s'", arg.c_str());
       else

@@ -330,6 +330,7 @@ class ClParserStackNode {
 
   void print() const;
   void print(std::ostream &os) const;
+
   void debugPrint() const;
 
  protected:

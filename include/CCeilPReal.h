@@ -47,7 +47,7 @@ class ClParserReal : public ClParserObj {
     return *this;
   }
 
-  ClParserReal *dup() const;
+  ClParserReal *dup() const override;
 
  public:
   static const ClParserReal &castObj(const ClParserObj &obj) {
@@ -56,7 +56,7 @@ class ClParserReal : public ClParserObj {
     return reinterpret_cast<const ClParserReal &>(obj);
   }
 
-  void copy(const ClParserObj &obj);
+  void copy(const ClParserObj &obj) override;
 
   //--------
 
@@ -70,51 +70,52 @@ class ClParserReal : public ClParserObj {
 
   long getInteger() const;
 
-  bool toBool() const;
+  bool toBool() const override;
 
   //------
 
-  std::string asString() const;
+  std::string asString() const override;
 
-  void print() const;
-  void print(std::ostream &os) const;
-  void debugPrint() const;
+  void print() const override;
+  void print(std::ostream &os) const override;
+
+  void debugPrint() const override;
 
   //------
 
-  int cmp(const ClParserObj &rhs) const;
+  int cmp(const ClParserObj &rhs) const override;
 
   //------
 
   // Inline Ops
 
-  const ClParserObj &increment();
-  const ClParserObj &decrement();
+  const ClParserObj &increment() override;
+  const ClParserObj &decrement() override;
 
   //------
 
   // Unary Ops
 
-  ClParserValuePtr unaryPlus () const;
-  ClParserValuePtr unaryMinus() const;
-  ClParserValuePtr bitNot    () const;
+  ClParserValuePtr unaryPlus () const override;
+  ClParserValuePtr unaryMinus() const override;
+  ClParserValuePtr bitNot    () const override;
 
   //------
 
   // Binary Ops
 
-  ClParserValuePtr plus(const ClParserObj &obj) const;
-  ClParserValuePtr minus(const ClParserObj &obj) const;
-  ClParserValuePtr times(const ClParserObj &obj) const;
-  ClParserValuePtr divide(const ClParserObj &obj) const;
-  ClParserValuePtr modulus(const ClParserObj &obj) const;
-  ClParserValuePtr power(const ClParserObj &obj) const;
-  ClParserValuePtr approxEqual(const ClParserObj &obj) const;
-  ClParserValuePtr bitAnd(const ClParserObj &obj) const;
-  ClParserValuePtr bitOr(const ClParserObj &obj) const;
-  ClParserValuePtr bitXor(const ClParserObj &obj) const;
-  ClParserValuePtr bitLShift(const ClParserObj &obj) const;
-  ClParserValuePtr bitRShift(const ClParserObj &obj) const;
+  ClParserValuePtr plus(const ClParserObj &obj) const override;
+  ClParserValuePtr minus(const ClParserObj &obj) const override;
+  ClParserValuePtr times(const ClParserObj &obj) const override;
+  ClParserValuePtr divide(const ClParserObj &obj) const override;
+  ClParserValuePtr modulus(const ClParserObj &obj) const override;
+  ClParserValuePtr power(const ClParserObj &obj) const override;
+  ClParserValuePtr approxEqual(const ClParserObj &obj) const override;
+  ClParserValuePtr bitAnd(const ClParserObj &obj) const override;
+  ClParserValuePtr bitOr(const ClParserObj &obj) const override;
+  ClParserValuePtr bitXor(const ClParserObj &obj) const override;
+  ClParserValuePtr bitLShift(const ClParserObj &obj) const override;
+  ClParserValuePtr bitRShift(const ClParserObj &obj) const override;
 
   //------
 
@@ -152,12 +153,12 @@ class ClParserReal : public ClParserObj {
   ClParserValuePtr max     () const override;
   ClParserValuePtr sum     () const override;
 
-  ClParserValuePtr index (const ClParserObj &obj) const;
-  ClParserValuePtr rindex(const ClParserObj &obj) const;
+  ClParserValuePtr index (const ClParserObj &obj) const override;
+  ClParserValuePtr rindex(const ClParserObj &obj) const override;
 
-  ClParserValuePtr sort(ClParserSortDirection direction) const;
+  ClParserValuePtr sort(ClParserSortDirection direction) const override;
 
-  ClParserValuePtr doAssert() const;
+  ClParserValuePtr doAssert() const override;
 
  private:
   long ival() const;

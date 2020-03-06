@@ -1455,7 +1455,7 @@ unstackStructure(int *error_code)
   while (stack_node && stack_node->isIdentifier() && stack_node->getIdentifier()->isStructPart()) {
     pop(identifier);
 
-    const std::string &name = identifier->getName();
+    const std::string &iname = identifier->getName();
 
     if (var_ref.isValid()) {
       ClParserValuePtr svalue;
@@ -1474,21 +1474,21 @@ unstackStructure(int *error_code)
 
       ClParserValuePtr structure_value;
 
-      if (! structure->getValue(name, structure_value)) {
+      if (! structure->getValue(iname, structure_value)) {
         if (structure->getIsFixedType()) {
           *error_code = int(ClErr::INVALID_STRUCT_REF);
           return;
         }
 
-        structure->addName(name);
+        structure->addName(iname);
       }
 
-      svar_ref = ClParserInst->createStructVarRef(variable, name);
+      svar_ref = ClParserInst->createStructVarRef(variable, iname);
 
       var_ref = ClParserVarRefPtr();
     }
     else
-      svar_ref->addName(name);
+      svar_ref->addName(iname);
 
     toNext();
 

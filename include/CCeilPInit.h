@@ -29,8 +29,8 @@ class ClParser {
   typedef void (*OutputProc)(const char *str, void *data);
 
  private:
-  typedef int (*StrCmpProc )(char *, char *);
-  typedef int (*StrNCmpProc)(char *, char *, int);
+  typedef int (*StrCmpProc )(const char *, const char *);
+  typedef int (*StrNCmpProc)(const char *, const char *, size_t);
 
  public:
   static ClParser *getInstance();

@@ -195,10 +195,10 @@ removeType(ClParserTypePtr type)
   for (int i = (int) num; i >= 1; i--) {
     TypeMap *type_map = type_map_list_[i - 1];
 
-    TypeMap::iterator p = type_map->find(name);
+    TypeMap::iterator pt = type_map->find(name);
 
-    if (p != type_map->end()) {
-      type_map->erase(p);
+    if (pt != type_map->end()) {
+      type_map->erase(pt);
       return;
     }
   }
@@ -232,10 +232,10 @@ getType(const std::string &name) const
   for (int i = (int) num; i >= 1; i--) {
     TypeMap *type_map = type_map_list_[i - 1];
 
-    TypeMap::const_iterator p = type_map->find(name);
+    TypeMap::const_iterator pt = type_map->find(name);
 
-    if (p != type_map->end())
-      return (*p).second;
+    if (pt != type_map->end())
+      return (*pt).second;
   }
 
   return ClParserTypePtr();
@@ -291,11 +291,11 @@ printAllTypes() const
 
     ClParserInst->output("\n");
 
-    TypeMap::const_iterator p1 = type_map->begin();
-    TypeMap::const_iterator p2 = type_map->end  ();
+    TypeMap::const_iterator pt1 = type_map->begin();
+    TypeMap::const_iterator pt2 = type_map->end  ();
 
-    for ( ; p1 != p2; ++p1)
-      (*p1).second->print();
+    for ( ; pt1 != pt2; ++pt1)
+      (*pt1).second->print();
   }
 }
 

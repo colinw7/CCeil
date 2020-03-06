@@ -846,14 +846,14 @@ processLine(const std::string &line)
     if (parse.isChar('(')) {
       parse.skipChar();
 
-      int i = parse.getPos();
+      int i1 = parse.getPos();
 
-      if (! ClLanguageArgs::readArgList(line, &i, ')', args)) {
+      if (! ClLanguageArgs::readArgList(line, &i1, ')', args)) {
         lmgr->syntaxError("missing close brackets for '!(' '%s' argument list", line.c_str());
         return nullptr;
       }
 
-      parse.setPos(i);
+      parse.setPos(i1);
 
       parse.skipSpace();
 
@@ -898,14 +898,14 @@ processLine(const std::string &line)
 
       parse.skipSpace();
 
-      int i = parse.getPos();
+      int i1 = parse.getPos();
 
-      if (! ClLanguageArgs::readArgList(line, &i, ')', args)) {
+      if (! ClLanguageArgs::readArgList(line, &i1, ')', args)) {
         lmgr->syntaxError("missing close brackets for '!(' '%s' argument list", line.c_str());
         return nullptr;
       }
 
-      parse.setPos(i);
+      parse.setPos(i1);
 
       parse.skipSpace();
 
@@ -975,14 +975,14 @@ processLine(const std::string &line)
   command_def = getCommandDef(scope, command_name, &is_end_name);
 
   if (command_def) {
-    int i = parse.getPos();
+    int i1 = parse.getPos();
 
     std::string args;
 
-    if (! ClLanguageArgs::readArgList(line, &i, '\0', args))
+    if (! ClLanguageArgs::readArgList(line, &i1, '\0', args))
       args = "";
 
-    parse.setPos(i);
+    parse.setPos(i1);
 
     parse.skipSpace();
 
@@ -1030,11 +1030,11 @@ processLine(const std::string &line)
 
     parse.skipSpace();
 
-    int i = parse.getPos();
+    int i1 = parse.getPos();
 
     std::string args;
 
-    if (! ClLanguageArgs::readArgList(line, &i, ')', args)) {
+    if (! ClLanguageArgs::readArgList(line, &i1, ')', args)) {
       if (procedure == nullptr)
         goto processLine_2;
 
@@ -1043,7 +1043,7 @@ processLine(const std::string &line)
       return nullptr;
     }
 
-    parse.setPos(i);
+    parse.setPos(i1);
 
     parse.skipSpace();
 
@@ -1170,9 +1170,9 @@ processLine(const std::string &line)
   if (! command->isSpecial()) {
     ClLanguageCommandDefCommand *ccommand = (ClLanguageCommandDefCommand *) command;
 
-    ClLanguageCommandDef *command_def = ccommand->getCommandDef();
+    ClLanguageCommandDef *commandDef1 = ccommand->getCommandDef();
 
-    if (command_def->getEndName() != "")
+    if (commandDef1->getEndName() != "")
       command = startBlockCommand(command);
     else {
       if (getBlockCommand()) {
@@ -2404,11 +2404,11 @@ addCommandDef(ClParserScopePtr scope, ClLanguageCommandDef *command_def)
   command_def_list1_[key1] = command_def;
 
   if (command_def->getEndName() != "") {
-    ClLanguageCommandDef *old_command_def =
+    ClLanguageCommandDef *oldCommandDef1 =
       getCommandDef(scope, command_def->getEndName(), &is_end_name);
 
-    if (old_command_def)
-      removeCommandDef(scope, old_command_def);
+    if (oldCommandDef1)
+      removeCommandDef(scope, oldCommandDef1);
 
     std::string key2 = scopeName + command_def->getEndName();
 

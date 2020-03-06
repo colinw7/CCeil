@@ -75,6 +75,7 @@ class ClParserFunc {
  public:
   void print() const;
   void print(std::ostream &os) const;
+
   void debugPrint() const;
 
   static bool isValidName(const std::string &name);

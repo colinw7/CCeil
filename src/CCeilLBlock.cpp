@@ -283,17 +283,17 @@ processBlockCommands()
        command and update the current command number for a goto
        to a label inside the block */
 
-    int type = current_block_data_.checkControlFlags(&i);
+    int type1 = current_block_data_.checkControlFlags(&i);
 
     /* Exit Command stops execution of all commands at all levels
        in the current file or terminates the interactive session */
 
-    if      (type == LANGUAGE_EXIT || type == LANGUAGE_ERROR)
+    if      (type1 == LANGUAGE_EXIT || type1 == LANGUAGE_ERROR)
       flag = true;
 
     /* Return terminates a procedure */
 
-    else if (type == LANGUAGE_RETURN) {
+    else if (type1 == LANGUAGE_RETURN) {
       if (current_block_data_.isType(CL_BLOCK_TYPE_FILE_BLOCK))
         ClLanguageMgrInst->syntaxError
          ("Invalid 'return' command when executing file '%s'",
@@ -306,10 +306,10 @@ processBlockCommands()
        valid for a file or a procedure. Other types terminate
        and leave parent block to handle */
 
-    else if (type == LANGUAGE_GOTO_OUTSIDE ||
-             type == LANGUAGE_INTERRUPT) {
+    else if (type1 == LANGUAGE_GOTO_OUTSIDE ||
+             type1 == LANGUAGE_INTERRUPT) {
       if      (current_block_data_.isType(CL_BLOCK_TYPE_PROCEDURE_BLOCK)) {
-        if (type == LANGUAGE_GOTO_OUTSIDE)
+        if (type1 == LANGUAGE_GOTO_OUTSIDE)
           ClLanguageMgrInst->syntaxError
            ("Invalid 'goto' to label '%s' outside procedure '%s'",
             ClLanguageMgrInst->getGoto().getName().c_str(),
@@ -320,7 +320,7 @@ processBlockCommands()
             current_block_data_.getName().c_str());
       }
       else if (current_block_data_.isType(CL_BLOCK_TYPE_FILE_BLOCK)) {
-        if (type == LANGUAGE_GOTO_OUTSIDE)
+        if (type1 == LANGUAGE_GOTO_OUTSIDE)
           ClLanguageMgrInst->syntaxError
            ("Invalid 'goto' to label '%s' outside file '%s'",
             ClLanguageMgrInst->getGoto().getName().c_str(),
@@ -336,7 +336,7 @@ processBlockCommands()
 
     /* Break terminates an iteration, otherwise invalid */
 
-    else if (type == LANGUAGE_BREAK) {
+    else if (type1 == LANGUAGE_BREAK) {
       if      (current_block_data_.isType(CL_BLOCK_TYPE_NORMAL_BLOCK))
         ClLanguageMgrInst->setBreakFlag(true);
       else if (current_block_data_.isType(CL_BLOCK_TYPE_PROCEDURE_BLOCK) ||
@@ -352,7 +352,7 @@ processBlockCommands()
        of remaining commands and leaves caller to do the next
        iteration), otherwise invalid */
 
-    else if (type == LANGUAGE_CONTINUE) {
+    else if (type1 == LANGUAGE_CONTINUE) {
       if      (current_block_data_.isType(CL_BLOCK_TYPE_NORMAL_BLOCK))
         ClLanguageMgrInst->setContinueFlag(true);
       else if (current_block_data_.isType(CL_BLOCK_TYPE_PROCEDURE_BLOCK) ||
@@ -382,12 +382,12 @@ processBlockCommands()
        command and update the current command number for a goto
        to a label inside the block */
 
-    int type = current_block_data_.checkControlFlags(&i);
+    int type1 = current_block_data_.checkControlFlags(&i);
 
     /* Exit Command stops execution of all commands at all levels
        in the current file or terminates the interactive session */
 
-    if      (type == LANGUAGE_EXIT || type == LANGUAGE_ERROR) {
+    if      (type1 == LANGUAGE_EXIT || type1 == LANGUAGE_ERROR) {
       flag = true;
 
       goto processBlockCommands1;
@@ -395,7 +395,7 @@ processBlockCommands()
 
     /* Return terminates a procedure */
 
-    else if (type == LANGUAGE_RETURN) {
+    else if (type1 == LANGUAGE_RETURN) {
       if (current_block_data_.isType(CL_BLOCK_TYPE_FILE_BLOCK))
         ClLanguageMgrInst->syntaxError
          ("Invalid 'return' command when executing file '%s'",
@@ -409,17 +409,17 @@ processBlockCommands()
     /* Goto to a label inside the block moves to the next command
        after the label and continues execution */
 
-    else if (type == LANGUAGE_GOTO_INSIDE)
+    else if (type1 == LANGUAGE_GOTO_INSIDE)
       goto again;
 
     /* Goto to a label outside the block or an interrupt is not
        valid for a file or a procedure. Other types terminate
        and leave parent block to handle */
 
-    else if (type == LANGUAGE_GOTO_OUTSIDE ||
-             type == LANGUAGE_INTERRUPT) {
+    else if (type1 == LANGUAGE_GOTO_OUTSIDE ||
+             type1 == LANGUAGE_INTERRUPT) {
       if      (current_block_data_.isType(CL_BLOCK_TYPE_PROCEDURE_BLOCK)) {
-        if (type == LANGUAGE_GOTO_OUTSIDE)
+        if (type1 == LANGUAGE_GOTO_OUTSIDE)
           ClLanguageMgrInst->syntaxError
            ("Invalid 'goto' to label '%s' outside procedure '%s'",
             ClLanguageMgrInst->getGoto().getName().c_str(),
@@ -430,7 +430,7 @@ processBlockCommands()
             current_block_data_.getName().c_str());
       }
       else if (current_block_data_.isType(CL_BLOCK_TYPE_FILE_BLOCK)) {
-        if (type == LANGUAGE_GOTO_OUTSIDE)
+        if (type1 == LANGUAGE_GOTO_OUTSIDE)
           ClLanguageMgrInst->syntaxError
            ("Invalid 'goto' to label '%s' outside file '%s'",
             ClLanguageMgrInst->getGoto().getName().c_str(),
@@ -448,7 +448,7 @@ processBlockCommands()
 
     /* Break terminates an iteration, otherwise invalid */
 
-    else if (type == LANGUAGE_BREAK) {
+    else if (type1 == LANGUAGE_BREAK) {
       if      (current_block_data_.isType(CL_BLOCK_TYPE_NORMAL_BLOCK))
         ClLanguageMgrInst->setBreakFlag(true);
       else if (current_block_data_.isType(CL_BLOCK_TYPE_PROCEDURE_BLOCK) ||
@@ -466,7 +466,7 @@ processBlockCommands()
        of remaining commands and leaves caller to do the next
        iteration), otherwise invalid */
 
-    else if (type == LANGUAGE_CONTINUE) {
+    else if (type1 == LANGUAGE_CONTINUE) {
       if      (current_block_data_.isType(CL_BLOCK_TYPE_NORMAL_BLOCK))
         ClLanguageMgrInst->setContinueFlag(true);
       else if (current_block_data_.isType(CL_BLOCK_TYPE_PROCEDURE_BLOCK) ||

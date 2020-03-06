@@ -467,10 +467,10 @@ ClParserArray(const uint *dims, uint num_dims, const ClParserValuePtr *values) :
     for (int j = 0; j < num_values; ++j) {
       const std::string &name = type->getSubType(j)->getName();
 
-      ClParserValuePtr value;
+      ClParserValuePtr ivalue;
 
-      if (values[i]->getStructure()->getValue(name, value))
-        value->getStructure()->setValue(name, value);
+      if (values[i]->getStructure()->getValue(name, ivalue))
+        values[i]->getStructure()->setValue(name, ivalue);
     }
   }
 }

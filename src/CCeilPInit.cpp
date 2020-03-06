@@ -85,8 +85,8 @@ setCaseSensitive(bool flag)
     strncmp_ = (StrNCmpProc) strncmp;
   }
   else {
-    strcmp_  = (StrCmpProc ) CStrUtil::casecmp;
-    strncmp_ = (StrNCmpProc) CStrUtil::casecmp;
+    strcmp_  = (StrCmpProc ) CStrUtil::ccasecmp;
+    strncmp_ = (StrNCmpProc) CStrUtil::ccasencmp;
   }
 }
 
