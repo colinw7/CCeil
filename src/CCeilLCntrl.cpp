@@ -1369,10 +1369,12 @@ processCommand(ClLanguageCommand *command)
 
       output("%s", ostr.c_str());
 
-      if      (command_state.isSignaled())
-        output("Killed by signal %d\n" , command_state.getSignum());
-      else if (command_state.isStopped())
-        output("Stopped by signal %d\n", command_state.getSignum());
+      if (command_state.getSignum() > 0) {
+        if      (command_state.isSignaled())
+          output("Killed by signal %d\n" , command_state.getSignum());
+        else if (command_state.isStopped())
+          output("Stopped by signal %d\n", command_state.getSignum());
+      }
 
       ClParserVarPtr var = ClParserInst->getVariable("_rc", true);
 

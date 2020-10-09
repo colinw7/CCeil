@@ -310,7 +310,7 @@ class ClLanguageMgr {
   typedef std::map<std::string, ClLanguageCommandDef *> CommandDefMap;
 
   int                     argc_              { 0 };
-  char                  **argv_              { nullptr };
+  char**                  argv_              { nullptr };
   bool                    exitFlag_          { false };
   int                     exitCode_          { 0 };
   bool                    intrFlag_          { false };
@@ -326,26 +326,26 @@ class ClLanguageMgr {
   CReadLine               readline_;
 #endif
   ClLanguageGoto          goto_;
-  FILE                   *output_fp_         { nullptr };
+  FILE*                   output_fp_         { nullptr };
   std::string             run_file_;
   bool                    exit_after_run_    { false };
   bool                    echo_commands_     { false };
-  uint                    ident_ { 1 };
+  uint                    ident_             { 1 };
   CommandDefMap           command_def_list1_;
   CommandDefMap           command_def_list2_;
-  ClLanguageCommand      *block_command_     { nullptr };
+  ClLanguageCommand*      block_command_     { nullptr };
   ClLanguageCommandList   block_command_stack_;
   bool                    first_line_        { true };
   std::string             prompt_;
   bool                    ignore_pos_proc_   { false };
   std::string             line_;
-  int                     line_len_ { 0 };
+  int                     line_len_          { 0 };
   std::string             line_buffer_;
   ClParserValuePtr        last_value_;
   bool                    abort_signal_      { false };
   CCeilLErrorMgr*         errorMgr_          { nullptr };
   CommandTermProc         command_term_proc_ { nullptr };
-  void                   *command_term_data_ { nullptr };
+  void*                   command_term_data_ { nullptr };
 };
 
 #endif

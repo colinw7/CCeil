@@ -361,7 +361,10 @@ ClStdCommandsInit(ClModuleInitType flag, void *)
 
     /* Set */
 
-    lmgr->defineCommand("config", ClStdConfigCommand);
+    if (ClParserInst->getDollarPrefix())
+      lmgr->defineCommand("config", ClStdConfigCommand);
+    else
+      lmgr->defineCommand("set", ClStdConfigCommand);
 
     //---
 
@@ -3971,7 +3974,7 @@ ClStdParseCommand(ClParserValuePtr *values, uint, void *, int *error_code)
 /*------------------------------------------------------------------*
  *
  * ClStdSetCommand
- *   Routine called when the 'setenv' command is entered.
+ *   Routine called when the 'set' command is entered.
  *
  *   This routine sets the value of the specified environment variable. The
  *   environment variable name is specified as a str in the first argument
