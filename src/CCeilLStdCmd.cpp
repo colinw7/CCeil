@@ -112,7 +112,7 @@ cl_builtin_module_def[] = {
   { "init", (ClModuleProc) ClStdCommandsInit, },
   { "set" , (ClModuleProc) ClStdCommandsSet , },
   { "help", (ClModuleProc) ClStdCommandsHelp, },
-  { ""    , 0                               , },
+  { ""    , nullptr                         , },
 };
 
 static int language_import_ident = -1;
@@ -460,7 +460,7 @@ ClStdCommandsSet(const char *option, const char *args, void *)
     bool        math_fail  = ClParserInst->getMathFail();
     double      tolerance  = ClParserInst->getTolerance();
 
-    lmgr->output("angle_type     %s\n"  , CUtil::toString(angle_type).c_str());
+    lmgr->output("angle_type     %s\n"  , CAngleTypeUtil::toString(angle_type).c_str());
     lmgr->output("prompt         '%s'\n", prompt.c_str());
     lmgr->output("real_format    '%s'\n", ClParserInst->getRealFormat().c_str());
     lmgr->output("integer_format '%s'\n", ClParserInst->getIntegerFormat().c_str());
@@ -474,7 +474,7 @@ ClStdCommandsSet(const char *option, const char *args, void *)
   if      (CStrUtil::casecmp(option, "angle_type") == 0) {
     /* Set Angle Type degrees/radians */
 
-    CAngleType angle_type = CUtil::toAngleType(args);
+    auto angle_type = CAngleTypeUtil::fromString(args);
 
     if (angle_type != CANGLE_TYPE_NONE)
       ClParserInst->setAngleType(angle_type);
@@ -484,7 +484,7 @@ ClStdCommandsSet(const char *option, const char *args, void *)
   else if (CStrUtil::casecmp(option, "prompt") == 0) {
     char *prompt;
 
-    ClLanguageArgs *args1 = new ClLanguageArgs;
+    auto *args1 = new ClLanguageArgs;
 
     args1->startArgs(0);
 
@@ -505,7 +505,7 @@ ClStdCommandsSet(const char *option, const char *args, void *)
 
     bool rc = false;
 
-    ClLanguageArgs *args1 = new ClLanguageArgs;
+    auto *args1 = new ClLanguageArgs;
 
     args1->startArgs(0);
 
@@ -536,7 +536,7 @@ ClStdCommandsSet(const char *option, const char *args, void *)
 
     bool rc = false;
 
-    ClLanguageArgs *args1 = new ClLanguageArgs;
+    auto *args1 = new ClLanguageArgs;
 
     args1->startArgs(0);
 
@@ -567,7 +567,7 @@ ClStdCommandsSet(const char *option, const char *args, void *)
 
     bool rc = false;
 
-    ClLanguageArgs *args1 = new ClLanguageArgs;
+    auto *args1 = new ClLanguageArgs;
 
     args1->startArgs(0);
 
@@ -1295,7 +1295,7 @@ ClStdFuncCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
 
     name = words[1];
 
-    ClLanguageFuncArg *func_arg = new ClLanguageFuncArg(name, type);
+    auto *func_arg = new ClLanguageFuncArg(name, type);
 
     funcArgs.args.push_back(func_arg);
   }
@@ -2845,12 +2845,10 @@ ClStdDefineCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
        to define Parser Function */
 
     if (old_lfunction != 0) {
-      int *arg_types;
+      int *arg_types = nullptr;
 
       if (old_lfunction->getNumArgs() > 0)
         arg_types = new int [old_lfunction->getNumArgs()];
-      else
-        arg_types = 0;
 
       for (uint i = 0; i < old_lfunction->getNumArgs(); i++)
         arg_types[i] = old_lfunction->getArg(i).getType();
@@ -4865,8 +4863,8 @@ ClStdHelpCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
 
   /*-------*/
 
-  FILE *fp     = 0;
-  FILE *old_fp = 0;
+  FILE *fp     = nullptr;
+  FILE *old_fp = nullptr;
 
   /*-------*/
 

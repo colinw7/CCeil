@@ -157,9 +157,8 @@ readFunctionArgList(const std::string &str, uint *i, int *error_code)
         (isalpha(str[*i]) || str[*i] == '_')) {
       std::string variable_name = readFunctionVariableName(str, i);
 
-      FuncArgList::iterator p =
-        std::find_if(variable_name_list.begin(), variable_name_list.end(),
-                     std::bind1st(std::equal_to<std::string>(), variable_name));
+      auto p = std::find_if(variable_name_list.begin(), variable_name_list.end(),
+                            std::bind1st(std::equal_to<std::string>(), variable_name));
 
       if (p != variable_name_list.end()) {
         *error_code = int(ClErr::MULTIPLE_DEF_FN_VARIABLE);
