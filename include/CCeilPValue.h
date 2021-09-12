@@ -150,7 +150,7 @@ class ClParserValue {
 
   ClParserValue *dup() const;
 
-  const ClParserValue &operator=(const ClParserValue &value);
+  ClParserValue &operator=(const ClParserValue &value);
 
  public:
   bool canConvertToInteger() const;

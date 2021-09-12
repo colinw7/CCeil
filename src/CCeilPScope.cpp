@@ -81,7 +81,7 @@ ClParserScope::
   delete varMgr_;
 }
 
-const ClParserScope &
+ClParserScope &
 ClParserScope::
 operator=(const ClParserScope &scope)
 {

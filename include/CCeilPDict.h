@@ -163,7 +163,7 @@ class ClParserDict : public ClParserObj {
 
  ~ClParserDict();
 
-  const ClParserDict &operator=(const ClParserDict &dict);
+  ClParserDict &operator=(const ClParserDict &dict);
 
   ClParserDict *dup() const override;
 

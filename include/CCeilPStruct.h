@@ -47,7 +47,7 @@ class ClParserStruct : public ClParserObj {
 
  ~ClParserStruct();
 
-  const ClParserStruct &operator=(const ClParserStruct &structure);
+  ClParserStruct &operator=(const ClParserStruct &structure);
 
   ClParserStruct *dup() const override;
 

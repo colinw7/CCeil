@@ -134,7 +134,7 @@ ClParserStruct::
 {
 }
 
-const ClParserStruct &
+ClParserStruct &
 ClParserStruct::
 operator=(const ClParserStruct &structure)
 {

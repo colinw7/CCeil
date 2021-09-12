@@ -800,7 +800,7 @@ ClParserValue::
   resetValue();
 }
 
-const ClParserValue &
+ClParserValue &
 ClParserValue::
 operator=(const ClParserValue &value)
 {

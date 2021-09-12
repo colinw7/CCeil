@@ -77,7 +77,7 @@ ClParserList::
   deleteAllValues();
 }
 
-const ClParserList &
+ClParserList &
 ClParserList::
 operator=(const ClParserList &list)
 {

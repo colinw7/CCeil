@@ -69,7 +69,7 @@ class ClLanguageCommand {
  private:
   ClLanguageCommand(const ClLanguageCommand &command);
 
-  const ClLanguageCommand &operator=(const ClLanguageCommand &command);
+  ClLanguageCommand &operator=(const ClLanguageCommand &command);
 
  protected:
   uint                   ident_     { 0 };

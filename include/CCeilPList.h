@@ -35,7 +35,7 @@ class ClParserList : public ClParserObj {
 
   ClParserListPtr dupList() const;
 
-  const ClParserList &operator=(const ClParserList &list);
+  ClParserList &operator=(const ClParserList &list);
 
  public:
   bool toBool() const override { return values_.size() > 0; }

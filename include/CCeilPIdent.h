@@ -40,7 +40,7 @@ class ClParserIdentifier {
    type_(identifier.type_), name_(identifier.name_), scopes_(identifier.scopes_) {
   }
 
-  const ClParserIdentifier &operator=(const ClParserIdentifier &identifier) {
+  ClParserIdentifier &operator=(const ClParserIdentifier &identifier) {
     type_   = identifier.type_;
     name_   = identifier.name_;
     scopes_ = identifier.scopes_;

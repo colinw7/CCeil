@@ -42,7 +42,7 @@ class ClParserScope {
 
  ~ClParserScope();
 
-  const ClParserScope &operator=(const ClParserScope &scope);
+  ClParserScope &operator=(const ClParserScope &scope);
 
   ClParserScope *dup() const;
 

@@ -41,7 +41,7 @@ class ClParserReal : public ClParserObj {
 
  ~ClParserReal() { }
 
-  const ClParserReal &operator=(const ClParserReal &real) {
+  ClParserReal &operator=(const ClParserReal &real) {
     real_ = real.real_;
 
     return *this;

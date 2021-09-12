@@ -181,7 +181,7 @@ ClParserDict::
   clearValues();
 }
 
-const ClParserDict &
+ClParserDict &
 ClParserDict::
 operator=(const ClParserDict &dict)
 {
