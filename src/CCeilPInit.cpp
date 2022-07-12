@@ -37,8 +37,8 @@ ClParser()
   output_proc_ = nullptr;
   output_data_ = nullptr;
 
-  strcmp_  = (StrCmpProc ) strcmp;
-  strncmp_ = (StrNCmpProc) strncmp;
+  strcmp_  = static_cast<StrCmpProc >(strcmp);
+  strncmp_ = static_cast<StrNCmpProc>(strncmp);
 }
 
 ClParser::
@@ -81,12 +81,12 @@ ClParser::
 setCaseSensitive(bool flag)
 {
   if (flag) {
-    strcmp_  = (StrCmpProc ) strcmp;
-    strncmp_ = (StrNCmpProc) strncmp;
+    strcmp_  = static_cast<StrCmpProc >(strcmp);
+    strncmp_ = static_cast<StrNCmpProc>(strncmp);
   }
   else {
-    strcmp_  = (StrCmpProc ) CStrUtil::ccasecmp;
-    strncmp_ = (StrNCmpProc) CStrUtil::ccasencmp;
+    strcmp_  = static_cast<StrCmpProc >(CStrUtil::ccasecmp);
+    strncmp_ = static_cast<StrNCmpProc>(CStrUtil::ccasencmp);
   }
 }
 

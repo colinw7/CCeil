@@ -26,10 +26,10 @@ createUserFn(const ClUserFnData &data)
   else
     type = 0;
 
-  ClParserUserFnPtr userfn = createUserFn(data.name, type, arg_types, data.proc, data.data);
+  auto userfn = createUserFn(data.name, uint(type), arg_types, data.proc, data.data);
 
   if (data.num != 0)
-    *data.num = userfn->getInd();
+    *data.num = int(userfn->getInd());
 
   return userfn;
 }
@@ -105,8 +105,8 @@ void
 ClParserUserFnMgr::
 stringToTypes(const std::string &str, int *type, IntVectorT &arg_types)
 {
-  int i   = 0;
-  int len = str.size();
+  uint i   = 0;
+  uint len = uint(str.size());
 
   *type = CL_PARSER_USERFN_TYPE_STD;
 
@@ -151,7 +151,7 @@ stringToTypes(const std::string &str, int *type, IntVectorT &arg_types)
           arg_type |= CL_PARSER_VALUE_TYPE_GENERIC;
           break;
         case '.': {
-          int j = i;
+          uint j = i;
 
           i = len;
 
@@ -226,7 +226,7 @@ ClParserUserFn(const std::string &name, uint type, const IntVectorT &arg_types,
 
   ind_ = ClParserInst->getNextUserFnInd();
 
-  uint num_arg_types = arg_types.size();
+  uint num_arg_types = uint(arg_types.size());
 
   for (uint i = 0; i <  num_arg_types; i++) {
     arg_types_.push_back(arg_types[i]);
@@ -275,7 +275,7 @@ ClParserValuePtr
 ClParserUserFn::
 exec(ClParserValueArray &values, int *error_code)
 {
-  uint num_values = values.size();
+  uint num_values = uint(values.size());
 
   ClParserValuePtr *values1 = new ClParserValuePtr [num_values + 1];
 
@@ -408,7 +408,7 @@ getArgList(CLArgType type, va_list *vargs)
         *num_reals = 0;
       }
       else
-        *num_reals = dims[0];
+        *num_reals = int(dims[0]);
 
       exec_data_.free_array_reals_    .push_back(*reals);
       exec_data_.free_array_real_dims_.push_back(dims);
@@ -428,7 +428,7 @@ getArgList(CLArgType type, va_list *vargs)
         *num_reals = 0;
       }
       else
-        *num_reals = dims[0];
+        *num_reals = int(dims[0]);
 
       exec_data_.free_array_floats_    .push_back(*reals);
       exec_data_.free_array_float_dims_.push_back(dims);
@@ -448,7 +448,7 @@ getArgList(CLArgType type, va_list *vargs)
         *num_integers = 0;
       }
       else
-        *num_integers = dims[0];
+        *num_integers = int(dims[0]);
 
       exec_data_.free_array_integers_    .push_back(*integers);
       exec_data_.free_array_integer_dims_.push_back(dims);
@@ -468,7 +468,7 @@ getArgList(CLArgType type, va_list *vargs)
         *num_integers = 0;
       }
       else
-        *num_integers = dims[0];
+        *num_integers = int(dims[0]);
 
       exec_data_.free_array_words_    .push_back(*integers);
       exec_data_.free_array_word_dims_.push_back(dims);
@@ -488,7 +488,7 @@ getArgList(CLArgType type, va_list *vargs)
         *num_strings = 0;
       }
       else
-        *num_strings = dims[0];
+        *num_strings = int(dims[0]);
 
       exec_data_.free_array_strings_    .push_back(*strings);
       exec_data_.free_array_string_dims_.push_back(dims);
@@ -501,14 +501,14 @@ getArgList(CLArgType type, va_list *vargs)
       if (n <= 0)
         ClParserInst->error("Invalid Skip Size");
       else
-        num += n - 1;
+        num += uint(n - 1);
     }
     else
       return getArgsFail(int(ClErr::INVALID_TYPE_FOR_OPERATOR));
 
     num++;
 
-    type = (CLArgType) va_arg(*vargs, int);
+    type = static_cast<CLArgType>(va_arg(*vargs, int));
   }
 
   return true;
@@ -543,7 +543,7 @@ setArgList(CLArgType type, va_list *vargs)
     else if (type == CLArgType::WORD) {
       int integer = va_arg(*vargs, int);
 
-      value = ClParserValueMgrInst->createValue((long) integer);
+      value = ClParserValueMgrInst->createValue(long(integer));
 
       exec_data_.values_[num] = value;
     }
@@ -558,7 +558,7 @@ setArgList(CLArgType type, va_list *vargs)
       char *chars = va_arg(*vargs, char *);
       int   len   = va_arg(*vargs, int);
 
-      value = ClParserValueMgrInst->createValue(chars, len);
+      value = ClParserValueMgrInst->createValue(chars, uint(len));
 
       exec_data_.values_[num] = value;
     }
@@ -568,7 +568,7 @@ setArgList(CLArgType type, va_list *vargs)
       double *reals     = va_arg(*vargs, double *);
       int     num_reals = va_arg(*vargs, int);
 
-      dims[0] = num_reals;
+      dims[0] = uint(num_reals);
 
       value = ClParserValueMgrInst->createValue(dims, 1, reals);
 
@@ -580,7 +580,7 @@ setArgList(CLArgType type, va_list *vargs)
       float *reals     = va_arg(*vargs, float *);
       int    num_reals = va_arg(*vargs, int);
 
-      dims[0] = num_reals;
+      dims[0] = uint(num_reals);
 
       value = ClParserValueMgrInst->createValue(dims, 1, reals);
 
@@ -592,7 +592,7 @@ setArgList(CLArgType type, va_list *vargs)
       long *integers     = va_arg(*vargs, long *);
       int   num_integers = va_arg(*vargs, int);
 
-      dims[0] = num_integers;
+      dims[0] = uint(num_integers);
 
       value = ClParserValueMgrInst->createValue(dims, 1, integers);
 
@@ -604,7 +604,7 @@ setArgList(CLArgType type, va_list *vargs)
       int *integers     = va_arg(*vargs, int *);
       int  num_integers = va_arg(*vargs, int);
 
-      dims[0] = num_integers;
+      dims[0] = uint(num_integers);
 
       value = ClParserValueMgrInst->createValue(dims, 1, integers);
 
@@ -613,10 +613,10 @@ setArgList(CLArgType type, va_list *vargs)
     else if (type == CLArgType::STRINGS) {
       uint dims[1];
 
-      const char **strings     = (const char **) va_arg(*vargs, char **);
+      const char **strings     = const_cast<const char **>(va_arg(*vargs, char **));
       int          num_strings = va_arg(*vargs, int);
 
-      dims[0] = num_strings;
+      dims[0] = uint(num_strings);
 
       value = ClParserValueMgrInst->createValue(dims, 1, strings);
 
@@ -630,14 +630,14 @@ setArgList(CLArgType type, va_list *vargs)
       if (n <= 0)
         ClParserInst->error("Invalid Skip Size");
       else
-        num += n - 1;
+        num += uint(n - 1);
     }
     else
       return setArgsFail(int(ClErr::INVALID_TYPE_FOR_OPERATOR));
 
     num++;
 
-    type = (CLArgType) va_arg(*vargs, int);
+    type = static_cast<CLArgType>(va_arg(*vargs, int));
   }
 
   return true;
@@ -665,23 +665,23 @@ void
 ClParserUserFn::ExecData::
 term()
 {
-  int num = free_strings_.size();
+  uint num = uint(free_strings_.size());
 
-  for (int i = 0; i < num; i++)
+  for (uint i = 0; i < num; i++)
     delete [] free_strings_[i];
 
   free_strings_.clear();
 
-  num = free_chars_.size();
+  num = uint(free_chars_.size());
 
-  for (int i = 0; i < num; i++)
+  for (uint i = 0; i < num; i++)
     delete [] free_chars_[i];
 
   free_chars_.clear();
 
-  num = free_array_reals_.size();
+  num = uint(free_array_reals_.size());
 
-  for (int i = 0; i < num; i++) {
+  for (uint i = 0; i < num; i++) {
     delete [] free_array_reals_[i];
     delete [] free_array_real_dims_[i];
   }
@@ -689,9 +689,9 @@ term()
   free_array_reals_.clear();
   free_array_real_dims_.clear();
 
-  num = free_array_floats_.size();
+  num = uint(free_array_floats_.size());
 
-  for (int i = 0; i < num; i++) {
+  for (uint i = 0; i < num; i++) {
     delete [] free_array_floats_[i];
     delete [] free_array_float_dims_[i];
   }
@@ -699,9 +699,9 @@ term()
   free_array_floats_.clear();
   free_array_float_dims_.clear();
 
-  num = free_array_integers_.size();
+  num = uint(free_array_integers_.size());
 
-  for (int i = 0; i < num; i++) {
+  for (uint i = 0; i < num; i++) {
     delete [] free_array_integers_[i];
     delete [] free_array_integer_dims_[i];
   }
@@ -709,9 +709,9 @@ term()
   free_array_integers_.clear();
   free_array_integer_dims_.clear();
 
-  num = free_array_words_.size();
+  num = uint(free_array_words_.size());
 
-  for (int i = 0; i < num; i++) {
+  for (uint i = 0; i < num; i++) {
     delete [] free_array_words_[i];
     delete [] free_array_word_dims_[i];
   }
@@ -719,9 +719,9 @@ term()
   free_array_words_.clear();
   free_array_word_dims_.clear();
 
-  num = free_array_strings_.size();
+  num = uint(free_array_strings_.size());
 
-  for (int i = 0; i < num; i++) {
+  for (uint i = 0; i < num; i++) {
     delete [] free_array_strings_[i];
     delete [] free_array_string_dims_[i];
   }

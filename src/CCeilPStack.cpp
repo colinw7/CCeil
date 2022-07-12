@@ -476,7 +476,7 @@ unstackTypeFunction(int *error_code)
 
   pop(op);
 
-  uint num_values = value_list.size();
+  uint num_values = uint(value_list.size());
 
   if (num_values > 0 && type->getNumSubTypes() != num_values) {
     if (num_values < type->getNumSubTypes())
@@ -853,7 +853,7 @@ unstackSelectExpression(int *error_code)
     return;
   }
 
-  int flag = value->getInteger()->getValue();
+  int flag = int(value->getInteger()->getValue());
 
   ClParserOperatorPtr op;
 
@@ -1226,7 +1226,7 @@ unstackInternalFunction(int *error_code)
 
   pop(op);
 
-  uint num_values = value_list.size();
+  uint num_values = uint(value_list.size());
 
   if (num_values == 0) {
     *error_code = int(ClErr::INVALID_NO_FUNCTION_ARGS);
@@ -1340,7 +1340,7 @@ unstackUserFunction(int *error_code)
 
   pop(op);
 
-  uint num_arg_values = arg_value_list.size();
+  uint num_arg_values = uint(arg_value_list.size());
 
   if (userfn->isVarArgs()) {
     if (userfn->getNumArgTypes() > 0 && num_arg_values < userfn->getNumArgTypes() - 1) {
@@ -1728,13 +1728,13 @@ unstackFunction(int *error_code)
 
   ClParserValueArray values;
 
-  int num_args = function->getNumArgs();
+  uint num_args = function->getNumArgs();
 
   toNext();
 
   ClParserOperatorPtr op;
 
-  for (int i = 0; i < num_args; ++i) {
+  for (uint i = 0; i < num_args; ++i) {
     toNext();
 
     ClParserValuePtr value1 = unstackExpressionValue(error_code);
@@ -1800,9 +1800,9 @@ stackFunctionStackNode(ClParserStackNode *stack_node, ClParserFuncValue *functio
   ClParserValuePtr value;
 
   if (stack_node->isIdentifier() && stack_node->getIdentifier()->isArgument()) {
-    int num_args = function_value->function->getNumArgs();
+    uint num_args = function_value->function->getNumArgs();
 
-    for (int i = 0; i < num_args; ++i) {
+    for (uint i = 0; i < num_args; ++i) {
       const std::string &arg = function_value->function->getArg(i);
 
       if (arg == stack_node->getIdentifier()->getName()) {
@@ -3053,7 +3053,7 @@ getVariables(char ***variables, uint *num_variables)
     }
   }
 
-  *num_variables = variable_list.size();
+  *num_variables = uint(variable_list.size());
 
   if (*num_variables > 0) {
     *variables = new char * [*num_variables];

@@ -21,7 +21,7 @@ ClParserTypeMgr::
 {
   delete type_map_;
 
-  uint num = type_map_list_.size();
+  uint num = uint(type_map_list_.size());
 
   for (uint i = 0; i < num; ++i)
     delete type_map_list_[i];
@@ -64,7 +64,7 @@ createType(const std::string &name, const std::string &arg_string)
   std::string type_string;
   std::string variable;
 
-  uint len = arg_string.size();
+  uint len = uint(arg_string.size());
 
   uint i = 0;
 
@@ -109,7 +109,7 @@ createType(const std::string &name, const std::string &arg_string)
         if (! CStrUtil::toInteger(dim_string, &dim))
           ClErrThrow(ClErr::ZERO_STRUCT_DIM);
 
-        dims.push_back(dim);
+        dims.push_back(uint(dim));
 
         CStrUtil::skipSpace(arg_string, &i);
       }
@@ -120,7 +120,7 @@ createType(const std::string &name, const std::string &arg_string)
 
       ++i;
 
-      uint num_dims = dims.size();
+      uint num_dims = uint(dims.size());
 
       if (num_dims == 0)
         ClErrThrow(ClErr::MISSING_STRUCT_DIMS);
@@ -190,10 +190,10 @@ removeType(ClParserTypePtr type)
     return;
   }
 
-  uint num = type_map_list_.size();
+  uint num = uint(type_map_list_.size());
 
-  for (int i = (int) num; i >= 1; i--) {
-    TypeMap *type_map = type_map_list_[i - 1];
+  for (int i = int(num); i >= 1; i--) {
+    TypeMap *type_map = type_map_list_[uint(i - 1)];
 
     TypeMap::iterator pt = type_map->find(name);
 
@@ -227,10 +227,10 @@ getType(const std::string &name) const
   if (p != type_map_->end())
     return (*p).second;
 
-  uint num = type_map_list_.size();
+  uint num = uint(type_map_list_.size());
 
-  for (int i = (int) num; i >= 1; i--) {
-    TypeMap *type_map = type_map_list_[i - 1];
+  for (int i = int(num); i >= 1; i--) {
+    TypeMap *type_map = type_map_list_[uint(i - 1)];
 
     TypeMap::const_iterator pt = type_map->find(name);
 
@@ -284,10 +284,10 @@ printAllTypes() const
   for ( ; p1 != p2; ++p1)
     (*p1).second->print();
 
-  uint num = type_map_list_.size();
+  uint num = uint(type_map_list_.size());
 
-  for (int i = num; i >= 1; i--) {
-    TypeMap *type_map = type_map_list_[i - 1];
+  for (int i = int(num); i >= 1; i--) {
+    TypeMap *type_map = type_map_list_[uint(i - 1)];
 
     ClParserInst->output("\n");
 
@@ -311,7 +311,7 @@ ClParserType::
 ClParserType(const std::string &name, const ClParserSubTypeArray &sub_types) :
  name_(name), is_fixed_(false)
 {
-  uint num_sub_types = sub_types.size();
+  uint num_sub_types = uint(sub_types.size());
 
   for (uint i = 0; i < num_sub_types; ++i)
     sub_types_.push_back(sub_types[i]);
@@ -358,11 +358,11 @@ getSubTypeNumber(const std::string &name)
   if (isBuiltinType())
     return -1;
 
-  uint num_sub_types = sub_types_.size();
+  uint num_sub_types = uint(sub_types_.size());
 
   for (uint i = 0; i < num_sub_types; ++i)
     if (name == sub_types_[i]->getName())
-      return i;
+      return int(i);
 
   return -1;
 }
@@ -401,7 +401,7 @@ print() const
 {
   ClParserInst->output("struct %s { ", name_.c_str());
 
-  uint num_sub_types = sub_types_.size();
+  uint num_sub_types = uint(sub_types_.size());
 
   for (uint i = 0; i < num_sub_types; i++) {
     ClParserInst->output("  ");
@@ -423,7 +423,7 @@ print(std::ostream &os) const
 {
   os << "struct " << name_ << " { ";
 
-  uint num_sub_types = sub_types_.size();
+  uint num_sub_types = uint(sub_types_.size());
 
   for (uint i = 0; i < num_sub_types; i++) {
     os << "  ";
@@ -509,7 +509,7 @@ void
 ClParserSubType::
 createTypeValue()
 {
-  uint num_dims = dims_.size();
+  uint num_dims = uint(dims_.size());
 
   if      (type_->isIntegerType()) {
     if (num_dims == 0)
@@ -545,7 +545,7 @@ print() const
 
   ClParserInst->output("%s", name_.c_str());
 
-  uint num_dims = dims_.size();
+  uint num_dims = uint(dims_.size());
 
   if (num_dims > 0) {
     ClParserInst->output("[");
@@ -569,7 +569,7 @@ print(std::ostream &os) const
 
   os << name_;
 
-  uint num_dims = dims_.size();
+  uint num_dims = uint(dims_.size());
 
   if (num_dims > 0) {
     os << "[";

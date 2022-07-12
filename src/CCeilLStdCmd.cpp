@@ -136,15 +136,6 @@ ClLanguageRunFunction(ClParserValuePtr *values, uint num_values, void *data, int
  * CALL:
  *   ClStdCommandsAdd();
  *
- * INPUT:
- *   None
- *
- * OUTPUT:
- *   None
- *
- * RETURNS:
- *   None
- *
  * NOTES:
  *   Commands must be imported before they can be used.
  *
@@ -170,9 +161,6 @@ ClStdCommandsAdd()
  *        :    First Time Initialisation, Commands and Variables are defined.
  *        :   CL_MODULE_INIT_TYPE_REINIT -
  *        :    Reinitialisation, Variables are redefined.
- *
- * OUTPUT:
- *   None
  *
  * RETURNS:
  *   flag1 : Whether the Initialisation worked or not.
@@ -438,9 +426,6 @@ ClStdCommandsInit(ClModuleInitType flag, void *)
  *
  *   args   : String containing additional args.
  *
- * OUTPUT:
- *   None
- *
  * RETURNS:
  *   flag   : Success flag
  *
@@ -653,9 +638,6 @@ ClStdCommandsSet(const char *option, const char *args, void *)
  * INPUT:
  *   args : Additional Arguments passed to the Help Command.
  *
- * OUTPUT:
- *   None
- *
  * RETURNS:
  *   flag : Whether the Help was successful or not.
  *
@@ -787,12 +769,6 @@ ClStdCommandsHelp(const char *, void *)
  *   command : Structure containing details of the command and arguments
  *           : supplied by the user.
  *
- * OUTPUT:
- *   None
- *
- * RETURNS:
- *   None
- *
  * NOTES:
  *   None
  *
@@ -853,12 +829,6 @@ ClStdImportCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
  *   command : Structure containing details of the command and arguments
  *           : supplied by the user.
  *
- * OUTPUT:
- *   None
- *
- * RETURNS:
- *   None
- *
  * NOTES:
  *   None
  *
@@ -898,12 +868,6 @@ ClStdNewCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
  * INPUT:
  *   command : Structure containing details of the command and arguments supplied
  *           : by the user.
- *
- * OUTPUT:
- *   None
- *
- * RETURNS:
- *   None
  *
  * NOTES:
  *   None
@@ -969,12 +933,6 @@ ClStdRunCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
  * INPUT:
  *   command : Structure containing details of the command and arguments supplied
  *           : by the user.
- *
- * OUTPUT:
- *   None
- *
- * RETURNS:
- *   None
  *
  * NOTES:
  *   None
@@ -1148,12 +1106,6 @@ ClStdProcCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
  * INPUT:
  *   command : Structure containing details of the command and arguments
  *           : supplied by the user.
- *
- * OUTPUT:
- *   None
- *
- * RETURNS:
- *   None
  *
  * NOTES:
  *   Only the int, real and str types are currently supported.
@@ -1359,12 +1311,6 @@ ClStdFuncCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
  *   command : Structure containing details of the command
  *           : and arguments supplied by the user.
  *
- * OUTPUT:
- *   None
- *
- * RETURNS:
- *   None
- *
  * NOTES:
  *   None
  *
@@ -1550,12 +1496,6 @@ ClStdForCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
  *   command : Structure containing details of the command
  *           : and arguments supplied by the user.
  *
- * OUTPUT:
- *   None
- *
- * RETURNS:
- *   None
- *
  * NOTES:
  *   None
  *
@@ -1717,12 +1657,6 @@ ClStdForEachCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
  *   command : Structure containing details of the command and arguments supplied
  *           : by the user.
  *
- * OUTPUT:
- *   None
- *
- * RETURNS:
- *   None
- *
  * NOTES:
  *   None
  *
@@ -1837,12 +1771,6 @@ ClStdWhileCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
  *   command : Structure containing details of the command and arguments supplied
  *           : by the user.
  *
- * OUTPUT:
- *   None
- *
- * RETURNS:
- *   None
- *
  * NOTES:
  *   None
  *
@@ -1955,12 +1883,6 @@ ClStdUntilCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
  * INPUT:
  *   command : Structure containing details of the command
  *           : and arguments supplied by the user.
- *
- * OUTPUT:
- *   None
- *
- * RETURNS:
- *   None
  *
  * NOTES:
  *   None
@@ -2088,12 +2010,6 @@ ClStdRepeatCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
  * INPUT:
  *   command : Structure containing details of the command : and arguments
  *           : supplied by the user.
- *
- * OUTPUT:
- *   None
- *
- * RETURNS:
- *   None
  *
  * NOTES:
  *   None
@@ -2314,12 +2230,6 @@ ClStdIfCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
  *   command : Structure containing details of the command
  *           : and arguments supplied by the user.
  *
- * OUTPUT:
- *   None
- *
- * RETURNS:
- *   None
- *
  * NOTES:
  *   None
  *
@@ -2352,12 +2262,6 @@ ClStdElseIfCommand(ClLanguageCommand *, ClLanguageArgs *, void *)
  * INPUT:
  *   command : Structure containing details of the command and arguments
  *           : supplied by the user.
- *
- * OUTPUT:
- *   None
- *
- * RETURNS:
- *   None
  *
  * NOTES:
  *   None
@@ -2392,12 +2296,6 @@ ClStdElseCommand(ClLanguageCommand *, ClLanguageArgs *, void *)
  * INPUT:
  *   command : Structure containing details of the command and arguments supplied
  *           : by the user.
- *
- * OUTPUT:
- *   None
- *
- * RETURNS:
- *   None
  *
  * NOTES:
  *   Sets goto flag  to 'true', goto name to the label name and goto depth to the
@@ -2467,12 +2365,6 @@ ClStdGotoCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
  *   command : Structure containing details of the command and arguments
  *           : supplied by the user.
  *
- * OUTPUT:
- *   None
- *
- * RETURNS:
- *   None
- *
  * NOTES:
  *   Sets break flag to 'true'. If the parent iterates it should
  *   clear the flag and terminate the block, if it does not iterate
@@ -2512,12 +2404,6 @@ ClStdBreakCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
  * INPUT:
  *   command : Structure containing details of the command
  *           : and arguments supplied by the user.
- *
- * OUTPUT:
- *   None
- *
- * RETURNS:
- *   None
  *
  * NOTES:
  *   Sets continue flag to 'true'. If the parent iterates it should
@@ -2565,12 +2451,6 @@ ClStdContinueCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
  * INPUT:
  *   command : Structure containing details of the command
  *           : and arguments supplied by the user.
- *
- * OUTPUT:
- *   None
- *
- * RETURNS:
- *   None
  *
  * NOTES:
  *   Sets return flag to 'true'. This is handled when the procedure
@@ -2628,12 +2508,6 @@ ClStdReturnCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
  * INPUT:
  *   command : Structure containing details of the command
  *           : and arguments supplied by the user.
- *
- * OUTPUT:
- *   None
- *
- * RETURNS:
- *   None
  *
  * NOTES:
  *   None
@@ -2697,12 +2571,6 @@ ClStdOnCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
  * INPUT:
  *   command : Structure containing details of the command
  *           : and arguments supplied by the user.
- *
- * OUTPUT:
- *   None
- *
- * RETURNS:
- *   None
  *
  * NOTES:
  *   None
@@ -2769,12 +2637,6 @@ ClStdRaiseCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
  * INPUT:
  *   command : Structure containing details of the command
  *           : and arguments supplied by the user.
- *
- * OUTPUT:
- *   None
- *
- * RETURNS:
- *   None
  *
  * NOTES:
  *   Allows a function to be defined from the command line interface.
@@ -2887,12 +2749,6 @@ ClStdDefineCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
  *   command : Structure containing details of the command
  *           : and arguments supplied by the user.
  *
- * OUTPUT:
- *   None
- *
- * RETURNS:
- *   None
- *
  * NOTES:
  *   Allows the ClParserDefineStructure routine to be
  *   used from the command line interface.
@@ -2975,12 +2831,6 @@ ClStdStructCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
  * INPUT:
  *   command : Structure containing details of the command
  *           : and arguments supplied by the user.
- *
- * OUTPUT:
- *   None
- *
- * RETURNS:
- *   None
  *
  * NOTES:
  *   If an argument starts with '@' then the subsequent
@@ -3180,12 +3030,6 @@ ClStdInputCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
  * INPUT:
  *   command : Structure containing details of the command and arguments
  *           : supplied by the user.
- *
- * OUTPUT:
- *   None
- *
- * RETURNS:
- *   None
  *
  * NOTES:
  *   If an argument starts with '@' then the subsequent str is taken as the
@@ -3694,7 +3538,7 @@ ClStdScanCommand(ClParserValuePtr *values, uint num_values, void *, int *error_c
           case 'o':
           case 'u':
           case 'x':
-            addrs.addrs[addrs.num_addrs] = (char *) new long;
+            addrs.addrs[addrs.num_addrs] = reinterpret_cast<char *>(new long);
             break;
           case 'c':
             if (len1 > 255)
@@ -3713,13 +3557,13 @@ ClStdScanCommand(ClParserValuePtr *values, uint num_values, void *, int *error_c
           case 'e':
           case 'f':
           case 'g':
-            addrs.addrs[addrs.num_addrs] = (char *) new double;
+            addrs.addrs[addrs.num_addrs] = reinterpret_cast<char *>(new double);
             break;
           case 'p':
-            addrs.addrs[addrs.num_addrs] = (char *) new char *;
+            addrs.addrs[addrs.num_addrs] = reinterpret_cast<char *>(new char *);
             break;
           case 'n':
-            addrs.addrs[addrs.num_addrs] = (char *) new int;
+            addrs.addrs[addrs.num_addrs] = reinterpret_cast<char *>(new int);
             break;
         }
 
@@ -3770,19 +3614,20 @@ ClStdScanCommand(ClParserValuePtr *values, uint num_values, void *, int *error_c
 
         break;
       case 'c': case 's':
-        value = ClParserValueMgrInst->createValue((char *) addrs.addrs[i]);
+        value = ClParserValueMgrInst->createValue(reinterpret_cast<char *>(addrs.addrs[i]));
 
         break;
       case 'e': case 'f': case 'g':
-        value = ClParserValueMgrInst->createValue(*((double *) addrs.addrs[i]));
+        value = ClParserValueMgrInst->createValue(*(reinterpret_cast<double *>(addrs.addrs[i])));
 
         break;
       case 'p':
-        value = ClParserValueMgrInst->createValue((long) addrs.addrs[i]);
+        value = ClParserValueMgrInst->createValue(reinterpret_cast<long>(addrs.addrs[i]));
 
         break;
       case 'n':
-        value = ClParserValueMgrInst->createValue((long) *((int *) addrs.addrs[i]));
+        value = ClParserValueMgrInst->createValue(
+                  static_cast<long>(*(reinterpret_cast<int *>(addrs.addrs[i]))));
 
         break;
     }
@@ -3790,7 +3635,7 @@ ClStdScanCommand(ClParserValuePtr *values, uint num_values, void *, int *error_c
     values[i + 2] = value;
   }
 
-  value = ClParserValueMgrInst->createValue((long) num_scanned);
+  value = ClParserValueMgrInst->createValue(static_cast<long>(num_scanned));
 
   *error_code = 0;
 
@@ -3882,7 +3727,7 @@ ClStdExecCommand(ClParserValuePtr *values, uint, void *, int *error_code)
     line_list.push_back(lines[i]);
 
   ClParserInst->createVar("_rc",
-    ClParserValueMgrInst->createValue((long) command_state.getStatus()));
+    ClParserValueMgrInst->createValue(static_cast<long>(command_state.getStatus())));
 
   dims[0]  = num_lines;
   num_dims = 1;
@@ -3985,12 +3830,6 @@ ClStdParseCommand(ClParserValuePtr *values, uint, void *, int *error_code)
  *   command : Structure containing details of the command
  *           : and arguments supplied by the user.
  *
- * OUTPUT:
- *   None
- *
- * RETURNS:
- *   None
- *
  * NOTES:
  *   None
  *
@@ -4065,12 +3904,6 @@ ClStdSetCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
  *   command : Structure containing details of the command
  *           : and arguments supplied by the user.
  *
- * OUTPUT:
- *   None
- *
- * RETURNS:
- *   None
- *
  * NOTES:
  *   None
  *
@@ -4123,12 +3956,6 @@ ClStdGetEnvCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
  *   command : Structure containing details of the command
  *           : and arguments supplied by the user.
  *
- * OUTPUT:
- *   None
- *
- * RETURNS:
- *   None
- *
  * NOTES:
  *   None
  *
@@ -4178,12 +4005,6 @@ ClStdSetEnvCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
  *   command : Structure containing details of the command
  *           : and arguments supplied by the user.
  *
- * OUTPUT:
- *   None
- *
- * RETURNS:
- *   None
- *
  * NOTES:
  *   None
  *
@@ -4227,12 +4048,6 @@ ClStdUnSetEnvCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
  * INPUT:
  *   command : Structure containing details of the command
  *           : and arguments supplied by the user.
- *
- * OUTPUT:
- *   None
- *
- * RETURNS:
- *   None
  *
  * NOTES:
  *   None
@@ -4426,7 +4241,7 @@ ClStdIsVarCommand(ClParserValuePtr *values, uint, void *, int *error_code)
 
   bool flag = ClParserInst->isVariable(name);
 
-  ClParserValuePtr value = ClParserValueMgrInst->createValue((long) flag);
+  ClParserValuePtr value = ClParserValueMgrInst->createValue(static_cast<long>(flag));
 
   return value;
 }
@@ -4445,12 +4260,6 @@ ClStdIsVarCommand(ClParserValuePtr *values, uint, void *, int *error_code)
  * INPUT:
  *   command : Structure containing details of the command
  *           : and arguments supplied by the user.
- *
- * OUTPUT:
- *   None
- *
- * RETURNS:
- *   None
  *
  * NOTES:
  *   None
@@ -4531,12 +4340,6 @@ ClStdUndefCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
  * INPUT:
  *   command : Structure containing details of the command
  *           : and arguments supplied by the user.
- *
- * OUTPUT:
- *   None
- *
- * RETURNS:
- *   None
  *
  * NOTES:
  *   None
@@ -4710,12 +4513,6 @@ ClStdWhatisCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
  *   command : Structure containing details of the command
  *           : and arguments supplied by the user.
  *
- * OUTPUT:
- *   None
- *
- * RETURNS:
- *   None
- *
  * NOTES:
  *   None
  *
@@ -4794,12 +4591,6 @@ ClStdStatusCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
  * INPUT:
  *   command : Structure containing details of the command
  *           : and arguments supplied by the user.
- *
- * OUTPUT:
- *   None
- *
- * RETURNS:
- *   None
  *
  * NOTES:
  *   None
@@ -4922,12 +4713,6 @@ ClStdHelpCommand(ClLanguageCommand *command, ClLanguageArgs *, void *)
  * INPUT:
  *   command : Structure containing details of the command
  *           : and arguments supplied by the user.
- *
- * OUTPUT:
- *   None
- *
- * RETURNS:
- *   None
  *
  * NOTES:
  *   The actual exit is handled by the parent routine

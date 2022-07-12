@@ -64,7 +64,7 @@ class ClParserStruct : public ClParserObj {
     return (type_.isValid() ? type_->getIsFixed() : false);
   }
 
-  uint getNumValues() const { return values_.size(); }
+  uint getNumValues() const { return uint(values_.size()); }
 
   ValueMap::const_iterator getValuesBegin() const;
   ValueMap::const_iterator getValuesEnd  () const;

@@ -58,7 +58,7 @@ class ClParserString : public ClParserObj {
 
   bool toBool() const override;
 
-  uint getLen() const { return text_.size(); }
+  uint getLen() const { return uint(text_.size()); }
 
   const std::string &getText() const { return text_; }
 

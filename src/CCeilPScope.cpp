@@ -20,7 +20,7 @@ ClParserScopePtr
 ClParserScopeMgr::
 getScope(const StringVectorT &names)
 {
-  uint num_names = names.size();
+  uint num_names = uint(names.size());
 
   assert(num_names > 0);
 

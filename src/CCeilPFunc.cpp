@@ -38,7 +38,7 @@ createFunc(const std::string &function_string, const std::string &expression_str
 {
   *error_code = 0;
 
-  uint len = function_string.size();
+  uint len = uint(function_string.size());
 
   uint i = 0;
 
@@ -89,7 +89,7 @@ createFunc(const std::string &function_string, const std::string &expression_str
 
   //------
 
-  uint num_args = arg_list.size();
+  uint num_args = uint(arg_list.size());
 
   for (uint j = 0; j < num_args; j++)
     func->addArg(arg_list[j]);
@@ -316,7 +316,7 @@ print() const
 {
   ClParserInst->output("%s(", name_.c_str());
 
-  uint num_args = args_.size();
+  uint num_args = uint(args_.size());
 
   if (num_args > 0) {
     ClParserInst->output("%s", args_[0].c_str());
@@ -338,7 +338,7 @@ print(std::ostream &os) const
 {
   os << name_ << "(";
 
-  uint num_args = args_.size();
+  uint num_args = uint(args_.size());
 
   if (num_args > 0) {
     os << args_[0];
@@ -363,9 +363,9 @@ debugPrint() const
 
   fprintf(stderr, "(");
 
-  int num_args = args_.size();
+  uint num_args = uint(args_.size());
 
-  for (int i = 0; i < num_args; i++) {
+  for (uint i = 0; i < num_args; i++) {
     if (i > 0) fprintf(stderr, ",");
 
     fprintf(stderr, "%s", args_[i].c_str());

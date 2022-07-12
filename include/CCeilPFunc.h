@@ -62,7 +62,7 @@ class ClParserFunc {
  public:
   const std::string &getName() const { return name_; }
 
-  uint getNumArgs() const { return args_.size(); }
+  uint getNumArgs() const { return uint(args_.size()); }
 
   const std::string &getArg(uint i) const { return args_[i]; }
 

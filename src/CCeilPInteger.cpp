@@ -273,7 +273,7 @@ ClParserValuePtr
 ClParserInteger::
 sqr() const
 {
-  double real = (1.0*integer_)*integer_;
+  double real = double(integer_)*double(integer_);
 
   long ireal;
 
@@ -289,7 +289,7 @@ sqrt() const
 {
   errno = 0;
 
-  double real = CMathGen::sqrt(integer_);
+  double real = CMathGen::sqrt(double(integer_));
 
   if (errno != 0 && ClParserInst->getMathFail())
     ClErrThrow(ClErr::INVALID_SQRT_VALUE);
@@ -306,7 +306,7 @@ ClParserValuePtr
 ClParserInteger::
 cos() const
 {
-  double value = ::cos(ClParserInst->toRadians(integer_));
+  double value = ::cos(ClParserInst->toRadians(double(integer_)));
 
   return ClParserValueMgrInst->createValue(value);
 }
@@ -315,7 +315,7 @@ ClParserValuePtr
 ClParserInteger::
 sin() const
 {
-  double value = ::sin(ClParserInst->toRadians(integer_));
+  double value = ::sin(ClParserInst->toRadians(double(integer_)));
 
   return ClParserValueMgrInst->createValue(value);
 }
@@ -324,7 +324,7 @@ ClParserValuePtr
 ClParserInteger::
 tan() const
 {
-  double value = ::tan(ClParserInst->toRadians(integer_));
+  double value = ::tan(ClParserInst->toRadians(double(integer_)));
 
   return ClParserValueMgrInst->createValue(value);
 }
@@ -335,7 +335,7 @@ acos() const
 {
   errno = 0;
 
-  double value = ClParserInst->fromRadians(CMathGen::acos(integer_));
+  double value = ClParserInst->fromRadians(CMathGen::acos(double(integer_)));
 
   if (errno != 0 && ClParserInst->getMathFail())
     ClErrThrow(ClErr::INVALID_ACOS_VALUE);
@@ -349,7 +349,7 @@ asin() const
 {
   errno = 0;
 
-  double value = ClParserInst->fromRadians(CMathGen::asin(integer_));
+  double value = ClParserInst->fromRadians(CMathGen::asin(double(integer_)));
 
   if (errno != 0 && ClParserInst->getMathFail())
     ClErrThrow(ClErr::INVALID_ASIN_VALUE);
@@ -361,7 +361,7 @@ ClParserValuePtr
 ClParserInteger::
 atan() const
 {
-  double value = ClParserInst->fromRadians(::atan(integer_));
+  double value = ClParserInst->fromRadians(::atan(double(integer_)));
 
   return ClParserValueMgrInst->createValue(value);
 }
@@ -370,7 +370,7 @@ ClParserValuePtr
 ClParserInteger::
 atan(double real) const
 {
-  double value = ClParserInst->fromRadians(::atan2(integer_, real));
+  double value = ClParserInst->fromRadians(::atan2(double(integer_), real));
 
   return ClParserValueMgrInst->createValue(value);
 }
@@ -379,7 +379,7 @@ ClParserValuePtr
 ClParserInteger::
 exp() const
 {
-  double value = ::exp(integer_);
+  double value = ::exp(double(integer_));
 
   return ClParserValueMgrInst->createValue(value);
 }
@@ -390,7 +390,7 @@ log() const
 {
   errno = 0;
 
-  double value = CMathGen::log(integer_);
+  double value = CMathGen::log(double(integer_));
 
   if (errno != 0 && ClParserInst->getMathFail())
     ClErrThrow(ClErr::INVALID_LOG_VALUE);
@@ -404,7 +404,7 @@ log10() const
 {
   errno = 0;
 
-  double value = CMathGen::log10(integer_);
+  double value = CMathGen::log10(double(integer_));
 
   if (errno != 0 && ClParserInst->getMathFail())
     ClErrThrow(ClErr::INVALID_LOG_VALUE);
@@ -416,7 +416,7 @@ ClParserValuePtr
 ClParserInteger::
 cosh() const
 {
-  double value = ::cosh(ClParserInst->toRadians(integer_));
+  double value = ::cosh(ClParserInst->toRadians(double(integer_)));
 
   return ClParserValueMgrInst->createValue(value);
 }
@@ -425,7 +425,7 @@ ClParserValuePtr
 ClParserInteger::
 sinh() const
 {
-  double value = ::sinh(ClParserInst->toRadians(integer_));
+  double value = ::sinh(ClParserInst->toRadians(double(integer_)));
 
   return ClParserValueMgrInst->createValue(value);
 }
@@ -434,7 +434,7 @@ ClParserValuePtr
 ClParserInteger::
 tanh() const
 {
-  double value = ::tanh(ClParserInst->toRadians(integer_));
+  double value = ::tanh(ClParserInst->toRadians(double(integer_)));
 
   return ClParserValueMgrInst->createValue(value);
 }
@@ -443,7 +443,7 @@ ClParserValuePtr
 ClParserInteger::
 norm() const
 {
-  double result = integer_;
+  double result = double(integer_);
 
   result = 0.5*std::sqrt(2.0)*result;
   result = 0.5*erfc(-result);
@@ -455,7 +455,7 @@ ClParserValuePtr
 ClParserInteger::
 invnorm() const
 {
-  double result = CInvNorm::calc(integer_);
+  double result = CInvNorm::calc(double(integer_));
 
   if (IsPosInf(result) || IsNegInf(result))
     SetNaN(result);
@@ -469,7 +469,7 @@ toChar() const
 {
   std::string text(" ");
 
-  text[0] = (char) integer_;
+  text[0] = char(integer_);
 
   return ClParserValueMgrInst->createValue(text);
 }
@@ -487,7 +487,7 @@ ClParserValuePtr
 ClParserInteger::
 toReal() const
 {
-  double value = integer_;
+  double value = double(integer_);
 
   return ClParserValueMgrInst->createValue(value);
 }
@@ -514,12 +514,12 @@ ClParserValuePtr
 ClParserInteger::
 toLower() const
 {
-  int c = (int) integer_;
+  int c = int(integer_);
 
   if (isupper(c))
     c = tolower(c);
 
-  long value = (long) c;
+  long value = long(c);
 
   return ClParserValueMgrInst->createValue(value);
 }
@@ -528,12 +528,12 @@ ClParserValuePtr
 ClParserInteger::
 toUpper() const
 {
-  int c = (int) integer_;
+  int c = int(integer_);
 
   if (islower(c))
     c = toupper(c);
 
-  long value = (long) c;
+  long value = long(c);
 
   return ClParserValueMgrInst->createValue(value);
 }
@@ -608,7 +608,7 @@ ClParserInteger::
 cmp(const ClParserObj &obj) const
 {
   if (base_type_ != obj.getBaseType())
-    return CMathGen::sign((long) (base_type_ - obj.getBaseType()));
+    return CMathGen::sign(long(base_type_ - obj.getBaseType()));
 
   const ClParserInteger &rhs = castObj(obj);
 
@@ -633,9 +633,9 @@ bool
 ClParserInteger::
 isInteger(double real, long &ireal)
 {
-  ireal = (long) real;
+  ireal = long(real);
 
-  double real1 = (double) ireal;
+  double real1 = double(ireal);
 
   return (fabs(real1 - real) < 1E-6);
 }

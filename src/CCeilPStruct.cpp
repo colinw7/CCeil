@@ -76,7 +76,7 @@ ClParserStruct(ClParserTypePtr type, const ClParserValueArray &values) :
   if (! type_.isValid())
     ClErrThrow(ClErr::INVALID_STRUCTURE_TYPE_NAME);
 
-  uint num_values = values.size();
+  uint num_values = uint(values.size());
 
   uint i = 0;
 
@@ -263,7 +263,7 @@ ClParserStruct::
 cmp(const ClParserObj &obj) const
 {
   if (base_type_ != obj.getBaseType())
-    return CMathGen::sign((long) (base_type_ - obj.getBaseType()));
+    return CMathGen::sign(long(base_type_ - obj.getBaseType()));
 
   const ClParserStruct &rhs = castObj(obj);
 
@@ -274,11 +274,11 @@ cmp(const ClParserObj &obj) const
       return  1;
   }
 
-  uint num_values1 = values_.size();
-  uint num_values2 = rhs.values_.size();
+  uint num_values1 = uint(    values_.size());
+  uint num_values2 = uint(rhs.values_.size());
 
   if (num_values1 != num_values2)
-    return (num_values1 - num_values2);
+    return int(num_values1 - num_values2);
 
   ValueMap::const_iterator pl1 =     values_.begin();
   ValueMap::const_iterator pl2 =     values_.end  ();

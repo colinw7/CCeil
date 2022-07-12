@@ -19,13 +19,13 @@ defineModule(const std::string &name, ClModuleDef *module_def)
 
   for (int i = 0; module_def[i].name != ""; ++i) {
     if      (CStrUtil::casecmp(module_def[i].name, "init") == 0)
-      module->setInitProc((ClModuleInitProc) module_def[i].proc);
+      module->setInitProc(reinterpret_cast<ClModuleInitProc>(module_def[i].proc));
     else if (CStrUtil::casecmp(module_def[i].name, "set" ) == 0)
-      module->setSetProc ((ClModuleSetProc ) module_def[i].proc);
+      module->setSetProc (reinterpret_cast<ClModuleSetProc >(module_def[i].proc));
     else if (CStrUtil::casecmp(module_def[i].name, "term") == 0)
-      module->setTermProc((ClModuleTermProc) module_def[i].proc);
+      module->setTermProc(reinterpret_cast<ClModuleTermProc>(module_def[i].proc));
     else if (CStrUtil::casecmp(module_def[i].name, "help") == 0)
-      module->setHelpProc((ClModuleHelpProc) module_def[i].proc);
+      module->setHelpProc(reinterpret_cast<ClModuleHelpProc>(module_def[i].proc));
     else
       std::cerr << "Invalid Module Procedure Name '" << module_def[i].name << "'" << std::endl;
   }

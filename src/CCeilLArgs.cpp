@@ -3,12 +3,12 @@
 class ClLanguageArgParser {
  public:
   ClLanguageArgParser(const std::string &str) :
-   str_(str), pos_(0), len_(str_.size()) {
+   str_(str), pos_(0), len_(uint(str_.size())) {
     inBrackets_.resize(4);
   }
 
-  int pos() const { return pos_; }
-  void setPos(int pos) { pos_ = pos; }
+  uint pos() const { return pos_; }
+  void setPos(uint pos) { pos_ = pos; }
 
   bool eof() const {
     return (pos_ >= len_);
@@ -27,12 +27,12 @@ class ClLanguageArgParser {
   }
 
   bool isChars(const std::string &str) const {
-    int len = str.size();
+    uint len = uint(str.size());
 
     if (pos_ + len >= len_)
       return false;
 
-    for (int i = 0; i < len; ++i)
+    for (uint i = 0; i < len; ++i)
       if (str_[pos_ + i] != str[i])
         return false;
 
@@ -113,13 +113,13 @@ class ClLanguageArgParser {
     ++pos_;
   }
 
-  void startBracket(int i) {
+  void startBracket(uint i) {
     assert(i >= 1 && i <= 4);
 
     ++inBrackets_[i - 1];
   }
 
-  bool endBracket(int i) {
+  bool endBracket(uint i) {
     assert(i >= 1 && i <= 4);
 
     --inBrackets_[i - 1];
@@ -128,7 +128,7 @@ class ClLanguageArgParser {
   }
 
   bool inBrackets() const {
-    for (int i = 0; i < 4; ++i)
+    for (uint i = 0; i < 4; ++i)
       if (inBrackets_[i] > 0)
         return true;
 
@@ -151,8 +151,8 @@ class ClLanguageArgParser {
 
  private:
   const std::string& str_;
-  int                pos_    { 0 };
-  int                len_    { 0 };
+  uint               pos_ { 0 };
+  uint               len_ { 0 };
   std::string        buffer_;
   std::vector<int>   inBrackets_;
 };
@@ -231,7 +231,7 @@ termArgs()
     arg_list_ = nullptr;
 
   if (string_stack_) {
-    int num_strings = string_stack_->size();
+    uint num_strings = uint(string_stack_->size());
 
     while (num_strings--) {
       char *str = (*string_stack_)[num_strings];
@@ -243,7 +243,7 @@ termArgs()
   }
 
   if (chars_stack_) {
-    int num_chars = chars_stack_->size();
+    uint num_chars = uint(chars_stack_->size());
 
     while (num_chars--) {
       char **chars = (*chars_stack_)[num_chars];
@@ -255,67 +255,67 @@ termArgs()
   }
 
   if (real_array_stack_) {
-    int num_real_arrays = real_array_stack_->size();
+    uint num_real_arrays = uint(real_array_stack_->size());
 
     while (num_real_arrays--) {
       void **real_array = (*real_array_stack_)[num_real_arrays];
 
       real_array_stack_->pop_back();
 
-      delete [] ((double *) real_array[0]);
-      delete [] ((uint *  ) real_array[1]);
+      delete [] (reinterpret_cast<double *>(real_array[0]));
+      delete [] (reinterpret_cast<uint *  >(real_array[1]));
     }
   }
 
   if (float_array_stack_) {
-    int num_float_arrays = float_array_stack_->size();
+    uint num_float_arrays = uint(float_array_stack_->size());
 
     while (num_float_arrays--) {
       void **float_array = (*float_array_stack_)[num_float_arrays];
 
       float_array_stack_->pop_back();
 
-      delete [] ((float *) float_array[0]);
-      delete [] ((uint * ) float_array[1]);
+      delete [] (reinterpret_cast<float *>(float_array[0]));
+      delete [] (reinterpret_cast<uint * >(float_array[1]));
     }
   }
 
   if (integer_array_stack_) {
-    int num_integer_arrays = integer_array_stack_->size();
+    uint num_integer_arrays = uint(integer_array_stack_->size());
 
     while (num_integer_arrays--) {
       void **integer_array = (*integer_array_stack_)[num_integer_arrays];
 
       integer_array_stack_->pop_back();
 
-      delete [] ((long *) integer_array[0]);
-      delete [] ((uint *) integer_array[1]);
+      delete [] (reinterpret_cast<long *>(integer_array[0]));
+      delete [] (reinterpret_cast<uint *>(integer_array[1]));
     }
   }
 
   if (word_array_stack_) {
-    int num_word_arrays = word_array_stack_->size();
+    uint num_word_arrays = uint(word_array_stack_->size());
 
     while (num_word_arrays--) {
       void **word_array = (*word_array_stack_)[num_word_arrays];
 
       word_array_stack_->pop_back();
 
-      delete [] ((int * ) word_array[0]);
-      delete [] ((uint *) word_array[1]);
+      delete [] (reinterpret_cast<int * >(word_array[0]));
+      delete [] (reinterpret_cast<uint *>(word_array[1]));
     }
   }
 
   if (string_array_stack_) {
-    int num_string_arrays = string_array_stack_->size();
+    uint num_string_arrays = uint(string_array_stack_->size());
 
     while (num_string_arrays--) {
       void **string_array = (*string_array_stack_)[num_string_arrays];
 
       string_array_stack_->pop_back();
 
-      delete [] ((void **) string_array[0]);
-      delete [] ((uint * ) string_array[1]);
+      delete [] (reinterpret_cast<void **>(string_array[0]));
+      delete [] (reinterpret_cast<uint * >(string_array[1]));
     }
   }
 }
@@ -359,7 +359,7 @@ checkNumberOfArgs(int min, int max)
 
   const std::string &command_name = ClLanguageMgrInst->getCommandName();
 
-  if      (min >= 0 && (int) num_args < min) {
+  if      (min >= 0 && int(num_args) < min) {
     if      (min > max)
       ClLanguageMgrInst->syntaxError
        ("insufficient arguments for '%s' (requires %d or greater)", command_name.c_str(), min);
@@ -372,7 +372,7 @@ checkNumberOfArgs(int min, int max)
 
     error_code = 1;
   }
-  else if (max >= min && (int) num_args > max) {
+  else if (max >= min && int(num_args) > max) {
     if (max == 0)
       ClLanguageMgrInst->syntaxError
        ("no arguments allowed for '%s'", command_name.c_str());
@@ -401,7 +401,7 @@ ClLanguageArgs::
 getNumArgs() const
 {
   if (arg_list_)
-    return arg_list_->size();
+    return uint(arg_list_->size());
   else
     return 0;
 }
@@ -620,7 +620,7 @@ getVArgList(CLArgType type, va_list *vargs)
     else if (type == CLArgType::WORD) {
       int *integer = va_arg(*vargs, int *);
 
-      *integer = getIntegerArg(num + 1, &error_code);
+      *integer = int(getIntegerArg(num + 1, &error_code));
     }
     else if (type == CLArgType::STRING) {
       char **str = va_arg(*vargs, char **);
@@ -640,7 +640,7 @@ getVArgList(CLArgType type, va_list *vargs)
 
       std::string arg = getArg(num + 1, &error_code);
 
-      *str = (char *) arg.c_str();
+      *str = const_cast<char *>(arg.c_str());
     }
     else if (type == CLArgType::VALUE) {
       ClParserValuePtr *value = va_arg(*vargs, ClParserValuePtr *);
@@ -658,7 +658,7 @@ getVArgList(CLArgType type, va_list *vargs)
       if (error_code != 0)
         break;
 
-      *num_reals = num_reals1;
+      *num_reals = int(num_reals1);
     }
     else if (type == CLArgType::FLOATS) {
       float **reals     = va_arg(*vargs, float **);
@@ -671,7 +671,7 @@ getVArgList(CLArgType type, va_list *vargs)
       if (error_code != 0)
         break;
 
-      *num_reals = num_reals1;
+      *num_reals = int(num_reals1);
     }
     else if (type == CLArgType::INTEGERS) {
       uint *dims;
@@ -691,7 +691,7 @@ getVArgList(CLArgType type, va_list *vargs)
         *num_integers = 0;
       }
       else if (num_dims == 1)
-        *num_integers = dims[0];
+        *num_integers = int(dims[0]);
       else
         *num_integers = 0;
     }
@@ -713,7 +713,7 @@ getVArgList(CLArgType type, va_list *vargs)
         *num_integers = 0;
       }
       else if (num_dims == 1)
-        *num_integers = dims[0];
+        *num_integers = int(dims[0]);
       else
         *num_integers = 0;
     }
@@ -735,7 +735,7 @@ getVArgList(CLArgType type, va_list *vargs)
         *num_strings = 0;
       }
       else if (num_dims == 1)
-        *num_strings = dims[0];
+        *num_strings = int(dims[0]);
       else
         *num_strings = 0;
     }
@@ -847,7 +847,7 @@ getVArgList(CLArgType type, va_list *vargs)
 
     num++;
 
-    type = (CLArgType) va_arg(*vargs, int);
+    type = static_cast<CLArgType>(va_arg(*vargs, int));
   }
 
   return num;
@@ -1335,7 +1335,7 @@ getArg(int n, int *error_code)
 
   uint num_args = getNumArgs();
 
-  if (n >= 1 && n <= (int) num_args)
+  if (n >= 1 && n <= int(num_args))
     arg = getIArg(n - 1);
   else
     *error_code = 1;
@@ -1347,7 +1347,7 @@ const std::string &
 ClLanguageArgs::
 getIArg(int i) const
 {
-  return (*arg_list_)[i];
+  return (*arg_list_)[uint(i)];
 }
 
 /*------------------------------------------------------------------*
@@ -1564,7 +1564,7 @@ setVArgList(CLArgType type, va_list *vargs)
       double *reals     = va_arg(*vargs, double *);
       int     num_reals = va_arg(*vargs, int);
 
-      dims[0] = num_reals;
+      dims[0] = uint(num_reals);
 
       setRealArrayArg(num + 1, reals, dims, 1, &error_code);
     }
@@ -1574,7 +1574,7 @@ setVArgList(CLArgType type, va_list *vargs)
       float *reals     = va_arg(*vargs, float *);
       int    num_reals = va_arg(*vargs, int);
 
-      dims[0] = num_reals;
+      dims[0] = uint(num_reals);
 
       setRealArrayArg(num + 1, reals, dims, 1, &error_code);
     }
@@ -1584,7 +1584,7 @@ setVArgList(CLArgType type, va_list *vargs)
       long *integers     = va_arg(*vargs, long *);
       int   num_integers = va_arg(*vargs, int);
 
-      dims[0] = num_integers;
+      dims[0] = uint(num_integers);
 
       setIntegerArrayArg(num + 1, integers, dims, 1, &error_code);
     }
@@ -1594,7 +1594,7 @@ setVArgList(CLArgType type, va_list *vargs)
       int *integers     = va_arg(*vargs, int *);
       int  num_integers = va_arg(*vargs, int);
 
-      dims[0] = num_integers;
+      dims[0] = uint(num_integers);
 
       setIntegerArrayArg(num + 1, integers, dims, 1, &error_code);
     }
@@ -1604,7 +1604,7 @@ setVArgList(CLArgType type, va_list *vargs)
       char **strings     = va_arg(*vargs, char **);
       int    num_strings = va_arg(*vargs, int);
 
-      dims[0] = num_strings;
+      dims[0] = uint(num_strings);
 
       setStringArrayArg(num + 1, strings, dims, 1, &error_code);
     }
@@ -1715,7 +1715,7 @@ setVArgList(CLArgType type, va_list *vargs)
 
     num++;
 
-    type = (CLArgType) va_arg(*vargs, int);
+    type = static_cast<CLArgType>(va_arg(*vargs, int));
   }
 
   return num;
@@ -1947,7 +1947,7 @@ setCharArrayArg(int n, char *chars, int num_chars, int *error_code)
   if (*error_code != 0)
     return;
 
-  value = ClParserValueMgrInst->createValue(chars, num_chars);
+  value = ClParserValueMgrInst->createValue(chars, uint(num_chars));
 
   if (! value.isValid())
     return;
@@ -2247,8 +2247,7 @@ setStringArrayArg(int n, char **strings, uint *dims, uint num_dims, int *error_c
   if (*error_code != 0)
     return;
 
-  value = ClParserValueMgrInst->
-    createValue(dims, num_dims, (const char **) strings);
+  value = ClParserValueMgrInst->createValue(dims, num_dims, const_cast<const char **>(strings));
 
   if (! value.isValid())
     return;
@@ -2439,12 +2438,12 @@ getCommandArgValues(ClLanguageCommand *command, ClParserValuePtr **values, int *
 
   /* Create Return Values Array */
 
-  *num_values = getNumArgs();
+  *num_values = int(getNumArgs());
 
   if (*num_values > 0) {
-    *values = new ClParserValuePtr [*num_values];
+    *values = new ClParserValuePtr [uint(*num_values)];
 
-    for (int i = 0; i < *num_values; i++)
+    for (uint i = 0; i < uint(*num_values); i++)
       (*values)[i] = ClParserValuePtr();
   }
   else
@@ -2452,8 +2451,8 @@ getCommandArgValues(ClLanguageCommand *command, ClParserValuePtr **values, int *
 
   /* Evaluate each Argument */
 
-  for (int i = 1; i <= *num_values; i++) {
-    std::string arg = getArg(i, &error_code);
+  for (uint i = 1; i <= uint(*num_values); i++) {
+    std::string arg = getArg(int(i), &error_code);
 
     if (error_code != 0)
       goto GetCommandValues_1;
@@ -2690,7 +2689,7 @@ readArgList(const std::string &str, int *pos, int end_char, std::string &text)
   if (! skipArgList(str, pos, end_char))
     return false;
 
-  text = str.substr(pos1, *pos - pos1);
+  text = str.substr(uint(pos1), uint(*pos - pos1));
 
   CStrUtil::stripSpaces(text);
 
@@ -2729,10 +2728,10 @@ skipArgList(const std::string &str, int *pos, int end_char, bool stripQuotes)
 
   ClLanguageArgParser parser(str);
 
-  parser.setPos(*pos);
+  parser.setPos(uint(*pos));
 
   while (! parser.eof()) {
-    if (parser.isChar(end_char) && ! parser.inBrackets()) {
+    if (parser.isChar(char(end_char)) && ! parser.inBrackets()) {
       flag = true;
       break;
     }
@@ -2822,7 +2821,7 @@ skipArgList(const std::string &str, int *pos, int end_char, bool stripQuotes)
   if (end_char == '\0' && parser.eof())
     flag = true;
 
-  *pos = parser.pos();
+  *pos = int(parser.pos());
 
   return flag;
 }
@@ -2855,9 +2854,9 @@ void
 ClLanguageArgs::
 replaceCharsInArgList(std::string &str, int c1, int c2)
 {
-  int len = str.size();
+  uint len = uint(str.size());
 
-  int i = 0;
+  uint i = 0;
 
   while (i < len) {
     if (str[i] == '\"') {
@@ -2896,7 +2895,7 @@ replaceCharsInArgList(std::string &str, int c1, int c2)
     }
     else {
       if (str[i] == c1)
-        str[i] = c2;
+        str[i] = char(c2);
 
       i++;
     }
@@ -2919,8 +2918,8 @@ stackRealArray(double *reals, uint *dims)
 {
   void **real_array = new void * [2];
 
-  real_array[0] = (void *) reals;
-  real_array[1] = (void *) dims;
+  real_array[0] = reinterpret_cast<void *>(reals);
+  real_array[1] = reinterpret_cast<void *>(dims);
 
   if (! real_array_stack_)
     real_array_stack_ = new RealArrayStack;
@@ -2934,8 +2933,8 @@ stackRealArray(float *reals, uint *dims)
 {
   void **real_array = new void * [2];
 
-  real_array[0] = (void *) reals;
-  real_array[1] = (void *) dims;
+  real_array[0] = reinterpret_cast<void *>(reals);
+  real_array[1] = reinterpret_cast<void *>(dims);
 
   if (! float_array_stack_)
     float_array_stack_ = new FloatArrayStack;
@@ -2949,8 +2948,8 @@ stackIntegerArray(long *integers, uint *dims)
 {
   void **integer_array = new void * [2];
 
-  integer_array[0] = (void *) integers;
-  integer_array[1] = (void *) dims;
+  integer_array[0] = reinterpret_cast<void *>(integers);
+  integer_array[1] = reinterpret_cast<void *>(dims);
 
   if (! integer_array_stack_)
     integer_array_stack_ = new IntegerArrayStack;
@@ -2964,8 +2963,8 @@ stackIntegerArray(int *integers, uint *dims)
 {
   void **integer_array = new void * [2];
 
-  integer_array[0] = (void *) integers;
-  integer_array[1] = (void *) dims;
+  integer_array[0] = reinterpret_cast<void *>(integers);
+  integer_array[1] = reinterpret_cast<void *>(dims);
 
   if (! word_array_stack_)
     word_array_stack_ = new WordArrayStack;
@@ -2979,8 +2978,8 @@ stackStringArray(char **strs, uint *dims)
 {
   void **string_array = new void * [2];
 
-  string_array[0] = (void *) strs;
-  string_array[1] = (void *) dims;
+  string_array[0] = reinterpret_cast<void *>(strs);
+  string_array[1] = reinterpret_cast<void *>(dims);
 
   if (! string_array_stack_)
     string_array_stack_ = new StringArrayStack;

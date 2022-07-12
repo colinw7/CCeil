@@ -111,7 +111,7 @@ ClParserProcessUnaryOperator(ClParserOperatorPtr op, ClParserValuePtr value, int
   /*------------------*/
 
   if (op->isType(CL_PARSER_OP_LOGICAL_NOT))
-    return ClParserValueMgrInst->createValue((long) ! value->toBool());
+    return ClParserValueMgrInst->createValue(long(! value->toBool()));
 
   /*------------------*/
 
@@ -171,9 +171,9 @@ ClParserProcessBinaryOperator(ClParserValuePtr rvalue1, ClParserOperatorPtr op,
     bool boolean2 = value2->toBool();
 
     if (op->isType(CL_PARSER_OP_LOGICAL_AND))
-      return ClParserValueMgrInst->createValue((long) (boolean1 && boolean2));
+      return ClParserValueMgrInst->createValue(long(boolean1 && boolean2));
     else
-      return ClParserValueMgrInst->createValue((long) (boolean1 || boolean2));
+      return ClParserValueMgrInst->createValue(long(boolean1 || boolean2));
   }
 
   /*-----------------*/
@@ -480,7 +480,7 @@ ClParserProcessInternFn(ClParserInternFnPtr internfn, const ClParserValueArray &
 
   *error_code = 0;
 
-  uint num_values = values.size();
+  uint num_values = uint(values.size());
 
   ClParserValuePtr value = ClParserValueMgrInst->createValue(values[0]);
 
@@ -491,10 +491,10 @@ ClParserProcessInternFn(ClParserInternFnPtr internfn, const ClParserValueArray &
           ClParserArrayPtr array = value->getArray();
 
           value = ClParserValueMgrInst->createValue(
-                    (long) (array->getType() | CL_PARSER_VALUE_TYPE_ARRAY));
+                    long(array->getType() | CL_PARSER_VALUE_TYPE_ARRAY));
         }
         else
-          value = ClParserValueMgrInst->createValue((long) value->getType());
+          value = ClParserValueMgrInst->createValue(long(value->getType()));
 
         break;
 
@@ -529,7 +529,7 @@ ClParserProcessInternFn(ClParserInternFnPtr internfn, const ClParserValueArray &
         if (values[0]->isType(CL_PARSER_VALUE_TYPE_STRING)) {
           std::string text = values[0]->toString()->getString()->getText();
 
-          uint len = text.size();
+          uint len = uint(text.size());
 
           uint match = 0;
 
@@ -562,8 +562,8 @@ ClParserProcessInternFn(ClParserInternFnPtr internfn, const ClParserValueArray &
         ClParserStringPtr str1 = values[0]->getString();
         ClParserStringPtr str2 = values[1]->getString();
 
-        value = ClParserProcessWhere((char *) str1->getText().c_str(),
-                                     (char *) str2->getText().c_str(),
+        value = ClParserProcessWhere(const_cast<char *>(str1->getText().c_str()),
+                                     const_cast<char *>(str2->getText().c_str()),
                                      error_code);
 
         if (*error_code != 0)
@@ -745,14 +745,14 @@ ClParserProcessInternFn(ClParserInternFnPtr internfn, const ClParserValueArray &
             return ClParserValuePtr();
           }
 
-          int dim = value1->getInteger()->getValue();
+          int dim = int(value1->getInteger()->getValue());
 
           if (dim <= 0 && ! (i == 0 && dim == 0 && num_values == 1)) {
             ClParserInst->signalError(error_code, ClErr::INVALID_DIMENSION);
             return ClParserValuePtr();
           }
 
-          dims.push_back(dim);
+          dims.push_back(uint(dim));
         }
 
         ClParserArrayPtr array = ClParserArray::createArray(dims, 0L);
@@ -772,14 +772,14 @@ ClParserProcessInternFn(ClParserInternFnPtr internfn, const ClParserValueArray &
             return ClParserValuePtr();
           }
 
-          int dim = value1->getInteger()->getValue();
+          int dim = int(value1->getInteger()->getValue());
 
           if (dim <= 0 && ! (i == 0 && dim == 0 && num_values == 1)) {
             ClParserInst->signalError(error_code, ClErr::INVALID_DIMENSION);
             return ClParserValuePtr();
           }
 
-          dims.push_back(dim);
+          dims.push_back(uint(dim));
         }
 
         ClParserArrayPtr array = ClParserArray::createArray(dims, 0.0);
@@ -799,14 +799,14 @@ ClParserProcessInternFn(ClParserInternFnPtr internfn, const ClParserValueArray &
             return ClParserValuePtr();
           }
 
-          int dim = value1->getInteger()->getValue();
+          int dim = int(value1->getInteger()->getValue());
 
           if (dim <= 0 && ! (i == 0 && dim == 0 && num_values == 1)) {
             ClParserInst->signalError(error_code, ClErr::INVALID_DIMENSION);
             return ClParserValuePtr();
           }
 
-          dims.push_back(dim);
+          dims.push_back(uint(dim));
         }
 
         ClParserArrayPtr array = ClParserArray::createArray(dims, "");
@@ -852,14 +852,14 @@ ClParserProcessInternFn(ClParserInternFnPtr internfn, const ClParserValueArray &
             return ClParserValuePtr();
           }
 
-          int dim = value1->getInteger()->getValue();
+          int dim = int(value1->getInteger()->getValue());
 
           if (dim <= 0 && ! (i == 0 && dim == 0 && num_values == 1)) {
             ClParserInst->signalError(error_code, ClErr::INVALID_DIMENSION);
             return ClParserValuePtr();
           }
 
-          dims.push_back(dim);
+          dims.push_back(uint(dim));
         }
 
         ClParserArrayPtr array = ClParserArray::createArray(dims, 0L);
@@ -881,14 +881,14 @@ ClParserProcessInternFn(ClParserInternFnPtr internfn, const ClParserValueArray &
             return ClParserValuePtr();
           }
 
-          int dim = value1->getInteger()->getValue();
+          int dim = int(value1->getInteger()->getValue());
 
           if (dim <= 0 && ! (i == 0 && dim == 0 && num_values == 1)) {
             ClParserInst->signalError(error_code, ClErr::INVALID_DIMENSION);
             return ClParserValuePtr();
           }
 
-          dims.push_back(dim);
+          dims.push_back(uint(dim));
         }
 
         ClParserArrayPtr array = ClParserArray::createArray(dims, 0.0);
@@ -910,14 +910,14 @@ ClParserProcessInternFn(ClParserInternFnPtr internfn, const ClParserValueArray &
             return ClParserValuePtr();
           }
 
-          int dim = value1->getInteger()->getValue();
+          int dim = int(value1->getInteger()->getValue());
 
           if (dim <= 0 && ! (i == 0 && dim == 0 && num_values == 1)) {
             ClParserInst->signalError(error_code, ClErr::INVALID_DIMENSION);
             return ClParserValuePtr();
           }
 
-          dims.push_back(dim);
+          dims.push_back(uint(dim));
         }
 
         ClParserArrayPtr array = ClParserArray::createArray(dims, "");
@@ -941,7 +941,7 @@ ClParserProcessInternFn(ClParserInternFnPtr internfn, const ClParserValueArray &
 
         ClParserStringPtr str1 = values[1]->getString();
 
-        ClParserTypePtr struct_type = ClParserInst->getType((char *) str1->getText().c_str());
+        auto struct_type = ClParserInst->getType(const_cast<char *>(str1->getText().c_str()));
 
         if (! struct_type.isValid()) {
           ClParserInst->signalError(error_code, ClErr::UNDEFINED_STRUCT_TYPE);
@@ -958,14 +958,14 @@ ClParserProcessInternFn(ClParserInternFnPtr internfn, const ClParserValueArray &
             return ClParserValuePtr();
           }
 
-          int dim = value1->getInteger()->getValue();
+          int dim = int(value1->getInteger()->getValue());
 
           if (dim <= 0 && ! (i == 1 && dim == 0 && num_values == 1)) {
             ClParserInst->signalError(error_code, ClErr::INVALID_DIMENSION);
             return ClParserValuePtr();
           }
 
-          dims.push_back(dim);
+          dims.push_back(uint(dim));
         }
 
         ClParserArrayPtr array = ClParserArray::createArray(struct_type, dims);
@@ -997,12 +997,12 @@ ClParserProcessAddrCommand(const ClParserValueArray &values, int *error_code)
 
   *error_code = 0;
 
-  uint num_values = values.size();
+  uint num_values = uint(values.size());
 
   if      (values[0]->isType(CL_PARSER_VALUE_TYPE_INTEGER)) {
     uint offset;
 
-    char *address = (char *) values[0]->getInteger()->getValue();
+    char *address = reinterpret_cast<char *>(values[0]->getInteger()->getValue());
 
     if (num_values < 2) {
       ClParserInst->signalError(error_code, ClErr::TOO_FEW_ARGUMENTS);
@@ -1023,7 +1023,7 @@ ClParserProcessAddrCommand(const ClParserValueArray &values, int *error_code)
         return value;
       }
 
-      offset = values[2]->getInteger()->getValue();
+      offset = uint(values[2]->getInteger()->getValue());
     }
     else
       offset = 0;
@@ -1034,7 +1034,7 @@ ClParserProcessAddrCommand(const ClParserValueArray &values, int *error_code)
       if (num_values > 3)
         ClParserInst->signalError(error_code, ClErr::TOO_MANY_ARGUMENTS);
       else
-        value = ClParserValueMgrInst->createValue((long)(*(short *) address));
+        value = ClParserValueMgrInst->createValue(long(*reinterpret_cast<short *>(address)));
     }
     else if (type == "int") {
       address += offset*sizeof(int);
@@ -1042,7 +1042,7 @@ ClParserProcessAddrCommand(const ClParserValueArray &values, int *error_code)
       if (num_values > 3)
         ClParserInst->signalError(error_code, ClErr::TOO_MANY_ARGUMENTS);
       else
-        value = ClParserValueMgrInst->createValue((long)(*(int *) address));
+        value = ClParserValueMgrInst->createValue(long(*reinterpret_cast<int *>(address)));
     }
     else if (type == "long") {
       address += offset*sizeof(long);
@@ -1050,7 +1050,7 @@ ClParserProcessAddrCommand(const ClParserValueArray &values, int *error_code)
       if (num_values > 3)
         ClParserInst->signalError(error_code, ClErr::TOO_MANY_ARGUMENTS);
       else
-        value = ClParserValueMgrInst->createValue((*(long *) address));
+        value = ClParserValueMgrInst->createValue((*reinterpret_cast<long *>(address)));
     }
     else if (type == "float") {
       address += offset*sizeof(float);
@@ -1058,7 +1058,7 @@ ClParserProcessAddrCommand(const ClParserValueArray &values, int *error_code)
       if (num_values > 3)
         ClParserInst->signalError(error_code, ClErr::TOO_MANY_ARGUMENTS);
       else
-        value = ClParserValueMgrInst->createValue((double)(*(float *) address));
+        value = ClParserValueMgrInst->createValue(double((*reinterpret_cast<float *>(address))));
     }
     else if (type == "double") {
       address += offset*sizeof(double);
@@ -1066,7 +1066,7 @@ ClParserProcessAddrCommand(const ClParserValueArray &values, int *error_code)
       if (num_values > 3)
         ClParserInst->signalError(error_code, ClErr::TOO_MANY_ARGUMENTS);
       else
-        value = ClParserValueMgrInst->createValue(*((double *) address));
+        value = ClParserValueMgrInst->createValue(*(reinterpret_cast<double *>(address)));
     }
     else if (type == "char *") {
       address += offset*sizeof(char);
@@ -1074,7 +1074,7 @@ ClParserProcessAddrCommand(const ClParserValueArray &values, int *error_code)
       if (num_values > 3)
         ClParserInst->signalError(error_code, ClErr::TOO_MANY_ARGUMENTS);
       else
-        value = ClParserValueMgrInst->createValue((char *) address);
+        value = ClParserValueMgrInst->createValue(reinterpret_cast<char *>(address));
     }
     else
       ClParserInst->signalError(error_code, ClErr::INVALID_TYPE_FOR_OPERATOR);
@@ -1107,19 +1107,19 @@ ClParserProcessAddrCommand(const ClParserValueArray &values, int *error_code)
     }
 
     if      (value1->isType(CL_PARSER_VALUE_TYPE_REAL)) {
-      const double *real = value1->getReal()->getValueP();
+      double *real = const_cast<double *>(value1->getReal()->getValueP());
 
-      address = (char *) real;
+      address = reinterpret_cast<char *>(real);
     }
     else if (value1->isType(CL_PARSER_VALUE_TYPE_INTEGER)) {
-      const long *integer = value1->getInteger()->getValueP();
+      long *integer = const_cast<long *>(value1->getInteger()->getValueP());
 
-      address = (char *) integer;
+      address = reinterpret_cast<char *>(integer);
     }
     else if (value1->isType(CL_PARSER_VALUE_TYPE_STRING)) {
-      const char *str = value1->getString()->getCharP();
+      char *str = const_cast<char *>(value1->getString()->getCharP());
 
-      address = (char *) str;
+      address = str;
     }
     else if (value1->isType(CL_PARSER_VALUE_TYPE_ARRAY)) {
       UIntVectorT dims;
@@ -1130,7 +1130,7 @@ ClParserProcessAddrCommand(const ClParserValueArray &values, int *error_code)
         double *reals;
 
         if (array1->toReals(&reals, dims))
-          address = (char *) reals;
+          address = reinterpret_cast<char *>(reals);
         else
           ClParserInst->signalError(error_code, ClErr::INVALID_TYPE_FOR_OPERATOR);
       }
@@ -1138,7 +1138,7 @@ ClParserProcessAddrCommand(const ClParserValueArray &values, int *error_code)
         long *integers;
 
         if (array1->toIntegers(&integers, dims))
-          address = (char *) integers;
+          address = reinterpret_cast<char *>(integers);
         else
           ClParserInst->signalError(error_code, ClErr::INVALID_TYPE_FOR_OPERATOR);
       }
@@ -1146,7 +1146,7 @@ ClParserProcessAddrCommand(const ClParserValueArray &values, int *error_code)
         char **strings;
 
         if (array1->toStrings(&strings, dims))
-          address = (char *) strings;
+          address = reinterpret_cast<char *>(strings);
         else
           ClParserInst->signalError(error_code, ClErr::INVALID_TYPE_FOR_OPERATOR);
       }
@@ -1157,7 +1157,7 @@ ClParserProcessAddrCommand(const ClParserValueArray &values, int *error_code)
       ClParserInst->signalError(error_code, ClErr::INVALID_TYPE_FOR_OPERATOR);
 
     if (*error_code == 0)
-      value = ClParserValueMgrInst->createValue((long) address);
+      value = ClParserValueMgrInst->createValue(long(address));
   }
   else
     ClParserInst->signalError(error_code, ClErr::INVALID_TYPE_FOR_OPERATOR);
@@ -1177,7 +1177,7 @@ ClParserProcessWhere(const std::string &variables_string, const std::string &exp
 
   StringVectorT variable_list;
 
-  uint len = variables_string.size();
+  uint len = uint(variables_string.size());
 
   for (uint i = 0; i < len; ++i) {
     CStrUtil::skipSpace(variables_string, &i);
@@ -1207,9 +1207,9 @@ ClParserProcessWhere(const std::string &variables_string, const std::string &exp
 
   /*****************/
 
-  int num_variables = variable_list.size();
+  uint num_variables = uint(variable_list.size());
 
-  for (int i = 0; i < num_variables; i++) {
+  for (uint i = 0; i < num_variables; i++) {
     ClParserValuePtr value = ClParserInst->getVariableValue(variable_list[i]);
 
     if (! value.isValid() || ! value->isType(CL_PARSER_VALUE_TYPE_ARRAY)) {
@@ -1228,7 +1228,7 @@ ClParserProcessWhere(const std::string &variables_string, const std::string &exp
   if (values[0]->getArray()->getNumData() <= 0) {
     uint dims = 0;
 
-    ClParserValuePtr value = ClParserValueMgrInst->createValue(&dims, 1, (long *) nullptr);
+    auto value = ClParserValueMgrInst->createValue(&dims, 1, static_cast<long *>(nullptr));
 
     return value;
   }
@@ -1249,8 +1249,8 @@ ClParserProcessWhere(const std::string &variables_string, const std::string &exp
   LongVectorT indices;
 
   for (uint u = 0; u < values[0]->getArray()->getNumData(); u++) {
-    for (int k = 0; k < num_variables; k++) {
-      ClParserValuePtr value2 = values[k]->getArray()->getValue(u + 1);
+    for (uint k = 0; k < num_variables; k++) {
+      auto value2 = values[k]->getArray()->getValue(int(u + 1));
 
       ClParserInst->createVar(variable_list[k], value2);
     }
@@ -1276,7 +1276,7 @@ ClParserProcessWhere(const std::string &variables_string, const std::string &exp
 
   /*************/
 
-  uint dims = indices.size();
+  uint dims = uint(indices.size());
 
   ClParserValuePtr value = ClParserValueMgrInst->createValue(&dims, 1, indices);
 
@@ -1295,7 +1295,7 @@ ClParserProcessUserFn(ClParserUserFnPtr userfn, const ClParserArgValueArray &arg
 
   *error_code = 0;
 
-  uint num_arg_values = arg_values.size();
+  uint num_arg_values = uint(arg_values.size());
 
   if (num_arg_values > 0) {
     ClParserValuePtr value1;
@@ -1536,18 +1536,18 @@ ClParserProcessStructureUserFn(ClParserUserFnPtr userfn, const ClParserArgValueA
   ClParserStructPtr structure = value1->getStructure();
 
   ClParserTypePtr type       = structure->getType();
-  int             num_values = structure->getNumValues();
+  uint            num_values = structure->getNumValues();
 
   ClParserValueArray struct_values;
 
-  for (int i = 0; i < num_values; ++i)
+  for (uint i = 0; i < num_values; ++i)
     struct_values.push_back(ClParserValuePtr());
 
   ClParserArgValueArray arg_values1 = arg_values;
 
   arg_values1[0].setVarRef(ClParserVarRefPtr());
 
-  for (int i = 0; i < num_values; i++) {
+  for (uint i = 0; i < num_values; i++) {
     const std::string &name = type->getSubType(i)->getName();
 
     ClParserValuePtr svalue;
@@ -1561,7 +1561,7 @@ ClParserProcessStructureUserFn(ClParserUserFnPtr userfn, const ClParserArgValueA
       return ClParserValuePtr();
   }
 
-  for (int i = 0; i < num_values; i++) {
+  for (uint i = 0; i < num_values; i++) {
     const std::string &name = type->getSubType(i)->getName();
 
     ClParserValuePtr svalue;

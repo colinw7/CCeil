@@ -84,7 +84,7 @@ getChars(char **text, uint *len) const
     (*text)[0] = '\0';
   }
   else {
-    *len  = text_.size();
+    *len  = uint(text_.size());
     *text = new char [*len + 1];
 
     memcpy(*text, text_.c_str(), *len);
@@ -105,7 +105,7 @@ getSubChars(int i1, int i2, char **text, uint *len) const
   if (! getSubChars(i1, i2, str))
     return false;
 
-  *len  = str.size();
+  *len  = uint(str.size());
   *text = new char [*len + 1];
 
   memcpy(*text, str.c_str(), *len);
@@ -130,7 +130,7 @@ getSubChars(int i1, int i2, std::string &text) const
 
   int len = i2 - i1 + 1;
 
-  text = text_.substr(i1, len);
+  text = text_.substr(uint(i1), uint(len));
 
   return true;
 }
@@ -148,7 +148,7 @@ replaceSubString(int i1, int i2, ClParserStringPtr str)
   if (i1 > i2)
     return false;
 
-  text_ = text_.substr(0, i1) + str->text_ + text_.substr(i2 + 1);
+  text_ = text_.substr(0, uint(i1)) + str->text_ + text_.substr(uint(i2 + 1));
 
   return true;
 }
@@ -157,7 +157,7 @@ bool
 ClParserString::
 removeString(ClParserStringPtr str)
 {
-  std::string::size_type pos = text_.find(str->text_);
+  auto pos = text_.find(str->text_);
 
   if (pos == std::string::npos)
     return false;
@@ -182,7 +182,7 @@ countSubStrings(const std::string &text) const
 
   std::string text1 = text_;
 
-  std::string::size_type pos = text1.find(text);
+  auto pos = text1.find(text);
 
   while (pos != std::string::npos) {
     text1 = text1.substr(0, pos) + text1.substr(pos + text.size());
@@ -208,10 +208,10 @@ getStringPos(const std::string &text) const
 {
   int pos = -1;
 
-  std::string::size_type pos1 = text_.find(text);
+  auto pos1 = text_.find(text);
 
   if (pos1 != std::string::npos)
-    pos = pos1;
+    pos = int(pos1);
 
   return pos;
 }
@@ -229,10 +229,10 @@ getStringRPos(const std::string &text) const
 {
   int pos = -1;
 
-  std::string::size_type pos1 = text_.rfind(text);
+  auto pos1 = text_.rfind(text);
 
   if (pos1 != std::string::npos)
-    pos = pos1;
+    pos = int(pos1);
 
   return pos;
 }
@@ -241,7 +241,7 @@ std::string
 ClParserString::
 subString(uint pos, int len) const
 {
-  return text_.substr(pos, len);
+  return text_.substr(pos, uint(len));
 }
 
 void
@@ -262,12 +262,12 @@ int
 ClParserString::
 find(const std::string &str) const
 {
-  std::string::size_type pos = text_.find(str);
+  auto pos = text_.find(str);
 
   if (pos == std::string::npos)
     return -1;
 
-  return pos;
+  return int(pos);
 }
 
 void
@@ -313,11 +313,11 @@ getMaxChar() const
   if (text_.size() == 0)
     return 0;
 
-  uchar c = text_[0];
+  uchar c = uchar(text_[0]);
 
-  for (uint i = 1; i < text_.size(); ++i)
+  for (uint i = 1; i < uint(text_.size()); ++i)
     if (text_[i] > c)
-      c = (uchar) text_[i];
+      c = uchar(text_[i]);
 
   return c;
 }
@@ -329,11 +329,11 @@ getMinChar() const
   if (text_.size() == 0)
     return 0;
 
-  uchar c = text_[0];
+  uchar c = uchar(text_[0]);
 
-  for (uint i = 1; i < text_.size(); ++i)
+  for (uint i = 1; i < uint(text_.size()); ++i)
     if (text_[i] < c)
-      c = (uchar) text_[i];
+      c = uchar(text_[i]);
 
   return c;
 }
@@ -343,7 +343,7 @@ ClParserString::
 cmp(const ClParserObj &obj) const
 {
   if (base_type_ != obj.getBaseType())
-    return CMathGen::sign((long) (base_type_ - obj.getBaseType()));
+    return CMathGen::sign(long(base_type_ - obj.getBaseType()));
 
   const ClParserString &rhs = castObj(obj);
 
@@ -380,15 +380,15 @@ format(ClParserValuePtr value, std::string &result) const
   else
     return false;
 
-  uint num_values = values.size();
+  uint num_values = uint(values.size());
 
   //-----
 
-  int value_num = 0;
+  uint value_num = 0;
 
-  int format_len = text_.size();
+  uint format_len = uint(text_.size());
 
-  int i = 0;
+  uint i = 0;
 
   while (i < format_len) {
     switch (text_[i]) {
@@ -409,7 +409,7 @@ format(ClParserValuePtr value, std::string &result) const
 
           ++i;
 
-          int k = i;
+          uint k = i;
 
           while (i < format_len && text_[i] != '>')
             ++i;
@@ -473,7 +473,7 @@ format(ClParserValuePtr value, std::string &result) const
         }
 
         if (format_code == '%') {
-          result += format_code;
+          result += char(format_code);
 
           break;
         }
@@ -481,7 +481,7 @@ format(ClParserValuePtr value, std::string &result) const
         long field_width = 0;
 
         if (field_width_as_value) {
-          if (value_num >= (int) num_values) {
+          if (value_num >= num_values) {
             result += value_format;
 
             break;
@@ -496,7 +496,7 @@ format(ClParserValuePtr value, std::string &result) const
         long precision = 0;
 
         if (precision_as_value) {
-          if (value_num >= (int) num_values) {
+          if (value_num >= num_values) {
             result += value_format;
 
             break;
@@ -508,7 +508,7 @@ format(ClParserValuePtr value, std::string &result) const
           value_num++;
         }
 
-        if (value_num >= (int) num_values) {
+        if (value_num >= num_values) {
           result += value_format;
 
           break;
@@ -531,11 +531,11 @@ format(ClParserValuePtr value, std::string &result) const
               value_num++;
 
             if (format_code == 'c') {
-              if (integer == 0 || ! isprint(integer))
+              if (integer == 0 || ! isprint(int(integer)))
                 integer = '.';
             }
 
-            char *buffer = new char [field_width + precision + 256];
+            char *buffer = new char [size_t(field_width + precision + 256)];
 
             const char *value_format1 = value_format.c_str();
 
@@ -564,7 +564,7 @@ format(ClParserValuePtr value, std::string &result) const
             if (value->getType() != CL_PARSER_VALUE_TYPE_DICTIONARY)
               value_num++;
 
-            char *buffer = new char [field_width + precision + 256];
+            char *buffer = new char [size_t(field_width + precision + 256)];
 
             const char *value_format1 = value_format.c_str();
 
@@ -597,7 +597,7 @@ format(ClParserValuePtr value, std::string &result) const
             if (value->getType() != CL_PARSER_VALUE_TYPE_DICTIONARY)
               value_num++;
 
-            char *buffer = new char [field_width + precision + 256];
+            char *buffer = new char [size_t(field_width + precision + 256)];
 
             const char *value_format1 = value_format.c_str();
 
@@ -639,7 +639,7 @@ toInteger(long *integer) const
 
   *integer = 0;
 
-  int pos = 0;
+  uint pos = 0;
 
   CStrUtil::skipSpace(text_, &pos);
 
@@ -660,11 +660,11 @@ toInteger(long *integer) const
     return false;
   }
 
-  pos = parser.getPos();
+  pos = uint(parser.getPos());
 
   CStrUtil::skipSpace(text_, &pos);
 
-  if (pos < (int) text_.size()) {
+  if (pos < text_.size()) {
     //error_code = int(ClErr::INVALID_STRING_TO_INTEGER_CONV);
     return false;
   }
@@ -692,7 +692,7 @@ toReal(double *real) const
     return false;
   }
 
-  int pos = 0;
+  uint pos = 0;
 
   CStrUtil::skipSpace(text_, &pos);
 
@@ -713,11 +713,11 @@ toReal(double *real) const
     return false;
   }
 
-  pos += parser.getPos();
+  pos += uint(parser.getPos());
 
   CStrUtil::skipSpace(text_, &pos);
 
-  if (pos < (int) text_.size()) {
+  if (pos < text_.size()) {
     //error_code = int(ClErr::INVALID_STRING_TO_REAL_CONV);
     return false;
   }
@@ -963,7 +963,7 @@ bitLShift(const ClParserObj &obj) const
 
   std::string result = text_;
 
-  roll(num, result);
+  roll(int(num), result);
 
   return ClParserValueMgrInst->createValue(result);
 }
@@ -978,7 +978,7 @@ bitRShift(const ClParserObj &obj) const
 
   std::string result = text_;
 
-  roll(num, result);
+  roll(int(num), result);
 
   return ClParserValueMgrInst->createValue(result);
 }
@@ -1370,7 +1370,7 @@ min() const
 {
   std::string result = " ";
 
-  result[0] = getMinChar();
+  result[0] = char(getMinChar());
 
   return ClParserValueMgrInst->createValue(result);
 }
@@ -1381,7 +1381,7 @@ max() const
 {
   std::string result = " ";
 
-  result[0] = getMaxChar();
+  result[0] = char(getMaxChar());
 
   return ClParserValueMgrInst->createValue(result);
 }
@@ -1395,7 +1395,7 @@ sum() const
   long result = 0;
 
   for (uint i = 0; i < len; ++i)
-    result += (uchar) text_[i];
+    result += uchar(text_[i]);
 
   return ClParserValueMgrInst->createValue(result);
 }
@@ -1441,7 +1441,7 @@ sort(ClParserSortDirection direction) const
   std::list<ClParserIntegerPtr>::iterator p2 = chars.end  ();
 
   for (uint i = 0; p1 != p2; ++p1, ++i)
-    result[i] = (*p1)->getValue();
+    result[i] = char((*p1)->getValue());
 
   return ClParserValueMgrInst->createValue(result);
 }
@@ -1466,5 +1466,5 @@ indexToText(int *ind) const
 
   --(*ind);
 
-  return (*ind >= 0 && *ind < (int) getLen());
+  return (*ind >= 0 && *ind < int(getLen()));
 }

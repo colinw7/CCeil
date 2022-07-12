@@ -66,7 +66,7 @@ ClParserValuePtr
 ClParserValueMgr::
 createValue(const char *str, uint len)
 {
-  ClParserValue *value = new ClParserValue(str, len);
+  ClParserValue *value = new ClParserValue(str, int(len));
 
   return ClParserValuePtr(value);
 }
@@ -383,7 +383,7 @@ ClParserValue(const char *text, int len) :
 {
   data_.real = nullptr;
 
-  setString(ClParserString::createString(text, len));
+  setString(ClParserString::createString(text, uint(len)));
 }
 
 ClParserValue::
@@ -555,13 +555,13 @@ ClParserValue(ClParserValueType type, ClParserValuePtr *values, int num_values) 
 
   switch (type_) {
     case CL_PARSER_VALUE_TYPE_ARRAY:
-      setArray(ClParserArray::createArray(values, num_values));
+      setArray(ClParserArray::createArray(values, uint(num_values)));
       break;
     case CL_PARSER_VALUE_TYPE_LIST:
-      setList(ClParserList::createList(values, num_values));
+      setList(ClParserList::createList(values, uint(num_values)));
       break;
     case CL_PARSER_VALUE_TYPE_DICTIONARY:
-      setDictionary(ClParserDict::createDict(values, num_values));
+      setDictionary(ClParserDict::createDict(values, uint(num_values)));
       break;
     default:
       ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
@@ -597,7 +597,7 @@ ClParserValue(ClParserValuePtr *values, int num_values) :
 {
   data_.real = nullptr;
 
-  setArray(ClParserArray::createArray(values, num_values));
+  setArray(ClParserArray::createArray(values, uint(num_values)));
 }
 
 ClParserValue::
@@ -624,7 +624,7 @@ ClParserValue(ClParserTypePtr type, ClParserValuePtr *values, int num_values) :
 {
   data_.real = nullptr;
 
-  setStructure(ClParserStruct::createStruct(type, values, num_values));
+  setStructure(ClParserStruct::createStruct(type, values, uint(num_values)));
 }
 
 ClParserValue::
@@ -1081,7 +1081,7 @@ convertToReal()
     return true;
 
   if (type_ == CL_PARSER_VALUE_TYPE_INTEGER) {
-    double real = (*data_.integer)->getValue();
+    double real = double((*data_.integer)->getValue());
 
     setReal(ClParserReal::createReal(real));
 
@@ -1154,7 +1154,7 @@ realValue(double *real) const
   if      (type_ == CL_PARSER_VALUE_TYPE_REAL)
     *real = (*data_.real)->getValue();
   else if (type_ == CL_PARSER_VALUE_TYPE_INTEGER)
-    *real = (double) (*data_.integer)->getValue();
+    *real = double((*data_.integer)->getValue());
   else
     return false;
 
@@ -1173,7 +1173,7 @@ integerValue(long *integer) const
   *integer = 0;
 
   if      (type_ == CL_PARSER_VALUE_TYPE_REAL)
-    *integer = (long) (*data_.real)->getInteger();
+    *integer = long((*data_.real)->getInteger());
   else if (type_ == CL_PARSER_VALUE_TYPE_INTEGER)
     *integer = (*data_.integer)->getValue();
   else
@@ -1194,9 +1194,9 @@ integerValue(int *integer) const
   *integer = 0;
 
   if      (type_ == CL_PARSER_VALUE_TYPE_REAL)
-    *integer = (int) (*data_.real)->getInteger();
+    *integer = int((*data_.real)->getInteger());
   else if (type_ == CL_PARSER_VALUE_TYPE_INTEGER)
-    *integer = (int) (*data_.integer)->getValue();
+    *integer = int((*data_.integer)->getValue());
   else
     return false;
 
@@ -1228,10 +1228,10 @@ ClParserValue::
 stringValue(char **chars, int *num_chars) const
 {
   if (type_ == CL_PARSER_VALUE_TYPE_STRING) {
-    *num_chars = (*data_.str)->getLen();
-    *chars     = new char [*num_chars + 1];
+    *num_chars = int((*data_.str)->getLen());
+    *chars     = new char [uint(*num_chars + 1)];
 
-    for (int i = 0; i < *num_chars; ++i)
+    for (uint i = 0; i < uint(*num_chars); ++i)
       (*chars)[i] = (*data_.str)->getChar(i);
   }
   else
@@ -1282,7 +1282,7 @@ realArrayValue(float **reals, uint **dims, uint *num_dims) const
   *dims     = new uint [1];
   *num_dims = 1;
 
-  (*reals)[0] = (float) real;
+  (*reals)[0] = float(real);
   (*dims )[0] = 1;
 
   return true;
@@ -1330,7 +1330,7 @@ integerArrayValue(int **integers, uint **dims, uint *num_dims) const
   *dims     = new uint [1];
   *num_dims = 1;
 
-  (*integers)[0] = (int) integer;
+  (*integers)[0] = int(integer);
   (*dims    )[0] = 1;
 
   return true;
@@ -1368,7 +1368,7 @@ toSubValues(ClParserValuePtr **values, uint *num_values) const
 
   toSubValues(values1);
 
-  *num_values = values1.size();
+  *num_values = uint(values1.size());
   *values     = new ClParserValuePtr [*num_values + 1];
 
   for (uint i = 0; i < *num_values; ++i)
@@ -1402,13 +1402,13 @@ toSubValues(ClParserValueArray &values) const
     uint num_values = (*data_.list)->getNumValues();
 
     for (uint i = 0; i < num_values; ++i)
-      values.push_back((*data_.list)->getValue(i + 1));
+      values.push_back((*data_.list)->getValue(int(i + 1)));
   }
   else if (type_ == CL_PARSER_VALUE_TYPE_DICTIONARY) {
     uint num_values = (*data_.dict)->numValues();
 
     for (uint i = 0; i < num_values; ++i)
-      values.push_back((*data_.dict)->getKeyValue(i));
+      values.push_back((*data_.dict)->getKeyValue(int(i)));
   }
   else if (type_ == CL_PARSER_VALUE_TYPE_STRUCTURE) {
     ClParserStruct::ValueMap::const_iterator p1 = (*data_.structure)->getValuesBegin();
@@ -1618,7 +1618,7 @@ checkBinaryTypes(ClParserValuePtr &value1, ClParserValuePtr &value2)
       }
       else if (value2->isType(CL_PARSER_VALUE_TYPE_INTEGER)) {
         array = ClParserArray::createArray
-                  (value1->getArray()->getDims(), (double) value2->getInteger()->getValue());
+                  (value1->getArray()->getDims(), double(value2->getInteger()->getValue()));
 
         ClParserValuePtr value3 = ClParserValueMgrInst->createValue(array);
 
@@ -1688,7 +1688,7 @@ checkBinaryTypes(ClParserValuePtr &value1, ClParserValuePtr &value2)
       }
       else if (value1->isType(CL_PARSER_VALUE_TYPE_INTEGER)) {
         array = ClParserArray::createArray(value2->getArray()->getDims(),
-                                           (double) value1->getInteger()->getValue());
+                                           double(value1->getInteger()->getValue()));
 
         ClParserValuePtr value3 = ClParserValueMgrInst->createValue(array);
 

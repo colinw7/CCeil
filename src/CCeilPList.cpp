@@ -58,7 +58,7 @@ ClParserList::
 ClParserList(const ClParserValueArray &values)  :
  ClParserObj(CL_PARSER_VALUE_TYPE_LIST)
 {
-  uint num_values = values.size();
+  uint num_values = uint(values.size());
 
   for (uint i = 0; i < num_values; ++i)
     addValue(values[i]);
@@ -119,7 +119,7 @@ uint
 ClParserList::
 getNumValues() const
 {
-  return values_.size();
+  return uint(values_.size());
 }
 
 void
@@ -162,8 +162,8 @@ bool
 ClParserList::
 deleteValue(ClParserValuePtr value)
 {
-  ClParserValueList::iterator p1 = values_.begin();
-  ClParserValueList::iterator p2 = values_.end  ();
+  auto p1 = values_.begin();
+  auto p2 = values_.end  ();
 
   for ( ; p1 != p2; ++p1) {
     if ((*p1)->cmp(value) == 0) {
@@ -187,8 +187,8 @@ bool
 ClParserList::
 deleteListValues(const ClParserList &list)
 {
-  ClParserValueList::const_iterator p1 = list.values_.begin();
-  ClParserValueList::const_iterator p2 = list.values_.end  ();
+  auto p1 = list.values_.begin();
+  auto p2 = list.values_.end  ();
 
   for ( ; p1 != p2; ++p1)
     deleteValue(*p1);
@@ -212,10 +212,10 @@ getValue(int ind) const
   if (ind < 0)
     ind += num_values + 1;
 
-  assert(ind >= 1 && ind <= (int) num_values);
+  assert(ind >= 1 && ind <= int(num_values));
 
-  ClParserValueList::const_iterator p1 = values_.begin();
-  ClParserValueList::const_iterator p2 = values_.end  ();
+  auto p1 = values_.begin();
+  auto p2 = values_.end  ();
 
   for (int i = 1; p1 != p2; ++p1, ++i)
     if (i == ind)
@@ -230,12 +230,12 @@ getValuePos(ClParserValuePtr value) const
 {
   uint pos = 0;
 
-  ClParserValueList::const_iterator p1 = values_.begin();
-  ClParserValueList::const_iterator p2 = values_.end  ();
+  auto p1 = values_.begin();
+  auto p2 = values_.end  ();
 
   for ( ; p1 != p2; ++p1, pos++)
     if ((*p1)->cmp(value) == 0)
-      return pos;
+      return int(pos);
 
   return -1;
 }
@@ -246,12 +246,12 @@ getRValuePos(ClParserValuePtr value) const
 {
   uint pos = 0;
 
-  ClParserValueList::const_reverse_iterator p1 = values_.rbegin();
-  ClParserValueList::const_reverse_iterator p2 = values_.rend  ();
+  auto p1 = values_.rbegin();
+  auto p2 = values_.rend  ();
 
   for ( ; p1 != p2; ++p1, pos++)
     if ((*p1)->cmp(value) == 0)
-      return pos;
+      return int(pos);
 
   return -1;
 }
@@ -385,19 +385,19 @@ ClParserList::
 cmp(const ClParserObj &obj) const
 {
   if (base_type_ != obj.getBaseType())
-    return CMathGen::sign((long) (base_type_ - obj.getBaseType()));
+    return CMathGen::sign(long(base_type_ - obj.getBaseType()));
 
   const ClParserList &rhs = castObj(obj);
 
-  uint num_values1 = values_.size();
-  uint num_values2 = rhs.values_.size();
+  uint num_values1 = uint(    values_.size());
+  uint num_values2 = uint(rhs.values_.size());
 
   if (num_values1 != num_values2)
-    return (num_values1 - num_values2);
+    return int(num_values1 - num_values2);
 
-  ClParserValueList::const_iterator p1 = values_.begin();
-  ClParserValueList::const_iterator p2 = rhs.values_.begin();
-  ClParserValueList::const_iterator p3 = values_.end  ();
+  auto p1 = values_.begin();
+  auto p2 = rhs.values_.begin();
+  auto p3 = values_.end  ();
 
   int cmp;
 
@@ -630,7 +630,7 @@ bitLShift(const ClParserObj &obj) const
 
   ClParserListPtr list = dupList();
 
-  list->roll(num);
+  list->roll(int(num));
 
   return ClParserValueMgrInst->createValue(list);
 }
@@ -648,7 +648,7 @@ bitRShift(const ClParserObj &obj) const
 
   ClParserListPtr list = dupList();
 
-  list->roll(num);
+  list->roll(int(num));
 
   return ClParserValueMgrInst->createValue(list);
 }
@@ -1016,12 +1016,12 @@ subscriptValue(const uint *subscripts, uint num_subscripts) const
   }
 
   if (num_subscripts == 1)
-    return getValue(subscripts[0]);
+    return getValue(int(subscripts[0]));
 
   ClParserListPtr list = createList();
 
   for (uint i = subscripts[0]; i <= subscripts[1]; i++)
-    list->addValue(getValue(i));
+    list->addValue(getValue(int(i)));
 
   return ClParserValueMgrInst->createValue(list);
 }
@@ -1032,7 +1032,7 @@ subscriptValue(const UIntVectorT &subscripts) const
 {
   error_code_ = 0;
 
-  uint num_subscripts = subscripts.size();
+  uint num_subscripts = uint(subscripts.size());
 
   if (num_subscripts > 2) {
     error_code_ = int(ClErr::TOO_MANY_SUBSCRIPTS);
@@ -1040,12 +1040,12 @@ subscriptValue(const UIntVectorT &subscripts) const
   }
 
   if (num_subscripts == 1)
-    return getValue(subscripts[0]);
+    return getValue(int(subscripts[0]));
 
   ClParserListPtr list = createList();
 
   for (uint i = subscripts[0]; i <= subscripts[1]; i++)
-    list->addValue(getValue(i));
+    list->addValue(getValue(int(i)));
 
   return ClParserValueMgrInst->createValue(list);
 }

@@ -130,19 +130,19 @@ return;
   /*--------------*/
 
   createStdVar("__INTEGER"   , ClParserValueMgrInst->createValue
-                                ((long) CL_PARSER_VALUE_TYPE_INTEGER));
+                                (long(CL_PARSER_VALUE_TYPE_INTEGER)));
   createStdVar("__REAL"      , ClParserValueMgrInst->createValue
-                                ((long) CL_PARSER_VALUE_TYPE_REAL));
+                                (long(CL_PARSER_VALUE_TYPE_REAL)));
   createStdVar("__STRING"    , ClParserValueMgrInst->createValue
-                                ((long) CL_PARSER_VALUE_TYPE_STRING));
+                                (long(CL_PARSER_VALUE_TYPE_STRING)));
   createStdVar("__ARRAY"     , ClParserValueMgrInst->createValue
-                                ((long) CL_PARSER_VALUE_TYPE_ARRAY));
+                                (long(CL_PARSER_VALUE_TYPE_ARRAY)));
   createStdVar("__LIST"      , ClParserValueMgrInst->createValue
-                                ((long) CL_PARSER_VALUE_TYPE_LIST));
+                                (long(CL_PARSER_VALUE_TYPE_LIST)));
   createStdVar("__DICTIONARY", ClParserValueMgrInst->createValue
-                                ((long) CL_PARSER_VALUE_TYPE_DICTIONARY));
+                                (long(CL_PARSER_VALUE_TYPE_DICTIONARY)));
   createStdVar("__STRUCTURE" , ClParserValueMgrInst->createValue
-                                ((long) CL_PARSER_VALUE_TYPE_STRUCTURE));
+                                (long(CL_PARSER_VALUE_TYPE_STRUCTURE)));
 }
 
 ClParserVarPtr
@@ -175,10 +175,10 @@ removeVariable(const std::string &name)
     return;
   }
 
-  int num = varMapStack_.size();
+  uint num = uint(varMapStack_.size());
 
-  for (int i = num - 1; i >= 0; --i) {
-    varMap = varMapStack_[i];
+  for (int i = int(num - 1); i >= 0; --i) {
+    varMap = varMapStack_[uint(i)];
 
     p = varMap->find(name);
 
@@ -246,10 +246,10 @@ getVariableI(const std::string &name, ClParserVarPtr &var, bool parentScope) con
   bool found = false;
 
   if (parentScope) {
-    int num = varMapStack_.size();
+    uint num = uint(varMapStack_.size());
 
-    for (int i = num - 1; i >= 0; i--) {
-      VarMap *varMap = varMapStack_[i];
+    for (int i = int(num - 1); i >= 0; i--) {
+      VarMap *varMap = varMapStack_[uint(i)];
 
       VarMap::iterator pv = varMap->find(name);
 
@@ -311,13 +311,13 @@ printAllVariables() const
   for ( ; p1 != p2; ++p1)
     (*p1).second->print();
 
-  int num = varMapStack_.size();
+  uint num = uint(varMapStack_.size());
 
-  for (int i = num - 1; i >= 0; i--) {
+  for (int i = int(num - 1); i >= 0; i--) {
     parser_->output("\n");
 
-    VarMap::iterator pt1 = varMapStack_[i]->begin();
-    VarMap::iterator pt2 = varMapStack_[i]->end  ();
+    auto pt1 = varMapStack_[uint(i)]->begin();
+    auto pt2 = varMapStack_[uint(i)]->end  ();
 
     for ( ; pt1 != pt2; ++pt1)
       (*pt1).second->print();
@@ -340,8 +340,8 @@ void
 ClParserVarMgr::
 deleteVariableProc(const std::string &name, ClParserVarMgr::VarProc proc, void *data)
 {
-  VarProcDataList::const_iterator p1 = varProcDataList_.begin();
-  VarProcDataList::const_iterator p2 = varProcDataList_.end  ();
+  auto p1 = varProcDataList_.begin();
+  auto p2 = varProcDataList_.end  ();
 
   for ( ; p1 != p2; ++ p1) {
     VarProcData *proc_data = *p1;
@@ -362,8 +362,8 @@ void
 ClParserVarMgr::
 callVariableProc(ClParserVarPtr variable)
 {
-  VarProcDataList::const_iterator p1 = varProcDataList_.begin();
-  VarProcDataList::const_iterator p2 = varProcDataList_.end  ();
+  auto p1 = varProcDataList_.begin();
+  auto p2 = varProcDataList_.end  ();
 
   for ( ; p1 != p2; ++ p1) {
     VarProcData *proc_data = *p1;
@@ -493,7 +493,7 @@ getValue(ClParserValuePtr &value) const
 {
   value = variable_->getValue();
 
-  uint num_subscripts = subscripts_.size();
+  uint num_subscripts = uint(subscripts_.size());
 
   if (num_subscripts == 0)
     return true;
@@ -517,7 +517,7 @@ bool
 ClParserVarRef::
 setValue(ClParserValuePtr new_value)
 {
-  uint num_subscripts = subscripts_.size();
+  uint num_subscripts = uint(subscripts_.size());
 
   // a = b
 
@@ -620,7 +620,7 @@ setValue(ClParserValuePtr new_value)
 
         array->toIntegers(subscripts);
 
-        uint num_ssubscripts = subscripts.size();
+        uint num_ssubscripts = uint(subscripts.size());
 
         if      (array1->isType(CL_PARSER_VALUE_TYPE_STRING)) {
           if (i < num_ssubscripts - 1) {
@@ -748,12 +748,12 @@ setValue(ClParserValuePtr new_value)
 
     array->toIntegers(subscripts);
 
-    int ind = subscripts[0];
+    int ind = int(subscripts[0]);
 
     if (ind < 0)
       ind += list->getNumValues() + 1;
 
-    if (ind < 1 || ind > (int) list->getNumValues())
+    if (ind < 1 || ind > int(list->getNumValues()))
       return false;
 
     ClParserValuePtr value1 = list->getValue(ind);
@@ -871,7 +871,7 @@ debugPrint() const
 
   value->debugPrint();
 
-  uint num_subscripts = subscripts_.size();
+  uint num_subscripts = uint(subscripts_.size());
 
   if (num_subscripts > 0) {
     for (uint i = 0; i < num_subscripts; i++) {
@@ -919,7 +919,7 @@ setValue(ClParserValuePtr value)
 
   ClParserStructPtr structure = svalue->getStructure();
 
-  uint num_names = names_.size();
+  uint num_names = uint(names_.size());
 
   for (uint i = 0; i < num_names - 1; ++i) {
     const std::string name = names_[i];
@@ -946,7 +946,7 @@ getValue(ClParserValuePtr &value) const
 
   ClParserStructPtr structure = svalue->getStructure();
 
-  uint num_names = names_.size();
+  uint num_names = uint(names_.size());
 
   for (uint i = 0; i < num_names - 1; ++i) {
     const std::string name = names_[i];
@@ -965,7 +965,7 @@ getValue(ClParserValuePtr &value) const
   if (! structure->getValue(name, value))
     return false;
 
-  uint num_subscripts = subscripts_.size();
+  uint num_subscripts = uint(subscripts_.size());
 
   if (num_subscripts == 0)
     return true;
@@ -1011,7 +1011,7 @@ debugPrint() const
 
   value->debugPrint();
 
-  uint num_subscripts = subscripts_.size();
+  uint num_subscripts = uint(subscripts_.size());
 
   if (num_subscripts > 0) {
     for (uint i = 0; i < num_subscripts; i++) {

@@ -594,7 +594,7 @@ toChar() const
 {
   std::string result(" ");
 
-  result[0] = (char) getInteger();
+  result[0] = char(getInteger());
 
   return ClParserValueMgrInst->createValue(result);
 }
@@ -639,12 +639,12 @@ ClParserValuePtr
 ClParserReal::
 toLower() const
 {
-  int c = (int) getInteger();
+  int c = int(getInteger());
 
   if (isupper(c))
     c = tolower(c);
 
-  long value = (long) c;
+  long value = long(c);
 
   return ClParserValueMgrInst->createValue(value);
 }
@@ -653,12 +653,12 @@ ClParserValuePtr
 ClParserReal::
 toUpper() const
 {
-  int c = (int) getInteger();
+  int c = int(getInteger());
 
   if (islower(c))
     c = toupper(c);
 
-  long value = (long) c;
+  long value = long(c);
 
   return ClParserValueMgrInst->createValue(value);
 }
@@ -733,7 +733,7 @@ ClParserReal::
 cmp(const ClParserObj &obj) const
 {
   if (base_type_ != obj.getBaseType())
-    return CMathGen::sign((long) (base_type_ - obj.getBaseType()));
+    return CMathGen::sign(long(base_type_ - obj.getBaseType()));
 
   const ClParserReal &rhs = castObj(obj);
 

@@ -345,7 +345,7 @@ ClParserArray(const uint *dims, uint num_dims, const char **strings) :
   uint num_data = getNumData();
 
   for (uint i = 0; i < num_data; ++i) {
-    uint len = (strings[i] ? strlen(strings[i]) : 0);
+    uint len = (strings[i] ? uint(strlen(strings[i])) : 0);
 
     values_.setLinearValue(i, ClParserValueMgrInst->createValue(strings[i], len));
   }
@@ -370,7 +370,7 @@ ClParserArray(const UIntVectorT &dims, const char **strings) :
   uint num_data = getNumData();
 
   for (uint i = 0; i < num_data; ++i) {
-    uint len = (strings[i] ? strlen(strings[i]) : 0);
+    uint len = (strings[i] ? uint(strlen(strings[i])) : 0);
 
     values_.setLinearValue(i, ClParserValueMgrInst->createValue(strings[i], len));
   }
@@ -462,9 +462,9 @@ ClParserArray(const uint *dims, uint num_dims, const ClParserValuePtr *values) :
 
     values_.getLinearValue(i, value);
 
-    int num_values = structure->getNumValues();
+    uint num_values = structure->getNumValues();
 
-    for (int j = 0; j < num_values; ++j) {
+    for (uint j = 0; j < num_values; ++j) {
       const std::string &name = type->getSubType(j)->getName();
 
       ClParserValuePtr ivalue;
@@ -527,7 +527,7 @@ ClParserArray::
 ClParserArray(const ClParserValueArray &values) :
  ClParserObj(CL_PARSER_VALUE_TYPE_ARRAY), type_(CL_PARSER_VALUE_TYPE_NONE)
 {
-  uint num_values = values.size();
+  uint num_values = uint(values.size());
 
   if (num_values <= 0)
     return;
@@ -565,7 +565,7 @@ ClParserArray(const ClParserValueArray &values) :
     values_ = values1;
   }
   else {
-    ValueArray values1(&num_values, 1, (ClParserValuePtr *) &values[0]);
+    ValueArray values1(&num_values, 1, const_cast<ClParserValuePtr *>(&values[0]));
 
     type_ = values[0]->getType();
 
@@ -807,7 +807,7 @@ toReals(double **reals, uint *num_reals) const
 
     values_.getLinearValue(i, value);
 
-    (*reals)[i] = (double) value->toReal()->getReal()->getValue();
+    (*reals)[i] = double(value->toReal()->getReal()->getValue());
   }
 
   if (num_reals)
@@ -829,7 +829,7 @@ toReals(float **reals, uint *num_reals) const
 
     values_.getLinearValue(i, value);
 
-    (*reals)[i] = (float) value->toReal()->getReal()->getValue();
+    (*reals)[i] = float(value->toReal()->getReal()->getValue());
   }
 
   if (num_reals)
@@ -913,7 +913,7 @@ toIntegers(int **integers, uint *num_integers) const
 
     values_.getLinearValue(i, value);
 
-    (*integers)[i] = (int) value->getInteger()->getValue();
+    (*integers)[i] = int(value->getInteger()->getValue());
   }
 
   if (num_integers)
@@ -935,7 +935,7 @@ toIntegers(uint **integers, uint *num_integers) const
 
     values_.getLinearValue(i, value);
 
-    (*integers)[i] = (uint) value->getInteger()->getValue();
+    (*integers)[i] = uint(value->getInteger()->getValue());
   }
 
   if (num_integers)
@@ -957,7 +957,7 @@ toIntegers(long **integers, uint *num_integers) const
 
     values_.getLinearValue(i, value);
 
-    (*integers)[i] = (long) value->getInteger()->getValue();
+    (*integers)[i] = long(value->getInteger()->getValue());
   }
 
   if (num_integers)
@@ -977,7 +977,7 @@ toIntegers(IntVectorT &integers) const
 
     values_.getLinearValue(i, value);
 
-    integers.push_back((int) value->getInteger()->getValue());
+    integers.push_back(int(value->getInteger()->getValue()));
   }
 
   return true;
@@ -994,7 +994,7 @@ toIntegers(UIntVectorT &integers) const
 
     values_.getLinearValue(i, value);
 
-    integers.push_back((uint) value->getInteger()->getValue());
+    integers.push_back(uint(value->getInteger()->getValue()));
   }
 
   return true;
@@ -1011,7 +1011,7 @@ toIntegers(LongVectorT &integers) const
 
     values_.getLinearValue(i, value);
 
-    integers.push_back((long) value->getInteger()->getValue());
+    integers.push_back(long(value->getInteger()->getValue()));
   }
 
   return true;
@@ -1060,7 +1060,7 @@ toStrings(char ***strings, uint *num_strings) const
 
     std::string str = value->getString()->getText();
 
-    (*strings)[i] = strdup((char *) str.c_str());
+    (*strings)[i] = strdup(const_cast<char *>(str.c_str()));
   }
 
   if (num_strings)
@@ -1078,7 +1078,7 @@ toValues(ClParserValuePtr **values, uint **dims, uint *num_dims) const
   if (! toValues(values1, dims, num_dims))
     return false;
 
-  uint num_values = values1.size();
+  uint num_values = uint(values1.size());
 
   *values = new ClParserValuePtr [num_values];
 
@@ -1097,7 +1097,7 @@ toValues(ClParserValuePtr **values, UIntVectorT &dims) const
   if (! toValues(values1, dims))
     return false;
 
-  uint num_values = values1.size();
+  uint num_values = uint(values1.size());
 
   *values = new ClParserValuePtr [num_values];
 
@@ -1160,7 +1160,7 @@ getValue(int i) const
 
   ClParserValuePtr value;
 
-  values_.getLinearValue(i, value);
+  values_.getLinearValue(uint(i), value);
 
   return value;
 }
@@ -1177,7 +1177,7 @@ getSubscriptValue(const int *subscripts, uint num_subscripts) const
     if (! indexToData(&subscript))
       return ClParserValuePtr();
 
-    subscripts1.push_back(subscript);
+    subscripts1.push_back(uint(subscript));
   }
 
   //------
@@ -1200,7 +1200,7 @@ getSubscriptValue(const IntVectorT &subscripts) const
 {
   UIntVectorT subscripts1;
 
-  uint num_subscripts = subscripts.size();
+  uint num_subscripts = uint(subscripts.size());
 
   for (uint i = 0; i < num_subscripts; ++i) {
     int subscript = subscripts[i];
@@ -1208,7 +1208,7 @@ getSubscriptValue(const IntVectorT &subscripts) const
     if (! indexToData(&subscript))
       return ClParserValuePtr();
 
-    subscripts1.push_back(subscript);
+    subscripts1.push_back(uint(subscript));
   }
 
   //------
@@ -1237,7 +1237,7 @@ setSubscriptValue(const int *subscripts, uint num_subscripts, ClParserValuePtr v
     if (! indexToData(&subscript))
       return false;
 
-    subscripts1.push_back(subscript);
+    subscripts1.push_back(uint(subscript));
   }
 
   if (num_subscripts == getNumDims()) {
@@ -1275,7 +1275,7 @@ setSubscriptValue(const int *subscripts, uint num_subscripts, ClParserValuePtr v
       return false;
 
     for (uint i = ind1, j = 0; i <= ind2; ++i, ++j)
-      setValue(i, array->getValue(j));
+      setValue(int(i), array->getValue(int(j)));
   }
 
   return true;
@@ -1287,7 +1287,7 @@ setSubscriptValue(const IntVectorT &subscripts, ClParserValuePtr value)
 {
   UIntVectorT subscripts1;
 
-  uint num_subscripts = subscripts.size();
+  uint num_subscripts = uint(subscripts.size());
 
   for (uint i = 0; i < num_subscripts; ++i) {
     int subscript = subscripts[i];
@@ -1295,7 +1295,7 @@ setSubscriptValue(const IntVectorT &subscripts, ClParserValuePtr value)
     if (! indexToData(&subscript))
       return false;
 
-    subscripts1.push_back(subscript);
+    subscripts1.push_back(uint(subscript));
   }
 
   if (num_subscripts == getNumDims()) {
@@ -1333,7 +1333,7 @@ setSubscriptValue(const IntVectorT &subscripts, ClParserValuePtr value)
       return false;
 
     for (uint i = ind1, j = 0; i <= ind2; ++i, ++j)
-      setValue(i, array->getValue(j));
+      setValue(int(i), array->getValue(int(j)));
   }
 
   return true;
@@ -1357,7 +1357,7 @@ getSubArray(int ind) const
 
   ValueArray varray;
 
-  values_.slice(ind, varray);
+  values_.slice(uint(ind), varray);
 
   // TODO: necessary ?
   varray = varray.flattened();
@@ -1378,7 +1378,7 @@ getSubArray(int start, int end) const
 
   ValueArray varray;
 
-  values_.slice(start, end, varray);
+  values_.slice(uint(start), uint(end), varray);
 
   // TODO: necessary ?
   varray = varray.flattened();
@@ -1404,7 +1404,7 @@ getSubValue(int ind) const
 
   ClParserValuePtr value;
 
-  values_.getLinearValue(ind, value);
+  values_.getLinearValue(uint(ind), value);
 
   return value;
 }
@@ -1419,7 +1419,7 @@ setValue(int i, ClParserValuePtr value)
   if (! indexToData(&i))
     return false;
 
-  values_.setLinearValue(i, value);
+  values_.setLinearValue(uint(i), value);
 
   return true;
 }
@@ -1429,7 +1429,7 @@ ClParserArray::
 cmp(const ClParserObj &obj) const
 {
   if (getBaseType() != obj.getBaseType())
-    return CMathGen::sign((long) (getBaseType() - obj.getBaseType()));
+    return CMathGen::sign(long(getBaseType() - obj.getBaseType()));
 
   const ClParserArray &rhs = castObj(obj);
 
@@ -1437,16 +1437,16 @@ cmp(const ClParserObj &obj) const
     return (type_ - rhs.type_);
 
   if (getNumData() != rhs.getNumData())
-    return (getNumData() - rhs.getNumData());
+    return int(getNumData() - rhs.getNumData());
 
   if (getNumDims() != rhs.getNumDims())
-    return (getNumDims() - rhs.getNumDims());
+    return int(getNumDims() - rhs.getNumDims());
 
   uint num_dims1 = getNumDims();
 
   for (uint i = 0; i < num_dims1; ++i)
     if (getDim(i) != rhs.getDim(i))
-      return (getDim(i) - rhs.getDim(i));
+      return int(getDim(i) - rhs.getDim(i));
 
   for (uint i = 0; i < getNumData(); ++i) {
     ClParserValuePtr value1, value2;
@@ -1457,7 +1457,7 @@ cmp(const ClParserObj &obj) const
     long cmp = value1->cmp(value2);
 
     if (cmp != 0)
-      return cmp;
+      return int(cmp);
   }
 
   return 0;
@@ -1599,11 +1599,11 @@ setIndexArray()
 
   if      (type_ == CL_PARSER_VALUE_TYPE_INTEGER) {
     for (uint i = 0; i < num_data; ++i)
-      values_.setLinearValue(i, ClParserValueMgrInst->createValue((long) (i + 1)));
+      values_.setLinearValue(i, ClParserValueMgrInst->createValue(long(i + 1)));
   }
   else if (type_ == CL_PARSER_VALUE_TYPE_REAL) {
     for (uint i = 0; i < num_data; ++i)
-      values_.setLinearValue(i, ClParserValueMgrInst->createValue((double) (i + 1)));
+      values_.setLinearValue(i, ClParserValueMgrInst->createValue(double(i + 1)));
   }
   else if (type_ == CL_PARSER_VALUE_TYPE_STRING) {
     char temp_string[32];
@@ -1611,7 +1611,7 @@ setIndexArray()
     for (uint i = 0; i < num_data; ++i) {
       sprintf(temp_string, "%d", i + 1);
 
-      uint len = strlen(temp_string);
+      uint len = uint(strlen(temp_string));
 
       values_.setLinearValue(i, ClParserValueMgrInst->createValue(temp_string, len));
     }
@@ -2871,10 +2871,10 @@ rindex(const ClParserObj &obj) const
 
   long integer = 0;
 
-  for (int i = (int) getNumData() - 1; i >= 0; ++i) {
+  for (int i = int(getNumData() - 1); i >= 0; ++i) {
     ClParserValuePtr value1;
 
-    values_.getLinearValue(i, value1);
+    values_.getLinearValue(uint(i), value1);
 
     if (value->cmp(value1) == 0)
       integer = i + 1;
@@ -2953,7 +2953,7 @@ internFn(ClParserInternFnPtr internfn, const ClParserValuePtr *values, uint num_
 
           array1->values_.getLinearValue(i, value);
 
-          long flag = (*is_func)(value->getInteger()->getValue());
+          long flag = (*is_func)(int(value->getInteger()->getValue()));
 
           array->values_.setLinearValue(i, ClParserValueMgrInst->createValue(flag));
         }
@@ -2981,7 +2981,7 @@ internFn(ClParserInternFnPtr internfn, const ClParserValuePtr *values, uint num_
       if (! values[2]->integerValue(&integer2))
         return ClParserValuePtr();
 
-      ClParserArrayPtr array = array1->getSubArray(integer1, integer2);
+      auto array = array1->getSubArray(int(integer1), int(integer2));
 
       if (! array.isValid())
         return ClParserValuePtr();
@@ -3211,7 +3211,7 @@ getSubscriptRange(int *i1, int *i2) const
   if (! toIntegers(subscripts))
     return false;
 
-  uint num_subscripts = subscripts.size();
+  uint num_subscripts = uint(subscripts.size());
 
   if (num_subscripts > 0)
     *i1 = subscripts[0];
@@ -3235,7 +3235,7 @@ indexToData(int *ind) const
 
   --(*ind);
 
-  return (*ind >= 0 && *ind < (int) getNumData());
+  return (*ind >= 0 && *ind < int(getNumData()));
 }
 
 bool
@@ -3247,5 +3247,5 @@ indexToData(int *ind, uint dim) const
 
   --(*ind);
 
-  return (*ind >= 0 && *ind < (int) getDim(dim));
+  return (*ind >= 0 && *ind < int(getDim(dim)));
 }

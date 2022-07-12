@@ -43,12 +43,12 @@ class ClLanguageCommand {
   bool isIdent(uint ident) const { return (ident_ == ident); }
 
   bool isIdentNoEnd(uint ident) const {
-    return ((ident_ & (~CL_END_BLOCK_COMMAND)) == ident);
+    return ((ident_ & uint(~CL_END_BLOCK_COMMAND)) == ident);
   }
 
   bool isIdentNoEnd(ClLanguageCommand *command) const {
-    int ident1 = (ident_          & (~CL_END_BLOCK_COMMAND));
-    int ident2 = (command->ident_ & (~CL_END_BLOCK_COMMAND));
+    uint ident1 = (ident_          & uint(~CL_END_BLOCK_COMMAND));
+    uint ident2 = (command->ident_ & uint(~CL_END_BLOCK_COMMAND));
 
     return (ident1 == ident2);
   }

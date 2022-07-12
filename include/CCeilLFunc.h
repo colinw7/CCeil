@@ -70,7 +70,7 @@ class ClLanguageFunc {
  public:
   const std::string &getName() const { return name_; }
 
-  uint getNumArgs() const { return args_.size(); }
+  uint getNumArgs() const { return uint(args_.size()); }
 
   const ClLanguageFuncArg &getArg(uint i) const { return *args_[i]; }
 

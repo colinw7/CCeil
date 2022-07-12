@@ -286,15 +286,16 @@ convertStringMatrixToStringArray(char ***array, uint **dims, uint *num_dims, cha
 
   *dims = new uint [1];
 
-  (*dims)[0] = num_matrix;
+  (*dims)[0] = uint(num_matrix);
 
-  if (num_matrix > 0)
-    *array = new char * [num_matrix];
+  if (num_matrix > 0) {
+    *array = new char * [uint(num_matrix)];
+
+    for (uint i = 0; i < uint(num_matrix); i++)
+      (*array)[i] = strdup(&matrix[i*uint(matrix_size)]);
+  }
   else
     *array = nullptr;
-
-  for (int i = 0; i < num_matrix; i++)
-    (*array)[i] = strdup(&matrix[i*matrix_size]);
 
   return true;
 }
@@ -360,24 +361,25 @@ convertStringArrayToStringMatrix(char **array, uint *dims, uint num_dims, char *
     return false;
   }
 
-  *num_matrix = dims[0];
+  *num_matrix = int(dims[0]);
 
-  if (*num_matrix > 0)
-    *matrix = new char [(*num_matrix)*matrix_size];
+  if (*num_matrix > 0) {
+    *matrix = new char [uint(*num_matrix)*uint(matrix_size)];
+
+    for (uint i = 0; i < uint(*num_matrix); i++) {
+      uint len = uint(strlen(array[i]));
+
+      if (len >= uint(matrix_size))
+        len = uint(matrix_size - 1);
+
+      strncpy(&(*matrix)[i*uint(matrix_size)], array[i], len);
+
+      for (uint j = len; j < uint(matrix_size); j++)
+        (&(*matrix)[i*uint(matrix_size)])[j] = '\0';
+    }
+  }
   else
     *matrix = nullptr;
-
-  for (int i = 0; i < *num_matrix; i++) {
-    int len = strlen(array[i]);
-
-    if (len >= matrix_size)
-      len = matrix_size - 1;
-
-    strncpy(&(*matrix)[i*matrix_size], array[i], len);
-
-    for (int j = len; j < matrix_size; j++)
-      (&(*matrix)[i*matrix_size])[j] = '\0';
-  }
 
   return true;
 }
@@ -435,19 +437,20 @@ convertCharMatrixToStringArray(char ***array, uint **dims, uint *num_dims, char 
 
   *dims = new uint [1];
 
-  (*dims)[0] = num_matrix;
+  (*dims)[0] = uint(num_matrix);
 
-  if (num_matrix > 0)
-    *array = new char * [num_matrix];
+  if (num_matrix > 0) {
+    *array = new char * [uint(num_matrix)];
+
+    for (uint i = 0; i < uint(num_matrix); i++) {
+      (*array)[i] = new char [uint(matrix_size + 1)];
+
+      strncpy((*array)[i], &matrix[i*uint(matrix_size)], uint(matrix_size));
+      (*array)[i][uint(matrix_size)] = '\0';
+    }
+  }
   else
     *array = nullptr;
-
-  for (int i = 0; i < num_matrix; i++) {
-    (*array)[i] = new char [matrix_size + 1];
-
-    strncpy((*array)[i], &matrix[i*matrix_size], matrix_size);
-    (*array)[i][matrix_size] = '\0';
-  }
 
   return true;
 }
@@ -513,24 +516,25 @@ convertStringArrayToCharMatrix(char **array, uint *dims, uint num_dims, char **m
     return false;
   }
 
-  *num_matrix = dims[0];
+  *num_matrix = int(dims[0]);
 
-  if (*num_matrix > 0)
-    *matrix = new char [(*num_matrix)*matrix_size];
+  if (*num_matrix > 0) {
+    *matrix = new char [uint(*num_matrix)*uint(matrix_size)];
+
+    for (uint i = 0; i < uint(*num_matrix); i++) {
+      uint len = uint(strlen(array[i]));
+
+      if (len > uint(matrix_size))
+        len = uint(matrix_size);
+
+      strncpy(&(*matrix)[i*uint(matrix_size)], array[i], len);
+
+      for (uint j = len; j < uint(matrix_size); j++)
+        (*matrix)[i*uint(matrix_size) + j] = ' ';
+    }
+  }
   else
     *matrix = nullptr;
-
-  for (int i = 0; i < *num_matrix; i++) {
-    int len = strlen(array[i]);
-
-    if (len > matrix_size)
-      len = matrix_size;
-
-    strncpy(&(*matrix)[i*matrix_size], array[i], len);
-
-    for (int j = len; j < matrix_size; j++)
-      (*matrix)[i*matrix_size + j] = ' ';
-  }
 
   return true;
 }
@@ -623,7 +627,7 @@ ClLanguageConverter *
 ClLanguageConverterMgr::
 getConverter(const std::string &from_type, const std::string &to_type) const
 {
-  uint num = converter_list_.size();
+  uint num = uint(converter_list_.size());
 
   for (uint i = 0; i < num; ++i) {
     ClLanguageConverter *converter = converter_list_[i];

@@ -14,7 +14,7 @@ class ClParserParser {
    parent_(parent), parse_(parent->parse_.getAt()), assign_(false), error_code_(0) {
   }
 
-  int getPos() const { return parse_.getPos(); }
+  int getPos() const { return int(parse_.getPos()); }
 
   bool isAssign() const { return assign_; }
 

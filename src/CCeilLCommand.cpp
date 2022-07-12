@@ -127,25 +127,25 @@ assign(const ClLanguageCommand &command)
 {
   assert(command.isPosProcedure());
 
-  free((char *) data_);
+  free(data_);
 
   ClLanguageCommand::assign(command);
 
-  data_ = strdup((char *) command.getData());
+  data_ = strdup(reinterpret_cast<char *>(command.getData()));
 }
 
 void
 ClLanguagePosProcCommand::
 term()
 {
-  free((char *) data_);
+  free(data_);
 }
 
 std::string
 ClLanguagePosProcCommand::
 toName() const
 {
-  return std::string((char *) data_);
+  return std::string(reinterpret_cast<char *>(data_));
 }
 
 const std::string &
@@ -233,25 +233,25 @@ void
 ClLanguageExpressionCommand::
 assign(const ClLanguageCommand &command)
 {
-  free((char *) data_);
+  free(data_);
 
   ClLanguageCommand::assign(command);
 
-  data_ = strdup((char *) command.getData());
+  data_ = strdup(reinterpret_cast<char *>(command.getData()));
 }
 
 void
 ClLanguageExpressionCommand::
 term()
 {
-  free((char *) data_);
+  free(data_);
 }
 
 std::string
 ClLanguageExpressionCommand::
 toName() const
 {
-  return std::string((char *) data_);
+  return std::string(reinterpret_cast<char *>(data_));
 }
 
 //----------

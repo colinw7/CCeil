@@ -70,7 +70,7 @@ class ClParserType {
  public:
   const std::string &getName() const { return name_; }
 
-  uint getNumSubTypes() const { return sub_types_.size(); }
+  uint getNumSubTypes() const { return uint(sub_types_.size()); }
 
   ClParserSubType *getSubType(uint i) const { return sub_types_[i]; }
 

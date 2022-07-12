@@ -461,13 +461,13 @@ parse()
   }
 
   if (parent_)
-    parent_->parse_.setPos(parent_->parse_.getPos() + parse_.getPos());
+    parent_->parse_.setPos(int(parent_->parse_.getPos()) + int(parse_.getPos()));
 
   return true;
 
  fail:
   if (parent_)
-    parent_->parse_.setPos(parent_->parse_.getPos() + parse_.getPos());
+    parent_->parse_.setPos(int(parent_->parse_.getPos()) + int(parse_.getPos()));
 
   return false;
 }
@@ -1272,7 +1272,7 @@ readNumericHexValue(ClParserValuePtr &value)
     parse_.skipChar();
   }
 
-  uint len = parse_string.size();
+  uint len = uint(parse_string.size());
 
   /*----------*/
 
@@ -1333,7 +1333,7 @@ readNumericOctValue(ClParserValuePtr &value)
     parse_.skipChar();
   }
 
-  uint len = parse_string.size();
+  uint len = uint(parse_string.size());
 
   /*----------*/
 
@@ -1433,7 +1433,7 @@ readNumericDecValue(ClParserValuePtr &value)
     return false;
   }
 
-  if ((double) integer != real)
+  if (double(integer) != real)
     value = ClParserValueMgrInst->createValue(real);
   else
     value = ClParserValueMgrInst->createValue(integer);
@@ -1516,7 +1516,7 @@ readStringValue(ClParserValuePtr &value)
           }
         }
 
-        parse_string += c;
+        parse_string += char(c);
       }
       else if (parse_.isChar('x')) {
         c = 0;
@@ -1534,7 +1534,7 @@ readStringValue(ClParserValuePtr &value)
           parse_.skipChar();
         }
 
-        parse_string += c;
+        parse_string += char(c);
       }
       else {
         switch (parse_.getCharAt()) {
@@ -1558,7 +1558,7 @@ readStringValue(ClParserValuePtr &value)
           }
         }
 
-        parse_string += c;
+        parse_string += char(c);
 
         parse_.skipChar();
       }

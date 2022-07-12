@@ -153,14 +153,14 @@ ClParserDict::
 ClParserDict(const ClParserValueArray &values) :
  ClParserObj(CL_PARSER_VALUE_TYPE_DICTIONARY)
 {
-  uint num_values = values.size();
+  uint num_values = uint(values.size());
 
   int num_values1 = num_values/2;
 
   for (int i = 0, j = 0; i < num_values1; i++, j += 2) {
-    const ClParserKey &key = valueToKey(values[j]);
+    const ClParserKey &key = valueToKey(values[uint(j)]);
 
-    addValue(key, values[j + 1]);
+    addValue(key, values[uint(j + 1)]);
   }
 }
 
@@ -277,7 +277,7 @@ uint
 ClParserDict::
 numValues() const
 {
-  return key_values_.size();
+  return uint(key_values_.size());
 }
 
 ClParserValuePtr
@@ -338,12 +338,12 @@ ClParserDict::
 cmp(const ClParserObj &obj) const
 {
   if (base_type_ != obj.getBaseType())
-    return CMathGen::sign((long) (base_type_ - obj.getBaseType()));
+    return CMathGen::sign(long(base_type_ - obj.getBaseType()));
 
   const ClParserDict &rhs = castObj(obj);
 
   if (numValues() != rhs.numValues())
-    return (numValues() - rhs.numValues());
+    return int(numValues() - rhs.numValues());
 
   KeyValueList::const_iterator p1b = key_values_.begin();
   KeyValueList::const_iterator p1e = key_values_.end  ();
@@ -1059,13 +1059,13 @@ ClParserValuePtr
 ClParserDict::
 getKeyValue(int ind) const
 {
-  if (ind < 0 || ind >= (int) numValues())
+  if (ind < 0 || ind >= int(numValues()))
     return ClParserValuePtr();
 
   ClParserKey      key;
   ClParserValuePtr value;
 
-  if (! getIndKeyValue(ind, key, value))
+  if (! getIndKeyValue(uint(ind), key, value))
     return ClParserValuePtr();
 
   ClParserValuePtr key_value = key.getAsValue();
@@ -1108,12 +1108,12 @@ ClParserKey(const ClParserKey &key) :
  type_(key.type_)
 {
   if (type_ == CL_PARSER_VALUE_TYPE_STRING) {
-    ClParserStringKeyValue *svalue = (ClParserStringKeyValue *) key.value_;
+    auto *svalue = reinterpret_cast<ClParserStringKeyValue *>(key.value_);
 
     value_ = new ClParserStringKeyValue(*svalue);
   }
   else {
-    ClParserIntegerKeyValue *ivalue = (ClParserIntegerKeyValue *) key.value_;
+    auto *ivalue = reinterpret_cast<ClParserIntegerKeyValue *>(key.value_);
 
     value_ = new ClParserIntegerKeyValue(*ivalue);
   }
@@ -1131,14 +1131,14 @@ operator=(const ClParserKey &key)
 {
   if (type_ == key.type_) {
     if (type_ == CL_PARSER_VALUE_TYPE_STRING) {
-      ClParserStringKeyValue *lvalue = (ClParserStringKeyValue *) value_;
-      ClParserStringKeyValue *rvalue = (ClParserStringKeyValue *) key.value_;
+      auto *lvalue = reinterpret_cast<ClParserStringKeyValue *>(value_);
+      auto *rvalue = reinterpret_cast<ClParserStringKeyValue *>(key.value_);
 
       *lvalue = *rvalue;
     }
     else {
-      ClParserIntegerKeyValue *lvalue = (ClParserIntegerKeyValue *) value_;
-      ClParserIntegerKeyValue *rvalue = (ClParserIntegerKeyValue *) key.value_;
+      auto *lvalue = reinterpret_cast<ClParserIntegerKeyValue *>(value_);
+      auto *rvalue = reinterpret_cast<ClParserIntegerKeyValue *>(key.value_);
 
       *lvalue = *rvalue;
     }
@@ -1149,12 +1149,12 @@ operator=(const ClParserKey &key)
     type_ = key.type_;
 
     if (type_ == CL_PARSER_VALUE_TYPE_STRING) {
-      ClParserStringKeyValue *svalue = (ClParserStringKeyValue *) key.value_;
+      auto *svalue = reinterpret_cast<ClParserStringKeyValue *>(key.value_);
 
       value_ = new ClParserStringKeyValue(*svalue);
     }
     else {
-      ClParserIntegerKeyValue *ivalue = (ClParserIntegerKeyValue *) key.value_;
+      auto *ivalue = reinterpret_cast<ClParserIntegerKeyValue *>(key.value_);
 
       value_ = new ClParserIntegerKeyValue(*ivalue);
     }
@@ -1170,14 +1170,14 @@ operator==(const ClParserKey &key) const
   if (type_ != key.type_) return false;
 
   if (type_ == CL_PARSER_VALUE_TYPE_STRING) {
-    ClParserStringKeyValue *lvalue = (ClParserStringKeyValue *) value_;
-    ClParserStringKeyValue *rvalue = (ClParserStringKeyValue *) key.value_;
+    auto *lvalue = reinterpret_cast<ClParserStringKeyValue *>(value_);
+    auto *rvalue = reinterpret_cast<ClParserStringKeyValue *>(key.value_);
 
     return (*lvalue == *rvalue);
   }
   else {
-    ClParserIntegerKeyValue *lvalue = (ClParserIntegerKeyValue *) value_;
-    ClParserIntegerKeyValue *rvalue = (ClParserIntegerKeyValue *) key.value_;
+    auto *lvalue = reinterpret_cast<ClParserIntegerKeyValue *>(value_);
+    auto *rvalue = reinterpret_cast<ClParserIntegerKeyValue *>(key.value_);
 
     return (*lvalue == *rvalue);
   }

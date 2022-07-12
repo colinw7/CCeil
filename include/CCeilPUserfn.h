@@ -104,7 +104,7 @@ class ClParserUserFn {
 
   const std::string &getName() const { return name_; }
 
-  uint getNumArgTypes() const { return arg_types_.size(); }
+  uint getNumArgTypes() const { return uint(arg_types_.size()); }
 
   int getArgType(uint i) const { return arg_types_[i]; }
 
