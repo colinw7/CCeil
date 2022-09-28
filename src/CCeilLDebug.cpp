@@ -1,5 +1,7 @@
 #include <CCeilL.h>
 
+static bool s_debug;
+
 /*------------------------------------------------------------------*
  *
  * setDebug
@@ -30,10 +32,10 @@ void
 ClLanguageDebug::
 setDebug(bool flag)
 {
+  s_debug = flag;
+
 #ifdef CL_LANGUAGE_DEBUG
   trace_mgr_.setActive(flag);
-#else
-  assert(&flag);
 #endif
 }
 

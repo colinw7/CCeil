@@ -254,7 +254,7 @@ parse()
         goto fail;
       }
 
-      assign_ = parser1.isAssign() | parser2.isAssign();
+      assign_ = parser1.isAssign() || parser2.isAssign();
 
       expression = true;
     }

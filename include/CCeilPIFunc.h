@@ -101,9 +101,9 @@ struct ClParserInternFnData {
 
   ClParserInternFnData() = default;
 
-  ClParserInternFnData(CLParserInternFnType type, const std::string &name,
-                       uint numArgs, ClParserArg *args, bool composite=false) :
-   type(type), name(name), numArgs(numArgs), args(args), composite(composite) {
+  ClParserInternFnData(CLParserInternFnType type1, const std::string &name1,
+                       uint numArgs1, ClParserArg *args1, bool composite1=false) :
+   type(type1), name(name1), numArgs(numArgs1), args(args1), composite(composite1) {
   }
 };
 

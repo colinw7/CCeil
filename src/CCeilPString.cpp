@@ -285,7 +285,7 @@ roll(int num, std::string &text) const
     return;
 
   if (num > 0) {
-    num %= text.size();
+    num %= int(text.size());
 
     for ( ; num > 0; --num) {
       char c = text[0];
@@ -296,7 +296,7 @@ roll(int num, std::string &text) const
   else {
     num = -num;
 
-    num %= text.size();
+    num %= int(text.size());
 
     for ( ; num > 0; --num) {
       char c = text[text.size() - 1];
