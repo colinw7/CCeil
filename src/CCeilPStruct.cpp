@@ -441,7 +441,7 @@ process(const ClParserStruct &lstructure, const ClParserObj &robj) const
 // Binary Ops
 
 struct Plus : public ClParserStruct::BinaryFunc {
-  void exec(ClParserValuePtr lhs, ClParserValuePtr rhs) const {
+  void exec(ClParserValuePtr lhs, ClParserValuePtr rhs) const override {
     lhs->plus(rhs);
   }
 };
@@ -454,7 +454,7 @@ plus(const ClParserObj &obj) const
 }
 
 struct Minus : public ClParserStruct::BinaryFunc {
-  void exec(ClParserValuePtr lhs, ClParserValuePtr rhs) const {
+  void exec(ClParserValuePtr lhs, ClParserValuePtr rhs) const override {
     lhs->minus(rhs);
   }
 };
@@ -467,7 +467,7 @@ minus(const ClParserObj &obj) const
 }
 
 struct Times : public ClParserStruct::BinaryFunc {
-  void exec(ClParserValuePtr lhs, ClParserValuePtr rhs) const {
+  void exec(ClParserValuePtr lhs, ClParserValuePtr rhs) const override {
     lhs->times(rhs);
   }
 };
@@ -480,7 +480,7 @@ times(const ClParserObj &obj) const
 }
 
 struct Divide : public ClParserStruct::BinaryFunc {
-  void exec(ClParserValuePtr lhs, ClParserValuePtr rhs) const {
+  void exec(ClParserValuePtr lhs, ClParserValuePtr rhs) const override {
     lhs->divide(rhs);
   }
 };
@@ -493,7 +493,7 @@ divide(const ClParserObj &obj) const
 }
 
 struct Modulus : public ClParserStruct::BinaryFunc {
-  void exec(ClParserValuePtr lhs, ClParserValuePtr rhs) const {
+  void exec(ClParserValuePtr lhs, ClParserValuePtr rhs) const override {
     lhs->modulus(rhs);
   }
 };
@@ -506,7 +506,7 @@ modulus(const ClParserObj &obj) const
 }
 
 struct Power : public ClParserStruct::BinaryFunc {
-  void exec(ClParserValuePtr lhs, ClParserValuePtr rhs) const {
+  void exec(ClParserValuePtr lhs, ClParserValuePtr rhs) const override {
     lhs->power(rhs);
   }
 };
@@ -519,7 +519,7 @@ power(const ClParserObj &obj) const
 }
 
 struct ApproxEqual : public ClParserStruct::BinaryFunc {
-  void exec(ClParserValuePtr lhs, ClParserValuePtr rhs) const {
+  void exec(ClParserValuePtr lhs, ClParserValuePtr rhs) const override {
     lhs->approxEqual(rhs);
   }
 };
@@ -532,7 +532,7 @@ approxEqual(const ClParserObj &obj) const
 }
 
 struct BitAnd : public ClParserStruct::BinaryFunc {
-  void exec(ClParserValuePtr lhs, ClParserValuePtr rhs) const {
+  void exec(ClParserValuePtr lhs, ClParserValuePtr rhs) const override {
     lhs->bitAnd(rhs);
   }
 };
@@ -545,7 +545,7 @@ bitAnd(const ClParserObj &obj) const
 }
 
 struct BitOr : public ClParserStruct::BinaryFunc {
-  void exec(ClParserValuePtr lhs, ClParserValuePtr rhs) const {
+  void exec(ClParserValuePtr lhs, ClParserValuePtr rhs) const override {
     lhs->bitOr(rhs);
   }
 };
@@ -558,7 +558,7 @@ bitOr(const ClParserObj &obj) const
 }
 
 struct BitXor : public ClParserStruct::BinaryFunc {
-  void exec(ClParserValuePtr lhs, ClParserValuePtr rhs) const {
+  void exec(ClParserValuePtr lhs, ClParserValuePtr rhs) const override {
     lhs->bitXor(rhs);
   }
 };
@@ -571,7 +571,7 @@ bitXor(const ClParserObj &obj) const
 }
 
 struct BitLShift : public ClParserStruct::BinaryFunc {
-  void exec(ClParserValuePtr lhs, ClParserValuePtr rhs) const {
+  void exec(ClParserValuePtr lhs, ClParserValuePtr rhs) const override {
     lhs->bitLShift(rhs);
   }
 };
@@ -584,7 +584,7 @@ bitLShift(const ClParserObj &obj) const
 }
 
 struct BitRShift : public ClParserStruct::BinaryFunc {
-  void exec(ClParserValuePtr lhs, ClParserValuePtr rhs) const {
+  void exec(ClParserValuePtr lhs, ClParserValuePtr rhs) const override {
     lhs->bitRShift(rhs);
   }
 };

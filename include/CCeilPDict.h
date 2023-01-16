@@ -33,11 +33,11 @@ struct ClParserIntegerKeyValue : public ClParserKeyValueBase {
     return (integer == value.integer);
   }
 
-  std::string toString() const {
+  std::string toString() const override {
     return CStrUtil::toString(integer);
   }
 
-  ClParserValuePtr toValue() const {
+  ClParserValuePtr toValue() const override {
     return ClParserValueMgrInst->createValue(integer);
   }
 };
@@ -63,11 +63,11 @@ struct ClParserStringKeyValue : public ClParserKeyValueBase {
     return (str == value.str);
   }
 
-  std::string toString() const {
+  std::string toString() const override {
     return str;
   }
 
-  ClParserValuePtr toValue() const {
+  ClParserValuePtr toValue() const override {
     return ClParserValueMgrInst->createValue(str);
   }
 };
