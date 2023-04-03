@@ -1658,8 +1658,8 @@ readIdentifier(ClParserIdentifierPtr &identifier)
 
   identifier = ClParserIdentifierMgrInst->createIdentifier(idstr);
 
-  StringVectorT::const_iterator p1 = scopes.begin();
-  StringVectorT::const_iterator p2 = scopes.end  ();
+  auto p1 = scopes.begin();
+  auto p2 = scopes.end  ();
 
   for ( ; p1 != p2; ++p1)
     identifier->addScope(*p1);

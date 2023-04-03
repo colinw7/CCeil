@@ -72,8 +72,8 @@ exec(ClParserValuePtr &value)
   if (stack_.isValid()) {
     ClParserStackMgrInst->startTempStack();
 
-    ClParserStack::StackNodeList::const_iterator p1 = stack_->stackNodeListBegin();
-    ClParserStack::StackNodeList::const_iterator p2 = stack_->stackNodeListEnd();
+    auto p1 = stack_->stackNodeListBegin();
+    auto p2 = stack_->stackNodeListEnd();
 
     for ( ; p1 != p2; ++p1)
       (*p1)->stack();

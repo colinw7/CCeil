@@ -196,7 +196,7 @@ class ClParser {
 #ifdef CL_PARSER_DEBUG
   FILE *setDebugFile(FILE *fp) { return trace_mgr_.setOutput(fp); }
 #else
-  FILE *setDebugFile(FILE *) { return 0; }
+  FILE *setDebugFile(FILE *) { return nullptr; }
 #endif
 
   bool isDebug() const {

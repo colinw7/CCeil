@@ -1411,8 +1411,8 @@ toSubValues(ClParserValueArray &values) const
       values.push_back((*data_.dict)->getKeyValue(int(i)));
   }
   else if (type_ == CL_PARSER_VALUE_TYPE_STRUCTURE) {
-    ClParserStruct::ValueMap::const_iterator p1 = (*data_.structure)->getValuesBegin();
-    ClParserStruct::ValueMap::const_iterator p2 = (*data_.structure)->getValuesEnd  ();
+    auto p1 = (*data_.structure)->getValuesBegin();
+    auto p2 = (*data_.structure)->getValuesEnd  ();
 
     for (uint i = 0; p1 != p2; ++p1, ++i)
       values.push_back(p1->second);

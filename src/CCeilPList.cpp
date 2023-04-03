@@ -141,8 +141,8 @@ ClParserList::
 addListValues(const ClParserList &list)
 {
   if (this != &list) {
-    ClParserValueList::const_iterator p1 = list.values_.begin();
-    ClParserValueList::const_iterator p2 = list.values_.end  ();
+    auto p1 = list.values_.begin();
+    auto p2 = list.values_.end  ();
 
     for ( ; p1 != p2; ++p1)
       addValue(*p1);
@@ -150,8 +150,8 @@ addListValues(const ClParserList &list)
   else {
     ClParserValueList values = list.values_;
 
-    ClParserValueList::const_iterator p1 = values.begin();
-    ClParserValueList::const_iterator p2 = values.end  ();
+    auto p1 = values.begin();
+    auto p2 = values.end  ();
 
     for ( ; p1 != p2; ++p1)
       addValue(*p1);
@@ -269,8 +269,8 @@ countValues(ClParserValuePtr value) const
 {
   uint count = 0;
 
-  ClParserValueList::const_iterator p1 = values_.begin();
-  ClParserValueList::const_iterator p2 = values_.end  ();
+  auto p1 = values_.begin();
+  auto p2 = values_.end  ();
 
   for ( ; p1 != p2; ++p1)
     if ((*p1)->cmp(value) == 0)
@@ -309,8 +309,8 @@ getMaxValue() const
 {
   ClParserValuePtr value;
 
-  ClParserValueList::const_iterator p1 = values_.begin();
-  ClParserValueList::const_iterator p2 = values_.end  ();
+  auto p1 = values_.begin();
+  auto p2 = values_.end  ();
 
   for ( ; p1 != p2; ++p1)
     if (! value.isValid() || (*p1)->cmp(value) > 0)
@@ -325,8 +325,8 @@ getMinValue() const
 {
   ClParserValuePtr value;
 
-  ClParserValueList::const_iterator p1 = values_.begin();
-  ClParserValueList::const_iterator p2 = values_.end  ();
+  auto p1 = values_.begin();
+  auto p2 = values_.end  ();
 
   for ( ; p1 != p2; ++p1)
     if (! value.isValid() || (*p1)->cmp(value) < 0)
@@ -341,8 +341,8 @@ std::string
 ClParserList::
 asString() const
 {
-  ClParserValueList::const_iterator p1 = values_.begin();
-  ClParserValueList::const_iterator p2 = values_.end  ();
+  auto p1 = values_.begin();
+  auto p2 = values_.end  ();
 
   std::string str = "{";
 
@@ -443,8 +443,8 @@ unaryPlus() const
 {
   ClParserListPtr list = createList();
 
-  ClParserValueList::const_iterator p1 = values_.begin();
-  ClParserValueList::const_iterator p2 = values_.end  ();
+  auto p1 = values_.begin();
+  auto p2 = values_.end  ();
 
   for ( ; p1 != p2; ++p1)
     list->addValue((*p1)->unaryPlus());
@@ -458,8 +458,8 @@ unaryMinus() const
 {
   ClParserListPtr list = createList();
 
-  ClParserValueList::const_iterator p1 = values_.begin();
-  ClParserValueList::const_iterator p2 = values_.end  ();
+  auto p1 = values_.begin();
+  auto p2 = values_.end  ();
 
   for ( ; p1 != p2; ++p1)
     list->addValue((*p1)->unaryMinus());
@@ -473,8 +473,8 @@ bitNot() const
 {
   ClParserListPtr list = createList();
 
-  ClParserValueList::const_iterator p1 = values_.begin();
-  ClParserValueList::const_iterator p2 = values_.end  ();
+  auto p1 = values_.begin();
+  auto p2 = values_.end  ();
 
   for ( ; p1 != p2; ++p1)
     list->addValue((*p1)->bitNot());
@@ -947,8 +947,8 @@ sum() const
 {
   ClParserValuePtr value;
 
-  ClParserValueList::const_iterator p1 = values_.begin();
-  ClParserValueList::const_iterator p2 = values_.end  ();
+  auto p1 = values_.begin();
+  auto p2 = values_.end  ();
 
   for ( ; p1 != p2; ++p1) {
     if (! value.isValid())

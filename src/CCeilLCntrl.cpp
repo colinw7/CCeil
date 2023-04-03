@@ -2458,7 +2458,7 @@ getCommandDef(ClParserScopePtr scope, const std::string &name, bool *is_end_name
 
   std::string key = scopeName + name;
 
-  CommandDefMap::const_iterator p = command_def_list1_.find(key);
+  auto p = command_def_list1_.find(key);
 
   if (p != command_def_list1_.end())
     return (*p).second;
@@ -2478,8 +2478,8 @@ void
 ClLanguageMgr::
 deleteCommandDefs()
 {
-  CommandDefMap::const_iterator p1 = command_def_list1_.begin();
-  CommandDefMap::const_iterator p2 = command_def_list1_.end  ();
+  auto p1 = command_def_list1_.begin();
+  auto p2 = command_def_list1_.end  ();
 
   for ( ; p1 != p2; ++p1)
     delete (*p1).second;

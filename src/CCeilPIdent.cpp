@@ -29,8 +29,8 @@ getScope() const
 {
   ClParserScopePtr scope;
 
-  ScopeList::const_iterator ps1 = scopes_.begin();
-  ScopeList::const_iterator ps2 = scopes_.end  ();
+  auto ps1 = scopes_.begin();
+  auto ps2 = scopes_.end  ();
 
   for ( ; ps1 != ps2; ++ps1) {
     if (scope.isValid())

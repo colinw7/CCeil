@@ -4,7 +4,7 @@ ClParserScopePtr
 ClParserScopeMgr::
 getScope(const std::string &name)
 {
-  ScopeMap::const_iterator p = scope_map_.find(name);
+  auto p = scope_map_.find(name);
 
   if (p != scope_map_.end())
     return (*p).second;

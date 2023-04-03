@@ -222,7 +222,7 @@ getType(const std::string &name) const
   else if (name == "str")
     return getStringType();
 
-  TypeMap::const_iterator p = type_map_->find(name);
+  auto p = type_map_->find(name);
 
   if (p != type_map_->end())
     return (*p).second;
@@ -232,7 +232,7 @@ getType(const std::string &name) const
   for (int i = int(num); i >= 1; i--) {
     TypeMap *type_map = type_map_list_[uint(i - 1)];
 
-    TypeMap::const_iterator pt = type_map->find(name);
+    auto pt = type_map->find(name);
 
     if (pt != type_map->end())
       return (*pt).second;
@@ -278,8 +278,8 @@ void
 ClParserTypeMgr::
 printAllTypes() const
 {
-  TypeMap::const_iterator p1 = type_map_->begin();
-  TypeMap::const_iterator p2 = type_map_->end  ();
+  auto p1 = type_map_->begin();
+  auto p2 = type_map_->end  ();
 
   for ( ; p1 != p2; ++p1)
     (*p1).second->print();
@@ -291,8 +291,8 @@ printAllTypes() const
 
     ClParserInst->output("\n");
 
-    TypeMap::const_iterator pt1 = type_map->begin();
-    TypeMap::const_iterator pt2 = type_map->end  ();
+    auto pt1 = type_map->begin();
+    auto pt2 = type_map->end  ();
 
     for ( ; pt1 != pt2; ++pt1)
       (*pt1).second->print();

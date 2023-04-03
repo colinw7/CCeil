@@ -108,8 +108,8 @@ createFunc(const std::string &function_string, const std::string &expression_str
 
   ClParserStackPtr stack = func->getStack();
 
-  ClParserStack::StackNodeList::const_iterator p1 = stack->stackNodeListBegin();
-  ClParserStack::StackNodeList::const_iterator p2 = stack->stackNodeListEnd();
+  auto p1 = stack->stackNodeListBegin();
+  auto p2 = stack->stackNodeListEnd();
 
   for ( ; p1 != p2; ++p1)
     markFunctionArgs(func, *p1);
@@ -250,7 +250,7 @@ ClParserFuncPtr
 ClParserFuncMgr::
 getFunction(const std::string &name) const
 {
-  FuncMap::const_iterator p = function_list_.find(name);
+  auto p = function_list_.find(name);
 
   if (p == function_list_.end())
     return ClParserFuncPtr();
@@ -262,7 +262,7 @@ void
 ClParserFuncMgr::
 removeFunction(const std::string &name)
 {
-  FuncMap::const_iterator p = function_list_.find(name);
+  auto p = function_list_.find(name);
 
   if (p == function_list_.end())
     return;
@@ -281,8 +281,8 @@ void
 ClParserFuncMgr::
 printAllFunctions() const
 {
-  FuncMap::const_iterator p1 = function_list_.begin();
-  FuncMap::const_iterator p2 = function_list_.end  ();
+  auto p1 = function_list_.begin();
+  auto p2 = function_list_.end  ();
 
   for ( ; p1 != p2; ++p1)
     (*p1).second->print();

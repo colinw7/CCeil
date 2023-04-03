@@ -1770,8 +1770,8 @@ unstackFunction(int *error_code)
   function_value.function = function;
   function_value.values   = values;
 
-  ClParserStack::StackNodeList::const_iterator p1 = function->getStack()->stackNodeListBegin();
-  ClParserStack::StackNodeList::const_iterator p2 = function->getStack()->stackNodeListEnd  ();
+  auto p1 = function->getStack()->stackNodeListBegin();
+  auto p2 = function->getStack()->stackNodeListEnd  ();
 
   for ( ; p1 != p2; ++p1)
     stackFunctionStackNode(*p1, &function_value);
@@ -2669,8 +2669,8 @@ setLastOperator()
 {
   last_operator_ = ClParserOperatorPtr();
 
-  StackNodeList::const_iterator p1 = stack_node_list_.begin();
-  StackNodeList::const_iterator p2 = stack_node_list_.end  ();
+  auto p1 = stack_node_list_.begin();
+  auto p2 = stack_node_list_.end  ();
 
   for ( ; p1 != p2; ++p1) {
     if (current_stack_node_ == p1)
@@ -2793,8 +2793,8 @@ void
 ClParserStack::
 print() const
 {
-  StackNodeList::const_iterator p1 = stack_node_list_.begin();
-  StackNodeList::const_iterator p2 = stack_node_list_.end  ();
+  auto p1 = stack_node_list_.begin();
+  auto p2 = stack_node_list_.end  ();
 
   for ( ; p1 != p2; ++p1)
     (*p1)->print();
@@ -2804,8 +2804,8 @@ void
 ClParserStack::
 print(std::ostream &os) const
 {
-  StackNodeList::const_iterator p1 = stack_node_list_.begin();
-  StackNodeList::const_iterator p2 = stack_node_list_.end  ();
+  auto p1 = stack_node_list_.begin();
+  auto p2 = stack_node_list_.end  ();
 
   for ( ; p1 != p2; ++p1)
     (*p1)->print(os);
@@ -2820,8 +2820,8 @@ debugPrintCurrent() const
 {
   fprintf(stderr, "Stack      : >");
 
-  StackNodeList::const_iterator p1 = stack_node_list_.begin();
-  StackNodeList::const_iterator p2 = stack_node_list_.end  ();
+  auto p1 = stack_node_list_.begin();
+  auto p2 = stack_node_list_.end  ();
 
   std::string marker = "\u00ab";
   //std::string marker = "#";
@@ -2845,8 +2845,8 @@ void
 ClParserStack::
 debugPrint() const
 {
-  StackNodeList::const_iterator p1 = stack_node_list_.begin();
-  StackNodeList::const_iterator p2 = stack_node_list_.end  ();
+  auto p1 = stack_node_list_.begin();
+  auto p2 = stack_node_list_.end  ();
 
   for ( ; p1 != p2; ++p1)
     (*p1)->debugPrint();
@@ -3039,8 +3039,8 @@ getVariables(char ***variables, uint *num_variables)
 
   StringVectorT variable_list;
 
-  StackNodeList::const_iterator p1 = stack_node_list_.begin();
-  StackNodeList::const_iterator p2 = stack_node_list_.end  ();
+  auto p1 = stack_node_list_.begin();
+  auto p2 = stack_node_list_.end  ();
 
   for ( ; p1 != p2; ++p1) {
     ClParserStackNode *stack_node = *p1;

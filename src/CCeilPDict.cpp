@@ -62,7 +62,7 @@ const ClParserKey &
 ClParserDictMgr::
 integerToKey(long integer)
 {
-  IntegerKeyMap::const_iterator p = integer_key_map_.find(integer);
+  auto p = integer_key_map_.find(integer);
 
   if (p != integer_key_map_.end())
     return (*p).second;
@@ -78,7 +78,7 @@ const ClParserKey &
 ClParserDictMgr::
 stringToKey(const std::string &str)
 {
-  StringKeyMap::const_iterator p = string_key_map_.find(str);
+  auto p = string_key_map_.find(str);
 
   if (p != string_key_map_.end())
     return (*p).second;
@@ -168,8 +168,8 @@ ClParserDict::
 ClParserDict(const ClParserDict &dict) :
  ClParserObj(CL_PARSER_VALUE_TYPE_DICTIONARY)
 {
-  KeyValueList::const_iterator p1 = dict.key_values_.begin();
-  KeyValueList::const_iterator p2 = dict.key_values_.end  ();
+  auto p1 = dict.key_values_.begin();
+  auto p2 = dict.key_values_.end  ();
 
   for ( ; p1 != p2; ++p1)
     addValue((*p1).key, (*p1).value);
@@ -235,8 +235,8 @@ void
 ClParserDict::
 addValues(const ClParserDict &dict)
 {
-  KeyValueList::const_iterator p1 = dict.key_values_.begin();
-  KeyValueList::const_iterator p2 = dict.key_values_.end  ();
+  auto p1 = dict.key_values_.begin();
+  auto p2 = dict.key_values_.end  ();
 
   for ( ; p1 != p2; ++p1)
     addValue((*p1).key, (*p1).value);
@@ -284,8 +284,8 @@ ClParserValuePtr
 ClParserDict::
 getKeyValue(const ClParserKey &key) const
 {
-  KeyValueList::const_iterator p1 = key_values_.begin();
-  KeyValueList::const_iterator p2 = key_values_.end  ();
+  auto p1 = key_values_.begin();
+  auto p2 = key_values_.end  ();
 
   for ( ; p1 != p2; ++p1)
     if ((*p1).key == key)
@@ -301,8 +301,8 @@ getIndValue(uint ind) const
   if (ind >= key_values_.size())
     return ClParserValuePtr();
 
-  KeyValueList::const_iterator p1 = key_values_.begin();
-  KeyValueList::const_iterator p2 = key_values_.end  ();
+  auto p1 = key_values_.begin();
+  auto p2 = key_values_.end  ();
 
   for (uint i = 0; p1 != p2; ++p1, ++i)
     if (i == ind)
@@ -318,8 +318,8 @@ getIndKeyValue(uint ind, ClParserKey &key, ClParserValuePtr &value) const
   if (ind >= key_values_.size())
     return false;
 
-  KeyValueList::const_iterator p1 = key_values_.begin();
-  KeyValueList::const_iterator p2 = key_values_.end  ();
+  auto p1 = key_values_.begin();
+  auto p2 = key_values_.end  ();
 
   for (uint i = 0; p1 != p2; ++p1, ++i) {
     if (i == ind) {
@@ -345,12 +345,12 @@ cmp(const ClParserObj &obj) const
   if (numValues() != rhs.numValues())
     return int(numValues() - rhs.numValues());
 
-  KeyValueList::const_iterator p1b = key_values_.begin();
-  KeyValueList::const_iterator p1e = key_values_.end  ();
+  auto p1b = key_values_.begin();
+  auto p1e = key_values_.end  ();
 
   for ( ; p1b != p1e; ++p1b) {
-    KeyValueList::const_iterator p2b = rhs.key_values_.begin();
-    KeyValueList::const_iterator p2e = rhs.key_values_.end  ();
+    auto p2b = rhs.key_values_.begin();
+    auto p2e = rhs.key_values_.end  ();
 
     for ( ; p2b != p2e; ++p2b)
       if ((*p1b).key == (*p2b).key)
@@ -374,8 +374,8 @@ countKeys(const ClParserKey &key) const
 {
   uint count = 0;
 
-  KeyValueList::const_iterator p1 = key_values_.begin();
-  KeyValueList::const_iterator p2 = key_values_.end  ();
+  auto p1 = key_values_.begin();
+  auto p2 = key_values_.end  ();
 
   for ( ; p1 != p2; ++p1)
     if ((*p1).key == key)
@@ -390,8 +390,8 @@ getMaxValue() const
 {
   ClParserValuePtr value;
 
-  KeyValueList::const_iterator p1 = key_values_.begin();
-  KeyValueList::const_iterator p2 = key_values_.end  ();
+  auto p1 = key_values_.begin();
+  auto p2 = key_values_.end  ();
 
   for ( ; p1 != p2; ++p1)
     if (! value.isValid() || (*p1).value->cmp(value) > 0)
@@ -406,8 +406,8 @@ getMinValue() const
 {
   ClParserValuePtr value;
 
-  KeyValueList::const_iterator p1 = key_values_.begin();
-  KeyValueList::const_iterator p2 = key_values_.end  ();
+  auto p1 = key_values_.begin();
+  auto p2 = key_values_.end  ();
 
   for ( ; p1 != p2; ++p1)
     if (! value.isValid() || (*p1).value->cmp(value) < 0)
@@ -450,8 +450,8 @@ std::string
 ClParserDict::
 asString() const
 {
-  KeyValueList::const_iterator p1 = key_values_.begin();
-  KeyValueList::const_iterator p2 = key_values_.end  ();
+  auto p1 = key_values_.begin();
+  auto p2 = key_values_.end  ();
 
   std::string str = "{{";
 

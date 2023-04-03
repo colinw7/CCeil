@@ -2903,8 +2903,8 @@ sort(ClParserSortDirection direction) const
 
   values.sort(ClParserValueCmp(direction));
 
-  std::list<ClParserValuePtr>::const_iterator p1 = values.begin();
-  std::list<ClParserValuePtr>::const_iterator p2 = values.end  ();
+  auto p1 = values.begin();
+  auto p2 = values.end  ();
 
   for (uint i = 0; p1 != p2; ++p1, ++i)
     array->values_.setLinearValue(i, *p1);

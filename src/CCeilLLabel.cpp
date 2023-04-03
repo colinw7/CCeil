@@ -32,8 +32,8 @@ void
 ClLanguageLabelDataMgr::
 clearCurrentLabelDatas()
 {
-  LabelDataMap::const_iterator p1 = current_label_list_.begin();
-  LabelDataMap::const_iterator p2 = current_label_list_.end  ();
+  auto p1 = current_label_list_.begin();
+  auto p2 = current_label_list_.end  ();
 
   for ( ; p1 != p2; ++p1)
     delete (*p1).second;
@@ -47,7 +47,7 @@ getCurrentLabelData(const std::string &name) const
 {
   ClLanguageLabelData *label_data = nullptr;
 
-  LabelDataMap::const_iterator p = current_label_list_.find(name);
+  auto p = current_label_list_.find(name);
 
   if (p != current_label_list_.end())
     label_data = (*p).second;

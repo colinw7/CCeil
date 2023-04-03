@@ -21,14 +21,14 @@ createUserFn(const ClUserFnData &data)
   int        type;
   IntVectorT arg_types;
 
-  if (data.types != 0)
+  if (data.types != nullptr)
     stringToTypes(data.types, &type, arg_types);
   else
     type = 0;
 
   auto userfn = createUserFn(data.name, uint(type), arg_types, data.proc, data.data);
 
-  if (data.num != 0)
+  if (data.num != nullptr)
     *data.num = int(userfn->getInd());
 
   return userfn;
@@ -84,7 +84,7 @@ bool
 ClParserUserFnMgr::
 isUserFn(const std::string &name) const
 {
-  UserFnMap::const_iterator p = user_function_map_.find(name);
+  auto p = user_function_map_.find(name);
 
   return (p != user_function_map_.end());
 }
@@ -93,7 +93,7 @@ ClParserUserFnPtr
 ClParserUserFnMgr::
 getUserFn(const std::string &name) const
 {
-  UserFnMap::const_iterator p = user_function_map_.find(name);
+  auto p = user_function_map_.find(name);
 
   if (p == user_function_map_.end())
     return ClParserUserFnPtr();
@@ -729,8 +729,8 @@ term()
   free_array_strings_.clear();
   free_array_string_dims_.clear();
 
-  execUserFn_ = 0;
+  execUserFn_ = nullptr;
 
-  values_     = 0;
+  values_     = nullptr;
   num_values_ = 0;
 }

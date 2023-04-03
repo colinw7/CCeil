@@ -22,7 +22,7 @@ ClParserInternFnPtr
 ClParserInternFnMgr::
 getInternFn(const std::string &name) const
 {
-  InternFnMap::const_iterator p = internfn_map_.find(name);
+  auto p = internfn_map_.find(name);
 
   if (p != internfn_map_.end())
     return (*p).second;

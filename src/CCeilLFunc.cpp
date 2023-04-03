@@ -36,7 +36,7 @@ lookupFunc(const std::string &name) const
 {
   ClLanguageFunc *function = nullptr;
 
-  FuncMap::const_iterator p = function_map_.find(name);
+  auto p = function_map_.find(name);
 
   if (p != function_map_.end())
     function = (*p).second;
@@ -48,8 +48,8 @@ void
 ClLanguageFuncMgr::
 printFuncs() const
 {
-  FuncMap::const_iterator p1 = function_map_.begin();
-  FuncMap::const_iterator p2 = function_map_.end  ();
+  auto p1 = function_map_.begin();
+  auto p2 = function_map_.end  ();
 
   for ( ; p1 != p2; ++p1)
     (*p1).second->print();
@@ -59,8 +59,8 @@ void
 ClLanguageFuncMgr::
 deleteFuncs()
 {
-  FuncMap::const_iterator p1 = function_map_.begin();
-  FuncMap::const_iterator p2 = function_map_.end  ();
+  auto p1 = function_map_.begin();
+  auto p2 = function_map_.end  ();
 
   for ( ; p1 != p2; ++p1)
     delete (*p1).second;

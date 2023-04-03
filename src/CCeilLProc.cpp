@@ -36,7 +36,7 @@ lookupProc(const std::string &name) const
 {
   ClLanguageProc *procedure = nullptr;
 
-  ProcMap::const_iterator p = proc_map_.find(name);
+  auto p = proc_map_.find(name);
 
   if (p != proc_map_.end())
     procedure = (*p).second;
@@ -48,8 +48,8 @@ void
 ClLanguageProcMgr::
 printProcs() const
 {
-  ProcMap::const_iterator p1 = proc_map_.begin();
-  ProcMap::const_iterator p2 = proc_map_.end  ();
+  auto p1 = proc_map_.begin();
+  auto p2 = proc_map_.end  ();
 
   for ( ; p1 != p2; ++p1)
     (*p1).second->print();
@@ -59,8 +59,8 @@ void
 ClLanguageProcMgr::
 deleteProcs()
 {
-  ProcMap::const_iterator p1 = proc_map_.begin();
-  ProcMap::const_iterator p2 = proc_map_.end  ();
+  auto p1 = proc_map_.begin();
+  auto p2 = proc_map_.end  ();
 
   for ( ; p1 != p2; ++p1)
     delete (*p1).second;

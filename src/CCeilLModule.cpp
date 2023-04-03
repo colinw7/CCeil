@@ -168,8 +168,8 @@ getModuleList(StringVectorT &modules) const
 {
   modules.clear();
 
-  ModuleMap::const_iterator p1 = module_list_.begin();
-  ModuleMap::const_iterator p2 = module_list_.end  ();
+  auto p1 = module_list_.begin();
+  auto p2 = module_list_.end  ();
 
   for ( ; p1 != p2; ++p1)
     modules.push_back((*p1).second->getName());
@@ -306,8 +306,8 @@ void
 ClModuleMgr::
 reinitModules()
 {
-  ModuleMap::const_iterator p1 = module_list_.begin();
-  ModuleMap::const_iterator p2 = module_list_.end  ();
+  auto p1 = module_list_.begin();
+  auto p2 = module_list_.end  ();
 
   for ( ; p1 != p2; ++p1) {
     ClModule *module = (*p1).second;
@@ -376,8 +376,8 @@ void
 ClModuleMgr::
 termModules()
 {
-  ModuleMap::const_iterator p1 = module_list_.begin();
-  ModuleMap::const_iterator p2 = module_list_.end  ();
+  auto p1 = module_list_.begin();
+  auto p2 = module_list_.end  ();
 
   for ( ; p1 != p2; ++p1) {
     ClModule *module = (*p1).second;
@@ -602,7 +602,7 @@ ClModule *
 ClModuleMgr::
 getModule(const std::string &name) const
 {
-  ModuleMap::const_iterator p = module_list_.find(name);
+  auto p = module_list_.find(name);
 
   if (p != module_list_.end())
     return (*p).second;
@@ -636,8 +636,8 @@ void
 ClModuleMgr::
 deleteModules()
 {
-  ModuleMap::const_iterator p1 = module_list_.begin();
-  ModuleMap::const_iterator p2 = module_list_.end  ();
+  auto p1 = module_list_.begin();
+  auto p2 = module_list_.end  ();
 
   for ( ; p1 != p2; ++p1)
     delete (*p1).second;

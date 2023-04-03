@@ -387,7 +387,7 @@ ClSignalCommand *
 ClSignalMgr::
 getSignalCommand(int type) const
 {
-  SignalCommandMap::const_iterator p = signal_command_map_.find(type);
+  auto p = signal_command_map_.find(type);
 
   if (p != signal_command_map_.end())
     return (*p).second;

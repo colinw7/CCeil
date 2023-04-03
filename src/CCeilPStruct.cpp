@@ -4,7 +4,7 @@ ClParserStructPtr
 ClParserStruct::
 createStruct()
 {
-  ClParserStruct *structure = new ClParserStruct;
+  auto *structure = new ClParserStruct;
 
   return ClParserStructPtr(structure);
 }
@@ -13,7 +13,7 @@ ClParserStructPtr
 ClParserStruct::
 createStruct(ClParserTypePtr type)
 {
-  ClParserStruct *structure = new ClParserStruct(type);
+  auto *structure = new ClParserStruct(type);
 
   return ClParserStructPtr(structure);
 }
@@ -22,7 +22,7 @@ ClParserStructPtr
 ClParserStruct::
 createStruct(ClParserTypePtr type, const ClParserValuePtr *values, uint num_values)
 {
-  ClParserStruct *structure = new ClParserStruct(type, values, num_values);
+  auto *structure = new ClParserStruct(type, values, num_values);
 
   return ClParserStructPtr(structure);
 }
@@ -31,7 +31,7 @@ ClParserStructPtr
 ClParserStruct::
 createStruct(ClParserTypePtr type, const ClParserValueArray &values)
 {
-  ClParserStruct *structure = new ClParserStruct(type, values);
+  auto *structure = new ClParserStruct(type, values);
 
   return ClParserStructPtr(structure);
 }
@@ -40,7 +40,7 @@ ClParserStructPtr
 ClParserStruct::
 createStruct(const ClParserStruct &structure)
 {
-  ClParserStruct *pstructure = new ClParserStruct(structure);
+  auto *pstructure = new ClParserStruct(structure);
 
   return ClParserStructPtr(pstructure);
 }
@@ -81,7 +81,7 @@ ClParserStruct(ClParserTypePtr type, const ClParserValueArray &values) :
   uint i = 0;
 
   for ( ; i < type_->getNumSubTypes() && i < num_values; ++i) {
-    ClParserValuePtr value1 = ClParserValueMgrInst->createValue(values[i]);
+    auto value1 = ClParserValueMgrInst->createValue(values[i]);
 
     if (! value1->convertToType(type_->getSubType(i)->getValue()))
       ClErrThrow(ClErr::INVALID_CONVERSION);
@@ -106,7 +106,7 @@ ClParserStruct(ClParserTypePtr type, const ClParserValuePtr *values, uint num_va
   uint i = 0;
 
   for ( ; i < type_->getNumSubTypes() && i < num_values; ++i) {
-    ClParserValuePtr value1 = ClParserValueMgrInst->createValue(values[i]);
+    auto value1 = ClParserValueMgrInst->createValue(values[i]);
 
     if (! value1->convertToType(type_->getSubType(i)->getValue()))
       ClErrThrow(ClErr::INVALID_CONVERSION);
@@ -122,8 +122,8 @@ ClParserStruct::
 ClParserStruct(const ClParserStruct &structure) :
  ClParserObj(CL_PARSER_VALUE_TYPE_STRUCTURE), type_(structure.type_)
 {
-  ValueMap::const_iterator p1 = values_.begin();
-  ValueMap::const_iterator p2 = values_.end  ();
+  auto p1 = structure.values_.begin();
+  auto p2 = structure.values_.end  ();
 
   for ( ; p1 != p2; ++p1)
     values_[p1->first] = p1->second;
@@ -143,8 +143,8 @@ operator=(const ClParserStruct &structure)
   if (type_ != structure.type_)
     values_.clear();
 
-  ValueMap::const_iterator p1 = structure.values_.begin();
-  ValueMap::const_iterator p2 = structure.values_.end  ();
+  auto p1 = structure.values_.begin();
+  auto p2 = structure.values_.end  ();
 
   for ( ; p1 != p2; ++p1)
     values_[p1->first] = p1->second;
@@ -158,7 +158,7 @@ copy(const ClParserObj &obj)
 {
   assert(base_type_ == obj.getBaseType());
 
-  const ClParserStruct &rhs = castObj(obj);
+  const auto &rhs = castObj(obj);
 
   *this = rhs;
 }
@@ -174,7 +174,7 @@ ClParserStructPtr
 ClParserStruct::
 dupStruct() const
 {
-  ClParserStruct *structure = dup();
+  auto *structure = dup();
 
   return ClParserStructPtr(structure);
 }
@@ -209,7 +209,7 @@ bool
 ClParserStruct::
 getValue(const std::string &name, ClParserValuePtr &value) const
 {
-  ValueMap::const_iterator p1 = values_.find(name);
+  auto p1 = values_.find(name);
 
   if (p1 == values_.end())
     return false;
@@ -223,7 +223,7 @@ bool
 ClParserStruct::
 setValue(const std::string &name, ClParserValuePtr value)
 {
-  ValueMap::iterator p1 = values_.find(name);
+  auto p1 = values_.find(name);
 
   if (p1 == values_.end())
     return false;
@@ -248,11 +248,8 @@ bool
 ClParserStruct::
 toBool() const
 {
-  ValueMap::const_iterator p1 = values_.begin();
-  ValueMap::const_iterator p2 = values_.end  ();
-
-  for ( ; p1 != p2; ++p1)
-    if (p1->second->toBool())
+  for (const auto &pv : values_)
+    if (pv.second->toBool())
       return true;
 
   return false;
@@ -280,10 +277,10 @@ cmp(const ClParserObj &obj) const
   if (num_values1 != num_values2)
     return int(num_values1 - num_values2);
 
-  ValueMap::const_iterator pl1 =     values_.begin();
-  ValueMap::const_iterator pl2 =     values_.end  ();
-  ValueMap::const_iterator pr1 = rhs.values_.begin();
-  ValueMap::const_iterator pr2 = rhs.values_.end  ();
+  auto pl1 =     values_.begin();
+  auto pl2 =     values_.end  ();
+  auto pr1 = rhs.values_.begin();
+  auto pr2 = rhs.values_.end  ();
 
   for ( ; pl1 != pl2 && pr1 != pr2; ++pl1, ++pr1) {
     int cmp = pl1->second->cmp(pl2->second);
@@ -301,8 +298,8 @@ std::string
 ClParserStruct::
 asString() const
 {
-  ValueMap::const_iterator p1 = values_.begin();
-  ValueMap::const_iterator p2 = values_.end  ();
+  auto p1 = values_.begin();
+  auto p2 = values_.end  ();
 
   std::string str;
 
@@ -344,11 +341,8 @@ const ClParserObj &
 ClParserStruct::
 increment()
 {
-  ValueMap::iterator p1 = values_.begin();
-  ValueMap::iterator p2 = values_.end  ();
-
-  for ( ; p1 != p2; ++p1)
-    p1->second->increment();
+  for (auto &pv : values_)
+    pv.second->increment();
 
   return *this;
 }
@@ -357,11 +351,8 @@ const ClParserObj &
 ClParserStruct::
 decrement()
 {
-  ValueMap::iterator p1 = values_.begin();
-  ValueMap::iterator p2 = values_.end  ();
-
-  for ( ; p1 != p2; ++p1)
-    p1->second->decrement();
+  for (auto &pv : values_)
+    pv.second->decrement();
 
   return *this;
 }
@@ -374,10 +365,10 @@ ClParserValuePtr
 ClParserStruct::
 unaryPlus() const
 {
-  ClParserStructPtr structure = dupStruct();
+  auto structure = dupStruct();
 
-  ValueMap::const_iterator p1 = values_.begin();
-  ValueMap::const_iterator p2 = values_.end  ();
+  auto p1 = values_.begin();
+  auto p2 = values_.end  ();
 
   for ( ; p1 != p2; ++p1)
     structure->setValue(p1->first, p1->second->unaryPlus());
@@ -389,10 +380,10 @@ ClParserValuePtr
 ClParserStruct::
 unaryMinus() const
 {
-  ClParserStructPtr structure = dupStruct();
+  auto structure = dupStruct();
 
-  ValueMap::const_iterator p1 = values_.begin();
-  ValueMap::const_iterator p2 = values_.end  ();
+  auto p1 = values_.begin();
+  auto p2 = values_.end  ();
 
   for ( ; p1 != p2; ++p1)
     structure->setValue(p1->first, p1->second->unaryMinus());
@@ -404,10 +395,10 @@ ClParserValuePtr
 ClParserStruct::
 bitNot() const
 {
-  ClParserStructPtr structure = dupStruct();
+  auto structure = dupStruct();
 
-  ValueMap::const_iterator p1 = values_.begin();
-  ValueMap::const_iterator p2 = values_.end  ();
+  auto p1 = values_.begin();
+  auto p2 = values_.end  ();
 
   for ( ; p1 != p2; ++p1)
     structure->setValue(p1->first, p1->second->bitNot());
@@ -426,11 +417,11 @@ process(const ClParserStruct &lstructure, const ClParserObj &robj) const
   if (lstructure.getType() != rstructure.getType())
     ClErrThrow(ClErr::INVALID_TYPE_MIX);
 
-  ClParserStructPtr lstructure1 = lstructure.dupStruct();
+  auto lstructure1 = lstructure.dupStruct();
 
-  ValueMap::const_iterator pl1 = lstructure1->values_.begin();
-  ValueMap::const_iterator pl2 = lstructure1->values_.end  ();
-  ValueMap::const_iterator pr1 = rstructure . values_.begin();
+  auto pl1 = lstructure1->values_.begin();
+  auto pl2 = lstructure1->values_.end  ();
+  auto pr1 = rstructure . values_.begin();
 
   for ( ; pl1 != pl2; ++pl1, ++pr1)
     exec(pl1->second, pr1->second);
@@ -604,13 +595,10 @@ ClParserValuePtr
 ClParserStruct::
 abs() const
 {
-  ClParserStructPtr structure = dupStruct();
+  auto structure = dupStruct();
 
-  ValueMap::const_iterator p1 = structure->values_.begin();
-  ValueMap::const_iterator p2 = structure->values_.end  ();
-
-  for ( ; p1 != p2; ++p1)
-    p1->second->abs();
+  for (auto &pv : structure->values_)
+    pv.second->abs();
 
   return ClParserValueMgrInst->createValue(structure);
 }
@@ -619,13 +607,10 @@ ClParserValuePtr
 ClParserStruct::
 ceil() const
 {
-  ClParserStructPtr structure = dupStruct();
+  auto structure = dupStruct();
 
-  ValueMap::const_iterator p1 = structure->values_.begin();
-  ValueMap::const_iterator p2 = structure->values_.end  ();
-
-  for ( ; p1 != p2; ++p1)
-    p1->second->ceil();
+  for (auto &pv : structure->values_)
+    pv.second->ceil();
 
   return ClParserValueMgrInst->createValue(structure);
 }
@@ -634,13 +619,10 @@ ClParserValuePtr
 ClParserStruct::
 floor() const
 {
-  ClParserStructPtr structure = dupStruct();
+  auto structure = dupStruct();
 
-  ValueMap::const_iterator p1 = structure->values_.begin();
-  ValueMap::const_iterator p2 = structure->values_.end  ();
-
-  for ( ; p1 != p2; ++p1)
-    p1->second->floor();
+  for (auto &pv : structure->values_)
+    pv.second->floor();
 
   return ClParserValueMgrInst->createValue(structure);
 }
@@ -649,13 +631,10 @@ ClParserValuePtr
 ClParserStruct::
 sign() const
 {
-  ClParserStructPtr structure = dupStruct();
+  auto structure = dupStruct();
 
-  ValueMap::const_iterator p1 = structure->values_.begin();
-  ValueMap::const_iterator p2 = structure->values_.end  ();
-
-  for ( ; p1 != p2; ++p1)
-    p1->second->sign();
+  for (auto &pv : structure->values_)
+    pv.second->sign();
 
   return ClParserValueMgrInst->createValue(structure);
 }
@@ -664,13 +643,10 @@ ClParserValuePtr
 ClParserStruct::
 sqr() const
 {
-  ClParserStructPtr structure = dupStruct();
+  auto structure = dupStruct();
 
-  ValueMap::const_iterator p1 = structure->values_.begin();
-  ValueMap::const_iterator p2 = structure->values_.end  ();
-
-  for ( ; p1 != p2; ++p1)
-    p1->second->sqr();
+  for (auto &pv : structure->values_)
+    pv.second->sqr();
 
   return ClParserValueMgrInst->createValue(structure);
 }
@@ -679,13 +655,10 @@ ClParserValuePtr
 ClParserStruct::
 sqrt() const
 {
-  ClParserStructPtr structure = dupStruct();
+  auto structure = dupStruct();
 
-  ValueMap::const_iterator p1 = structure->values_.begin();
-  ValueMap::const_iterator p2 = structure->values_.end  ();
-
-  for ( ; p1 != p2; ++p1)
-    p1->second->sqrt();
+  for (auto &pv : structure->values_)
+    pv.second->sqrt();
 
   return ClParserValueMgrInst->createValue(structure);
 }
@@ -694,13 +667,10 @@ ClParserValuePtr
 ClParserStruct::
 cos() const
 {
-  ClParserStructPtr structure = dupStruct();
+  auto structure = dupStruct();
 
-  ValueMap::const_iterator p1 = structure->values_.begin();
-  ValueMap::const_iterator p2 = structure->values_.end  ();
-
-  for ( ; p1 != p2; ++p1)
-    p1->second->cos();
+  for (auto &pv : structure->values_)
+    pv.second->cos();
 
   return ClParserValueMgrInst->createValue(structure);
 }
@@ -709,13 +679,10 @@ ClParserValuePtr
 ClParserStruct::
 sin() const
 {
-  ClParserStructPtr structure = dupStruct();
+  auto structure = dupStruct();
 
-  ValueMap::const_iterator p1 = structure->values_.begin();
-  ValueMap::const_iterator p2 = structure->values_.end  ();
-
-  for ( ; p1 != p2; ++p1)
-    p1->second->sin();
+  for (auto &pv : structure->values_)
+    pv.second->sin();
 
   return ClParserValueMgrInst->createValue(structure);
 }
@@ -724,13 +691,10 @@ ClParserValuePtr
 ClParserStruct::
 tan() const
 {
-  ClParserStructPtr structure = dupStruct();
+  auto structure = dupStruct();
 
-  ValueMap::const_iterator p1 = structure->values_.begin();
-  ValueMap::const_iterator p2 = structure->values_.end  ();
-
-  for ( ; p1 != p2; ++p1)
-    p1->second->tan();
+  for (auto &pv : structure->values_)
+    pv.second->tan();
 
   return ClParserValueMgrInst->createValue(structure);
 }
@@ -739,13 +703,10 @@ ClParserValuePtr
 ClParserStruct::
 acos() const
 {
-  ClParserStructPtr structure = dupStruct();
+  auto structure = dupStruct();
 
-  ValueMap::const_iterator p1 = structure->values_.begin();
-  ValueMap::const_iterator p2 = structure->values_.end  ();
-
-  for ( ; p1 != p2; ++p1)
-    p1->second->acos();
+  for (auto &pv : structure->values_)
+    pv.second->acos();
 
   return ClParserValueMgrInst->createValue(structure);
 }
@@ -754,13 +715,10 @@ ClParserValuePtr
 ClParserStruct::
 asin() const
 {
-  ClParserStructPtr structure = dupStruct();
+  auto structure = dupStruct();
 
-  ValueMap::const_iterator p1 = structure->values_.begin();
-  ValueMap::const_iterator p2 = structure->values_.end  ();
-
-  for ( ; p1 != p2; ++p1)
-    p1->second->asin();
+  for (auto &pv : structure->values_)
+    pv.second->asin();
 
   return ClParserValueMgrInst->createValue(structure);
 }
@@ -769,13 +727,10 @@ ClParserValuePtr
 ClParserStruct::
 atan() const
 {
-  ClParserStructPtr structure = dupStruct();
+  auto structure = dupStruct();
 
-  ValueMap::const_iterator p1 = structure->values_.begin();
-  ValueMap::const_iterator p2 = structure->values_.end  ();
-
-  for ( ; p1 != p2; ++p1)
-    p1->second->atan();
+  for (auto &pv : structure->values_)
+    pv.second->atan();
 
   return ClParserValueMgrInst->createValue(structure);
 }
@@ -784,13 +739,10 @@ ClParserValuePtr
 ClParserStruct::
 atan(double real) const
 {
-  ClParserStructPtr structure = dupStruct();
+  auto structure = dupStruct();
 
-  ValueMap::const_iterator p1 = structure->values_.begin();
-  ValueMap::const_iterator p2 = structure->values_.end  ();
-
-  for ( ; p1 != p2; ++p1)
-    p1->second->atan(real);
+  for (auto &pv : structure->values_)
+    pv.second->atan(real);
 
   return ClParserValueMgrInst->createValue(structure);
 }
@@ -799,13 +751,10 @@ ClParserValuePtr
 ClParserStruct::
 exp() const
 {
-  ClParserStructPtr structure = dupStruct();
+  auto structure = dupStruct();
 
-  ValueMap::const_iterator p1 = structure->values_.begin();
-  ValueMap::const_iterator p2 = structure->values_.end  ();
-
-  for ( ; p1 != p2; ++p1)
-    p1->second->exp();
+  for (auto &pv : structure->values_)
+    pv.second->exp();
 
   return ClParserValueMgrInst->createValue(structure);
 }
@@ -814,13 +763,10 @@ ClParserValuePtr
 ClParserStruct::
 log() const
 {
-  ClParserStructPtr structure = dupStruct();
+  auto structure = dupStruct();
 
-  ValueMap::const_iterator p1 = structure->values_.begin();
-  ValueMap::const_iterator p2 = structure->values_.end  ();
-
-  for ( ; p1 != p2; ++p1)
-    p1->second->log();
+  for (auto &pv : structure->values_)
+    pv.second->log();
 
   return ClParserValueMgrInst->createValue(structure);
 }
@@ -829,13 +775,10 @@ ClParserValuePtr
 ClParserStruct::
 log10() const
 {
-  ClParserStructPtr structure = dupStruct();
+  auto structure = dupStruct();
 
-  ValueMap::const_iterator p1 = structure->values_.begin();
-  ValueMap::const_iterator p2 = structure->values_.end  ();
-
-  for ( ; p1 != p2; ++p1)
-    p1->second->log10();
+  for (auto &pv : structure->values_)
+    pv.second->log10();
 
   return ClParserValueMgrInst->createValue(structure);
 }
@@ -844,13 +787,10 @@ ClParserValuePtr
 ClParserStruct::
 cosh() const
 {
-  ClParserStructPtr structure = dupStruct();
+  auto structure = dupStruct();
 
-  ValueMap::const_iterator p1 = structure->values_.begin();
-  ValueMap::const_iterator p2 = structure->values_.end  ();
-
-  for ( ; p1 != p2; ++p1)
-    p1->second->cosh();
+  for (auto &pv : structure->values_)
+    pv.second->cosh();
 
   return ClParserValueMgrInst->createValue(structure);
 }
@@ -859,13 +799,10 @@ ClParserValuePtr
 ClParserStruct::
 sinh() const
 {
-  ClParserStructPtr structure = dupStruct();
+  auto structure = dupStruct();
 
-  ValueMap::const_iterator p1 = structure->values_.begin();
-  ValueMap::const_iterator p2 = structure->values_.end  ();
-
-  for ( ; p1 != p2; ++p1)
-    p1->second->sinh();
+  for (auto &pv : structure->values_)
+    pv.second->sinh();
 
   return ClParserValueMgrInst->createValue(structure);
 }
@@ -874,13 +811,10 @@ ClParserValuePtr
 ClParserStruct::
 tanh() const
 {
-  ClParserStructPtr structure = dupStruct();
+  auto structure = dupStruct();
 
-  ValueMap::const_iterator p1 = structure->values_.begin();
-  ValueMap::const_iterator p2 = structure->values_.end  ();
-
-  for ( ; p1 != p2; ++p1)
-    p1->second->tanh();
+  for (auto &pv : structure->values_)
+    pv.second->tanh();
 
   return ClParserValueMgrInst->createValue(structure);
 }
@@ -907,13 +841,10 @@ ClParserValuePtr
 ClParserStruct::
 toChar() const
 {
-  ClParserStructPtr structure = dupStruct();
+  auto structure = dupStruct();
 
-  ValueMap::const_iterator p1 = structure->values_.begin();
-  ValueMap::const_iterator p2 = structure->values_.end  ();
-
-  for ( ; p1 != p2; ++p1)
-    p1->second->toChar();
+  for (auto &pv : structure->values_)
+    pv.second->toChar();
 
   return ClParserValueMgrInst->createValue(structure);
 }
@@ -949,13 +880,10 @@ ClParserValuePtr
 ClParserStruct::
 isNan() const
 {
-  ClParserStructPtr structure = dupStruct();
+  auto structure = dupStruct();
 
-  ValueMap::const_iterator p1 = structure->values_.begin();
-  ValueMap::const_iterator p2 = structure->values_.end  ();
-
-  for ( ; p1 != p2; ++p1)
-    p1->second->isNan();
+  for (auto &pv : structure->values_)
+    pv.second->isNan();
 
   return ClParserValueMgrInst->createValue(structure);
 }
@@ -964,13 +892,10 @@ ClParserValuePtr
 ClParserStruct::
 toLower() const
 {
-  ClParserStructPtr structure = dupStruct();
+  auto structure = dupStruct();
 
-  ValueMap::const_iterator p1 = structure->values_.begin();
-  ValueMap::const_iterator p2 = structure->values_.end  ();
-
-  for ( ; p1 != p2; ++p1)
-    p1->second->toLower();
+  for (auto &pv : structure->values_)
+    pv.second->toLower();
 
   return ClParserValueMgrInst->createValue(structure);
 }
@@ -979,13 +904,10 @@ ClParserValuePtr
 ClParserStruct::
 toUpper() const
 {
-  ClParserStructPtr structure = dupStruct();
+  auto structure = dupStruct();
 
-  ValueMap::const_iterator p1 = structure->values_.begin();
-  ValueMap::const_iterator p2 = structure->values_.end  ();
-
-  for ( ; p1 != p2; ++p1)
-    p1->second->toUpper();
+  for (auto &pv : structure->values_)
+    pv.second->toUpper();
 
   return ClParserValueMgrInst->createValue(structure);
 }
@@ -994,13 +916,10 @@ ClParserValuePtr
 ClParserStruct::
 min() const
 {
-  ClParserStructPtr structure = dupStruct();
+  auto structure = dupStruct();
 
-  ValueMap::const_iterator p1 = structure->values_.begin();
-  ValueMap::const_iterator p2 = structure->values_.end  ();
-
-  for ( ; p1 != p2; ++p1)
-    p1->second->min();
+  for (auto &pv : structure->values_)
+    pv.second->min();
 
   return ClParserValueMgrInst->createValue(structure);
 }
@@ -1009,13 +928,10 @@ ClParserValuePtr
 ClParserStruct::
 max() const
 {
-  ClParserStructPtr structure = dupStruct();
+  auto structure = dupStruct();
 
-  ValueMap::const_iterator p1 = structure->values_.begin();
-  ValueMap::const_iterator p2 = structure->values_.end  ();
-
-  for ( ; p1 != p2; ++p1)
-    p1->second->max();
+  for (auto &pv : structure->values_)
+    pv.second->max();
 
   return ClParserValueMgrInst->createValue(structure);
 }
@@ -1024,13 +940,10 @@ ClParserValuePtr
 ClParserStruct::
 sum() const
 {
-  ClParserStructPtr structure = dupStruct();
+  auto structure = dupStruct();
 
-  ValueMap::const_iterator p1 = structure->values_.begin();
-  ValueMap::const_iterator p2 = structure->values_.end  ();
-
-  for ( ; p1 != p2; ++p1)
-    p1->second->sum();
+  for (auto &pv : structure->values_)
+    pv.second->sum();
 
   return ClParserValueMgrInst->createValue(structure);
 }
@@ -1041,13 +954,10 @@ index(const ClParserObj &obj) const
 {
   ClParserValuePtr value = ClParserValueMgrInst->createValue(obj);
 
-  ClParserStructPtr structure = dupStruct();
+  auto structure = dupStruct();
 
-  ValueMap::const_iterator p1 = structure->values_.begin();
-  ValueMap::const_iterator p2 = structure->values_.end  ();
-
-  for ( ; p1 != p2; ++p1)
-    p1->second->index(value);
+  for (auto &pv : structure->values_)
+    pv.second->index(value);
 
   return ClParserValueMgrInst->createValue(structure);
 }
@@ -1058,13 +968,10 @@ rindex(const ClParserObj &obj) const
 {
   ClParserValuePtr value = ClParserValueMgrInst->createValue(obj);
 
-  ClParserStructPtr structure = dupStruct();
+  auto structure = dupStruct();
 
-  ValueMap::const_iterator p1 = structure->values_.begin();
-  ValueMap::const_iterator p2 = structure->values_.end  ();
-
-  for ( ; p1 != p2; ++p1)
-    p1->second->rindex(value);
+  for (auto &pv : structure->values_)
+    pv.second->rindex(value);
 
   return ClParserValueMgrInst->createValue(structure);
 }
@@ -1073,13 +980,10 @@ ClParserValuePtr
 ClParserStruct::
 sort(ClParserSortDirection direction) const
 {
-  ClParserStructPtr structure = dupStruct();
+  auto structure = dupStruct();
 
-  ValueMap::const_iterator p1 = structure->values_.begin();
-  ValueMap::const_iterator p2 = structure->values_.end  ();
-
-  for ( ; p1 != p2; ++p1)
-    p1->second->sort(direction);
+  for (auto &pv : structure->values_)
+    pv.second->sort(direction);
 
   return ClParserValueMgrInst->createValue(structure);
 }
