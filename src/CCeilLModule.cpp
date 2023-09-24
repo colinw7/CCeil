@@ -449,9 +449,10 @@ termModule(const std::string &name)
 
 bool
 ClModuleMgr::
-importExternalModule(const std::string &/*name*/)
+importExternalModule(const std::string &name)
 {
 #ifdef CL_IMPORT_EXTERNAL
+  // get shared library path
   std::string libname = moduleSearchLib("CL_LIBRARY_PATH", name);
 
   if (! libname)
@@ -465,16 +466,20 @@ importExternalModule(const std::string &/*name*/)
     return false;
   }
 
-  /*-------------*/
+  //---
 
-  char *symbol = nullptr;
-
+  // open shared library
   CShLib shlib(libname);
 
   if (! shlib.open()) {
     ClLanguageMgrInst->error("Failed to Open Library %s", libname.c_str());
     return false;
   }
+
+  //---
+
+  // get symbols
+  char *symbol = nullptr;
 
   std::string symname;
 
@@ -507,6 +512,8 @@ importExternalModule(const std::string &/*name*/)
 
   return true;
 #else
+  assert(name.size());
+
   return false;
 #endif
 }

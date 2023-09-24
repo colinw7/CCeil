@@ -158,7 +158,7 @@ readFunctionArgList(const std::string &str, uint *i, int *error_code)
       std::string variable_name = readFunctionVariableName(str, i);
 
       auto p = std::find_if(variable_name_list.begin(), variable_name_list.end(),
-                            std::bind1st(std::equal_to<std::string>(), variable_name));
+                            [&](const auto &val) { return (val == variable_name); });
 
       if (p != variable_name_list.end()) {
         *error_code = int(ClErr::MULTIPLE_DEF_FN_VARIABLE);
