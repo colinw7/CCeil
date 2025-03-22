@@ -21,15 +21,12 @@ class ClParserList : public ClParserObj {
   }
 
  protected:
-  friend class CRefPtr<ClParserList>;
   friend class ClParserValue;
 
   ClParserList();
   ClParserList(const ClParserValuePtr *values, uint num_values);
   ClParserList(const ClParserValueArray &values);
   ClParserList(const ClParserList &list);
-
- ~ClParserList();
 
   ClParserList *dup() const override;
 
@@ -38,6 +35,8 @@ class ClParserList : public ClParserObj {
   ClParserList &operator=(const ClParserList &list);
 
  public:
+ ~ClParserList();
+
   bool toBool() const override { return values_.size() > 0; }
 
   void copy(const ClParserObj &obj) override;

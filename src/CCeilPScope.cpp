@@ -28,7 +28,7 @@ getScope(const StringVectorT &names)
 
   ClParserScopePtr scope = getScope(name);
 
-  if (! scope.isValid())
+  if (! scope)
     return scope;
 
   if (num_names == 1)

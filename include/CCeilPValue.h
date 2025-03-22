@@ -95,8 +95,6 @@ class ClParserValueMgr {
 class ClParserValue {
  protected:
   friend class ClParserValueMgr;
-  friend class CRefPtr<ClParserValue>;
-  friend class CRefPtrDbg<ClParserValue>;
 
   ClParserValue();
   explicit ClParserValue(double real);
@@ -146,13 +144,13 @@ class ClParserValue {
   ClParserValue(ClParserTypePtr type, const UIntVectorT &dims);
   ClParserValue(uint *dims, uint num_dims, ClParserValuePtr *values);
 
- ~ClParserValue();
-
   ClParserValue *dup() const;
 
   ClParserValue &operator=(const ClParserValue &value);
 
  public:
+ ~ClParserValue();
+
   bool canConvertToInteger() const;
   bool canConvertToReal() const;
 

@@ -15,7 +15,7 @@ bool
 ClParserInternFnMgr::
 isInternFn(const std::string &name) const
 {
-  return getInternFn(name).isValid();
+  return !!getInternFn(name);
 }
 
 ClParserInternFnPtr
@@ -35,9 +35,9 @@ ClParserInternFnMgr::
 addInternFns()
 {
   for (uint i = 0; parser_internfn[i].type != CLParserInternFnType::NONE; ++i) {
-    ClParserInternFn *internfn = new ClParserInternFn(parser_internfn[i]);
+    auto *internfn = new ClParserInternFn(parser_internfn[i]);
 
-    internfn_map_[parser_internfn[i].name] = internfn;
+    internfn_map_[parser_internfn[i].name] = ClParserInternFnPtr(internfn);
   }
 }
 

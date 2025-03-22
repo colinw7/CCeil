@@ -70,7 +70,7 @@ class ClParserInternFnMgr {
 
  public:
   ClParserInternFnMgr();
-  ~ClParserInternFnMgr();
+ ~ClParserInternFnMgr();
 
   bool isInternFn(const std::string &name) const;
 
@@ -112,7 +112,6 @@ struct ClParserInternFnData {
 class ClParserInternFn {
  protected:
   friend class ClParserInternFnMgr;
-  friend class CRefPtr<ClParserInternFn>;
 
   ClParserInternFn(CLParserInternFnType type, const std::string &name,
                    uint numArgs, ClParserArg *args, bool composite);

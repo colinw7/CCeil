@@ -3,9 +3,9 @@
 ClParserTypeMgr::
 ClParserTypeMgr()
 {
-  integer_type_ = new ClParserType("int");
-  real_type_    = new ClParserType("real");
-  string_type_  = new ClParserType("str");
+  integer_type_ = ClParserTypePtr(new ClParserType("int" ));
+  real_type_    = ClParserTypePtr(new ClParserType("real"));
+  string_type_  = ClParserTypePtr(new ClParserType("str" ));
 
   type_map_ = new TypeMap;
 }
@@ -78,7 +78,7 @@ createType(const std::string &name, const std::string &arg_string)
 
     ClParserTypePtr type1 = ClParserInst->getType(type_string);
 
-    if (! type1.isValid())
+    if (! type1)
       ClErrThrow(ClErr::UNDEFINED_STRUCT_TYPE);
 
     CStrUtil::skipSpace(arg_string, &i);
@@ -162,7 +162,7 @@ addType(ClParserType *type)
   if (type->isGlobal() && ! type_map_list_.empty())
     type_map = type_map_list_[0];
 
-  (*type_map)[name] = type;
+  (*type_map)[name] = ClParserTypePtr(type);
 
   return (*type_map)[name];
 }
@@ -208,7 +208,7 @@ bool
 ClParserTypeMgr::
 isType(const std::string &name) const
 {
-  return (getType(name).isValid());
+  return !!getType(name);
 }
 
 ClParserTypePtr
@@ -371,21 +371,21 @@ bool
 ClParserType::
 isIntegerType() const
 {
-  return (this == ClParserInst->getIntegerType().getPtr());
+  return (this == ClParserInst->getIntegerType().get());
 }
 
 bool
 ClParserType::
 isRealType() const
 {
-  return (this == ClParserInst->getRealType().getPtr());
+  return (this == ClParserInst->getRealType().get());
 }
 
 bool
 ClParserType::
 isStringType() const
 {
-  return (this == ClParserInst->getStringType().getPtr());
+  return (this == ClParserInst->getStringType().get());
 }
 
 bool

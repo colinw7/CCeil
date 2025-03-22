@@ -57,10 +57,10 @@ ClParserStruct::
 ClParserStruct(ClParserTypePtr type) :
  ClParserObj(CL_PARSER_VALUE_TYPE_STRUCTURE), type_(type)
 {
-  if (type_.isValid() && type_->isBuiltinType())
+  if (type_ && type_->isBuiltinType())
     ClErrThrow(ClErr::INVALID_STRUCTURE_TYPE_NAME);
 
-  uint num_sub_types = (type_.isValid() ? type_->getNumSubTypes() : 0);
+  uint num_sub_types = (type_ ? type_->getNumSubTypes() : 0);
 
   for (uint i = 0; i < num_sub_types; ++i)
     values_[type_->getSubType(i)->getName()] = type_->getSubType(i)->getValue();
@@ -70,10 +70,10 @@ ClParserStruct::
 ClParserStruct(ClParserTypePtr type, const ClParserValueArray &values) :
  ClParserObj(CL_PARSER_VALUE_TYPE_STRUCTURE), type_(type)
 {
-  if (type_.isValid() && type_->isBuiltinType())
+  if (type_ && type_->isBuiltinType())
     ClErrThrow(ClErr::INVALID_STRUCTURE_TYPE_NAME);
 
-  if (! type_.isValid())
+  if (! type_)
     ClErrThrow(ClErr::INVALID_STRUCTURE_TYPE_NAME);
 
   uint num_values = uint(values.size());
@@ -97,10 +97,10 @@ ClParserStruct::
 ClParserStruct(ClParserTypePtr type, const ClParserValuePtr *values, uint num_values) :
  ClParserObj(CL_PARSER_VALUE_TYPE_STRUCTURE), type_(type)
 {
-  if (type_.isValid() && type_->isBuiltinType())
+  if (type_ && type_->isBuiltinType())
     ClErrThrow(ClErr::INVALID_STRUCTURE_TYPE_NAME);
 
-  if (! type_.isValid())
+  if (! type_)
     ClErrThrow(ClErr::INVALID_STRUCTURE_TYPE_NAME);
 
   uint i = 0;
@@ -197,7 +197,7 @@ void
 ClParserStruct::
 addName(const std::string &name)
 {
-  if (! type_.isValid())
+  if (! type_)
     type_ = ClParserInst->createType();
 
   type_->addSubType(name);

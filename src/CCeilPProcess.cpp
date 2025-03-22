@@ -21,7 +21,7 @@ ClParserProcessInlineOperator(ClParserOperatorPtr op, ClParserVarRefPtr var_ref,
 
   *error_code = 0;
 
-  if (! op.isValid() || ! var_ref.isValid()) {
+  if (! op || ! var_ref) {
     ClParserInst->signalError(error_code, ClErr::INVALID_UNARY_EXPRESSION);
     return ClParserValuePtr();
   }
@@ -64,7 +64,7 @@ ClParserSubProcessInlineOperator(ClParserOperatorPtr op, ClParserValuePtr value,
 
   ClParserValuePtr value1;
 
-  if (! value.isValid())
+  if (! value)
     value1 = ClParserValueMgrInst->createValue(0L);
   else
     value1 = value;
@@ -103,7 +103,7 @@ ClParserProcessUnaryOperator(ClParserOperatorPtr op, ClParserValuePtr value, int
 
   /*------------------*/
 
-  if (! op.isValid() || ! value.isValid()) {
+  if (! op || ! value) {
     ClParserInst->signalError(error_code, ClErr::INVALID_UNARY_EXPRESSION);
     return ClParserValuePtr();
   }
@@ -158,7 +158,7 @@ ClParserProcessBinaryOperator(ClParserValuePtr rvalue1, ClParserOperatorPtr op,
 
   /*-----------------*/
 
-  if (! value1.isValid() || ! op.isValid() || ! value2.isValid()) {
+  if (! value1 || ! op || ! value2) {
     ClParserInst->signalError(error_code, ClErr::INVALID_BINARY_EXPRESSION);
     return ClParserValuePtr();
   }
@@ -316,7 +316,7 @@ ClParserProcessAssignmentOperator(ClParserVarRefPtr var_ref, ClParserOperatorPtr
 
   *error_code = 0;
 
-  if (! value.isValid()) {
+  if (! value) {
     ClParserInst->signalError(error_code, ClErr::INVALID_RHS_FOR_ASSIGNMENT);
     return;
   }
@@ -362,7 +362,7 @@ ClParserProcessAssignmentOperator(ClParserVarRefPtr var_ref, ClParserOperatorPtr
 
   ClParserValuePtr value1;
 
-  if (operator1.isValid()) {
+  if (operator1) {
     ClParserValuePtr sub_value;
 
     if (! var_ref->getValue(sub_value)) {
@@ -398,7 +398,7 @@ ClParserProcessAssignmentOperator(ClParserStructVarRefPtr svar_ref, ClParserOper
 
   *error_code = 0;
 
-  if (! value.isValid()) {
+  if (! value) {
     ClParserInst->signalError(error_code, ClErr::INVALID_RHS_FOR_ASSIGNMENT);
     return;
   }
@@ -444,7 +444,7 @@ ClParserProcessAssignmentOperator(ClParserStructVarRefPtr svar_ref, ClParserOper
 
   ClParserValuePtr value1;
 
-  if (operator1.isValid()) {
+  if (operator1) {
     ClParserValuePtr sub_value;
 
     if (! svar_ref->getValue(sub_value)) {
@@ -831,7 +831,7 @@ ClParserProcessInternFn(ClParserInternFnPtr internfn, const ClParserValueArray &
 
         ClParserArrayPtr array = value->getArray()->concat(*values[1]->getArray());
 
-        if (! array.isValid()) {
+        if (! array) {
           ClParserInst->signalError(error_code, ClErr::INVALID_TYPE_MIX);
           break;
         }
@@ -943,7 +943,7 @@ ClParserProcessInternFn(ClParserInternFnPtr internfn, const ClParserValueArray &
 
         auto struct_type = ClParserInst->getType(const_cast<char *>(str1->getText().c_str()));
 
-        if (! struct_type.isValid()) {
+        if (! struct_type) {
           ClParserInst->signalError(error_code, ClErr::UNDEFINED_STRUCT_TYPE);
           break;
         }
@@ -1010,7 +1010,7 @@ ClParserProcessAddrCommand(const ClParserValueArray &values, int *error_code)
     }
 
     if (values[1]->getType() != CL_PARSER_VALUE_TYPE_STRING ||
-        ! values[1]->getString().isValid()) {
+        ! values[1]->getString()) {
       ClParserInst->signalError(error_code, ClErr::INVALID_TYPE_FOR_OPERATOR);
       return value;
     }
@@ -1087,7 +1087,7 @@ ClParserProcessAddrCommand(const ClParserValueArray &values, int *error_code)
       return value;
     }
 
-    if (! values[0]->getString().isValid()) {
+    if (! values[0]->getString()) {
       ClParserInst->signalError(error_code, ClErr::INVALID_TYPE_FOR_OPERATOR);
       return value;
     }
@@ -1101,7 +1101,7 @@ ClParserProcessAddrCommand(const ClParserValueArray &values, int *error_code)
 
     ClParserValuePtr value1 = ClParserInst->getVariableValue(name);
 
-    if (! value1.isValid()) {
+    if (! value1) {
       ClParserInst->signalError(error_code, ClErr::INVALID_TYPE_FOR_OPERATOR);
       return value1;
     }
@@ -1212,7 +1212,7 @@ ClParserProcessWhere(const std::string &variables_string, const std::string &exp
   for (uint i = 0; i < num_variables; i++) {
     ClParserValuePtr value = ClParserInst->getVariableValue(variable_list[i]);
 
-    if (! value.isValid() || ! value->isType(CL_PARSER_VALUE_TYPE_ARRAY)) {
+    if (! value || ! value->isType(CL_PARSER_VALUE_TYPE_ARRAY)) {
       ClParserInst->signalError(error_code, ClErr::ARRAY_FN_HAS_NON_ARRAY);
       return ClParserValuePtr();
     }
@@ -1302,7 +1302,7 @@ ClParserProcessUserFn(ClParserUserFnPtr userfn, const ClParserArgValueArray &arg
 
     ClParserVarRefPtr var_ref = arg_values[0].getVarRef();
 
-    if (var_ref.isValid()) {
+    if (var_ref) {
       if (! var_ref->getValue(value1)) {
         ClParserInst->signalError(error_code, ClErr::UNDEFINED_VALUE);
         return ClParserValuePtr();
@@ -1311,7 +1311,7 @@ ClParserProcessUserFn(ClParserUserFnPtr userfn, const ClParserArgValueArray &arg
     else
       value1 = arg_values[0].getValue();
 
-    if (value1.isValid()) {
+    if (value1) {
       if      (value1->isType(CL_PARSER_VALUE_TYPE_ARRAY) &&
                userfn->getNumArgTypes() > 0 &&
                ! (userfn->getArgType(0) & CL_PARSER_VALUE_TYPE_ARRAY)) {
@@ -1337,7 +1337,7 @@ ClParserProcessUserFn(ClParserUserFnPtr userfn, const ClParserArgValueArray &arg
   for (uint i = 0; i < num_arg_values; i++) {
     ClParserVarRefPtr var_ref = arg_values[i].getVarRef();
 
-    if (var_ref.isValid()) {
+    if (var_ref) {
       if (! var_ref->getValue(values[i])) {
         ClParserInst->signalError(error_code, ClErr::UNDEFINED_VALUE);
         return ClParserValuePtr();
@@ -1357,12 +1357,12 @@ ClParserProcessUserFn(ClParserUserFnPtr userfn, const ClParserArgValueArray &arg
       types = userfn->getArgType(userfn->getNumArgTypes() - 1);
 
     if (types & CL_PARSER_VALUE_TYPE_OUTPUT) {
-      if (! var_ref.isValid()) {
+      if (! var_ref) {
         ClParserInst->signalError(error_code, ClErr::INVALID_LVALUE_FOR_ASSIGNMENT);
         return ClParserValuePtr();
       }
 
-      if (! values[i].isValid()) {
+      if (! values[i]) {
         if      (types & CL_PARSER_VALUE_TYPE_REAL)
           values[i] = ClParserValueMgrInst->createValue(0.0);
         else if (types & CL_PARSER_VALUE_TYPE_INTEGER)
@@ -1378,7 +1378,7 @@ ClParserProcessUserFn(ClParserUserFnPtr userfn, const ClParserArgValueArray &arg
       }
     }
 
-    if (! values[i].isValid()) {
+    if (! values[i]) {
       ClParserInst->signalError(error_code, ClErr::UNDEFINED_VALUE);
 
       return ClParserValuePtr();
@@ -1396,7 +1396,7 @@ ClParserProcessUserFn(ClParserUserFnPtr userfn, const ClParserArgValueArray &arg
 
   ClParserValuePtr value = userfn->exec(values, error_code);
 
-  if (! value.isValid() || *error_code != 0)
+  if (! value || *error_code != 0)
     return ClParserValuePtr();
 
   /*-----------------*/
@@ -1447,7 +1447,7 @@ ClParserProcessArrayUserFn(ClParserUserFnPtr userfn, const ClParserArgValueArray
 
   ClParserVarRefPtr var_ref = arg_values[0].getVarRef();
 
-  if (var_ref.isValid()) {
+  if (var_ref) {
     if (! var_ref->getValue(value1)) {
       ClParserInst->signalError(error_code, ClErr::UNDEFINED_VALUE);
       return ClParserValuePtr();
@@ -1524,7 +1524,7 @@ ClParserProcessStructureUserFn(ClParserUserFnPtr userfn, const ClParserArgValueA
 
   ClParserVarRefPtr var_ref = arg_values[0].getVarRef();
 
-  if (var_ref.isValid()) {
+  if (var_ref) {
     if (! var_ref->getValue(value1)) {
       ClParserInst->signalError(error_code, ClErr::UNDEFINED_VALUE);
       return ClParserValuePtr();

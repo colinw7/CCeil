@@ -52,7 +52,6 @@ class ClParserArray : public ClParserObj {
   }
 
  protected:
-  friend class CRefPtr<ClParserArray>;
   friend class ClParserValue;
 
   ClParserArray();
@@ -97,8 +96,6 @@ class ClParserArray : public ClParserObj {
 
   ClParserArray(const ClParserArray &array);
 
- ~ClParserArray();
-
   ClParserArray &operator=(const ClParserArray &array);
 
   ClParserArray *dup() const override;
@@ -106,6 +103,8 @@ class ClParserArray : public ClParserObj {
   ClParserArrayPtr dupArray() const;
 
  public:
+ ~ClParserArray();
+
   void copy(const ClParserObj &obj) override;
 
   //--------

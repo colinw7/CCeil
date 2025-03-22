@@ -91,18 +91,17 @@ class ClParserVar {
 
  protected:
   friend class ClParserVarMgr;
-  friend class CRefPtr<ClParserVar>;
 
   explicit ClParserVar(const std::string &name);
   ClParserVar(const std::string &name, ClParserValuePtr value);
 
   ClParserVar(const ClParserVar &var);
 
- ~ClParserVar();
-
   ClParserVar *dup() const;
 
  public:
+ ~ClParserVar();
+
   const std::string &getName() const {
     return name_;
   }
@@ -182,16 +181,15 @@ class ClParserVar {
 class ClParserVarRef {
  protected:
   friend class ClParserVarMgr;
-  friend class CRefPtr<ClParserVarRef>;
 
   ClParserVarRef(ClParserVarPtr variable,
                  const ClParserValueArray &subscripts = ClParserValueArray());
 
-  virtual ~ClParserVarRef() { }
-
   ClParserVarRef *dup() const;
 
  public:
+  virtual ~ClParserVarRef() { }
+
   virtual bool setValue(ClParserValuePtr value);
 
   virtual bool getValue(ClParserValuePtr &value) const;
@@ -230,16 +228,15 @@ class ClParserVarRef {
 class ClParserStructVarRef : public ClParserVarRef {
  protected:
   friend class ClParserVarMgr;
-  friend class CRefPtr<ClParserStructVarRef>;
 
   ClParserStructVarRef(ClParserVarPtr variable, const std::string &name,
                        const ClParserValueArray &subscripts = ClParserValueArray());
 
- ~ClParserStructVarRef() { }
-
   ClParserStructVarRef *dup() const;
 
  public:
+ ~ClParserStructVarRef() { }
+
   bool setValue(ClParserValuePtr value) override;
 
   bool getValue(ClParserValuePtr &value) const override;

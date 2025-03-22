@@ -140,15 +140,15 @@ class ClParserStack {
 
  protected:
   friend class ClParserStackMgr;
-  friend class CRefPtr<ClParserStack>;
 
   ClParserStack();
   ClParserStack(const ClParserStack &stack);
- ~ClParserStack();
 
   ClParserStack *dup() const;
 
  public:
+ ~ClParserStack();
+
   bool getRestart() const {
     return restart_;
   }

@@ -30,7 +30,6 @@ class ClParserIdentifier {
 
  protected:
   friend class ClParserIdentifierMgr;
-  friend class CRefPtr<ClParserIdentifier>;
 
   ClParserIdentifier(const std::string &name) :
    type_(ClParserIdentifierType::NONE), name_(name) {

@@ -27,8 +27,11 @@ bool
 ClParserOperatorMgr::
 initOperatorMap()
 {
-  for (uint i = 0; parser_operators[i]; ++i)
-    operator_map_[parser_operators[i]->type] = new ClParserOperator(*parser_operators[i]);
+  for (uint i = 0; parser_operators[i]; ++i) {
+    auto *op = new ClParserOperator(*parser_operators[i]);
+
+    operator_map_[parser_operators[i]->type] = ClParserOperatorPtr(op);
+  }
 
   return true;
 }
@@ -82,7 +85,7 @@ checkUnstack(ClParserOperatorPtr last_operator) const
 {
   bool unstack = false;
 
-  if (last_operator.isValid() &&
+  if (last_operator &&
       (last_operator->data_.precedence > data_.precedence ||
        (last_operator->data_.precedence == data_.precedence &&
         data_.associativity == CLParserOperatorAssociate::L_TO_R)))

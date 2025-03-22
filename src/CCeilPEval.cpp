@@ -69,7 +69,7 @@ bool
 ClParserExpr::
 exec(ClParserValuePtr &value)
 {
-  if (stack_.isValid()) {
+  if (stack_) {
     ClParserStackMgrInst->startTempStack();
 
     auto p1 = stack_->stackNodeListBegin();
@@ -92,10 +92,10 @@ exec(ClParserValuePtr &value)
     value = ClParserValuePtr();
   }
 
-  if (stack_.isValid())
+  if (stack_)
     ClParserStackMgrInst->endTempStack();
 
-  if (! value.isValid())
+  if (! value)
     return false;
 
   return true;

@@ -5,7 +5,6 @@
 
 class ClParserReal : public ClParserObj {
  protected:
-  friend class CRefPtr<ClParserReal>;
   friend class ClParserValue;
 
  protected:
@@ -39,8 +38,6 @@ class ClParserReal : public ClParserObj {
    ClParserObj(CL_PARSER_VALUE_TYPE_REAL), real_(real->real_) {
   }
 
- ~ClParserReal() { }
-
   ClParserReal &operator=(const ClParserReal &real) {
     real_ = real.real_;
 
@@ -55,6 +52,8 @@ class ClParserReal : public ClParserObj {
 
     return reinterpret_cast<const ClParserReal &>(obj);
   }
+
+ ~ClParserReal() { }
 
   void copy(const ClParserObj &obj) override;
 

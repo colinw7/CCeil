@@ -319,12 +319,12 @@ parse()
       if (parse_.isChar('(')) {
         ClParserInternFnPtr internfn;
 
-        if (scope.isValid())
+        if (scope)
           internfn = scope->getInternFn(name);
         else
           internfn = ClParserInst->getInternFn(name);
 
-        if (internfn.isValid()) {
+        if (internfn) {
           ClParserStackMgrInst->push(internfn);
 
           ClParserStackMgrInst->toNext();
@@ -332,12 +332,12 @@ parse()
         else {
           ClParserUserFnPtr userfn;
 
-          if (scope.isValid())
+          if (scope)
             userfn = scope->getUserFn(name);
           else
             userfn = ClParserInst->getUserFn(name);
 
-          if (userfn.isValid()) {
+          if (userfn) {
             ClParserStackMgrInst->push(userfn);
 
             ClParserStackMgrInst->toNext();
@@ -345,7 +345,7 @@ parse()
           else {
             ClParserTypePtr type = ClParserInst->getType(name);
 
-            if (type.isValid()) {
+            if (type) {
               ClParserStackMgrInst->push(type);
 
               ClParserStackMgrInst->toNext();

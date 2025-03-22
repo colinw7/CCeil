@@ -5,7 +5,6 @@
 
 class ClParserString : public ClParserObj {
  protected:
-  friend class CRefPtr<ClParserString>;
   friend class ClParserValue;
 
  protected:
@@ -39,8 +38,6 @@ class ClParserString : public ClParserObj {
 
   ClParserString(const ClParserString &str);
 
- ~ClParserString() { }
-
   ClParserString &operator=(const ClParserString &str);
 
   ClParserString *dup() const override;
@@ -51,6 +48,8 @@ class ClParserString : public ClParserObj {
 
     return reinterpret_cast<const ClParserString &>(obj);
   }
+
+ ~ClParserString() { }
 
   void copy(const ClParserObj &obj) override;
 

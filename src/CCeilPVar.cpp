@@ -156,7 +156,7 @@ addVariable(ClParserVar *var)
 
   const std::string &name = var->getName();
 
-  (*varMap)[name] = var;
+  (*varMap)[name] = ClParserVarPtr(var);
 
   return (*varMap)[name];
 }
@@ -268,7 +268,7 @@ getVariableI(const std::string &name, ClParserVarPtr &var, bool parentScope) con
     return false;
 
   // create variable in this scope
-  if (var->getValue().isValid() && ! var->isGlobal()) {
+  if (var->getValue() && ! var->isGlobal()) {
     ClParserVarMgr *th = const_cast<ClParserVarMgr *>(this);
 
     var = th->createVarI(var->getName(), var->getValue());
@@ -283,7 +283,7 @@ getVariableValue(const std::string &name) const
 {
   ClParserVarPtr var;
 
-  if (! getVariableI(name, var) || ! var->getValue().isValid())
+  if (! getVariableI(name, var) || ! var->getValue())
     return ClParserValuePtr();
 
   return var->getValue();
@@ -786,7 +786,7 @@ setValue(ClParserValuePtr new_value)
 
     ClParserValuePtr value1 = dictionary->getValue(ind);
 
-    if (! value1.isValid())
+    if (! value1)
       return false;
 
     if (num_subscripts > 1) {

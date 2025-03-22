@@ -5,7 +5,6 @@
 
 class ClParserInteger : public ClParserObj {
  public:
-  friend class CRefPtr<ClParserInteger>;
   friend class ClParserValue;
 
   static ClParserIntegerPtr createInteger(long integer=0) {
@@ -38,8 +37,6 @@ class ClParserInteger : public ClParserObj {
    ClParserObj(CL_PARSER_VALUE_TYPE_INTEGER), integer_(integer->integer_) {
   }
 
- ~ClParserInteger() { }
-
   ClParserInteger &operator=(const ClParserInteger &integer) {
     integer_ = integer.integer_;
 
@@ -54,6 +51,8 @@ class ClParserInteger : public ClParserObj {
 
     return reinterpret_cast<const ClParserInteger &>(obj);
   }
+
+ ~ClParserInteger() { }
 
   void copy(const ClParserObj &obj) override;
 

@@ -131,7 +131,7 @@ assignValue(const std::string &str, ClParserValuePtr value, int *error_code)
 
     ClParserValuePtr value2 = ClParserStackMgrInst->evaluateStack();
 
-    if (! value2.isValid()) {
+    if (! value2) {
       signalError(error_code, ClErr::INVALID_EXPRESSION);
       return;
     }
@@ -178,7 +178,7 @@ assignSubscriptValue(const std::string &str, int i, ClParserValuePtr value, int 
 
   ClParserValuePtr value2 = ClParserStackMgrInst->evaluateStack();
 
-  if (! value2.isValid()) {
+  if (! value2) {
     signalError(error_code, ClErr::INVALID_EXPRESSION);
     return;
   }

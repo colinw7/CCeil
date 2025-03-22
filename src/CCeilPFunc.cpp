@@ -236,14 +236,14 @@ void
 ClParserFuncMgr::
 addFunction(ClParserFunc *func)
 {
-  function_list_[func->getName()] = func;
+  function_list_[func->getName()] = ClParserFuncPtr(func);
 }
 
 bool
 ClParserFuncMgr::
 isFunction(const std::string &name) const
 {
-  return getFunction(name).isValid();
+  return !!getFunction(name);
 }
 
 ClParserFuncPtr

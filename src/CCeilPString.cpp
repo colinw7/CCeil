@@ -420,7 +420,7 @@ format(ClParserValuePtr value, std::string &result) const
 
           values[0] = value->getDictionary()->getValue(ind);
 
-          if (! values[0].isValid())
+          if (! values[0])
             return false;
 
           if (text_[i] == '>')

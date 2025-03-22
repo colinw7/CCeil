@@ -1076,7 +1076,7 @@ ClStdProcCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
     ClLanguageFuncMgrInst->deleteFunc(old_lfunction->getName());
   }
 
-  if (old_pfunction.isValid())
+  if (old_pfunction)
     ClParserInst->removeFunction(old_pfunction->getName());
 
   /* Add Procedure to List */
@@ -1266,7 +1266,7 @@ ClStdFuncCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
     ClLanguageFuncMgrInst->deleteFunc(old_lfunction->getName());
   }
 
-  if (old_pfunction.isValid())
+  if (old_pfunction)
     ClParserInst->removeFunction(old_pfunction->getName());
 
   /* Add Function to List */
@@ -1404,7 +1404,7 @@ ClStdForCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
                           for_expr1.c_str());
     return;
   }
-  else if (! value.isValid()) {
+  else if (! value) {
     lmgr->syntaxError("undefined 'for' expression 1 - '%s'", for_expr1.c_str());
     return;
   }
@@ -1420,7 +1420,7 @@ ClStdForCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
                           for_expr2.c_str());
     return;
   }
-  else if (! value.isValid()) {
+  else if (! value) {
     lmgr->syntaxError("undefined 'for' expression 2 - '%s'", for_expr2.c_str());
     return;
   }
@@ -1451,7 +1451,7 @@ ClStdForCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
                             for_expr3.c_str());
       return;
     }
-    else if (! value.isValid()) {
+    else if (! value) {
       lmgr->syntaxError("undefined 'for' expression 3 - '%s'", for_expr3.c_str());
       return;
     }
@@ -1465,7 +1465,7 @@ ClStdForCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
                             for_expr2.c_str());
       return;
     }
-    else if (! value.isValid()) {
+    else if (! value) {
       lmgr->syntaxError("undefined 'for' expression 2 - '%s'", for_expr2.c_str());
       return;
     }
@@ -1593,7 +1593,7 @@ ClStdForEachCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
                           expression.c_str());
     return;
   }
-  else if (! value.isValid()) {
+  else if (! value) {
     lmgr->syntaxError("undefined 'foreach' expression 1 - '%s'", expression.c_str());
     return;
   }
@@ -1733,7 +1733,7 @@ ClStdWhileCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
                             expression.c_str());
       return;
     }
-    else if (! value.isValid()) {
+    else if (! value) {
       lmgr->syntaxError("undefined 'while' expression - '%s'", expression.c_str());
       return;
     }
@@ -1854,7 +1854,7 @@ ClStdUntilCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
                             expression.c_str());
       return;
     }
-    else if (! value.isValid()) {
+    else if (! value) {
       lmgr->syntaxError("undefined 'until' expression - '%s'", expression.c_str());
       return;
     }
@@ -1955,7 +1955,7 @@ ClStdRepeatCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
                           expression.c_str());
     return;
   }
-  else if (! value.isValid()) {
+  else if (! value) {
     lmgr->syntaxError("undefined 'repeat' expression - '%s'", expression.c_str());
     return;
   }
@@ -2097,7 +2097,7 @@ ClStdIfCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
     lmgr->expressionError(ClErr::INVALID_EXPRESSION, "'if' expression - '%s'", expression.c_str());
     return;
   }
-  else if (! evalue.isValid()) {
+  else if (! evalue) {
     lmgr->syntaxError("undefined 'if' expression - '%s'", expression.c_str());
     return;
   }
@@ -2178,7 +2178,7 @@ ClStdIfCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
                               expression0.c_str());
         return;
       }
-      else if (! evalue0.isValid()) {
+      else if (! evalue0) {
         lmgr->syntaxError("undefined 'elseif' expression - '%s'", expression0.c_str());
         return;
       }
@@ -2984,7 +2984,7 @@ ClStdInputCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
 
     ClParserValuePtr value = ClParserValueMgrInst->createValue(line);
 
-    if (! value.isValid())
+    if (! value)
       goto set_value;
 
     ClParserInst->assignValue(variable1, value, &error_code);
@@ -3003,7 +3003,7 @@ ClStdInputCommand(ClLanguageCommand *, ClLanguageArgs *args, void *)
   else {
     ClParserValuePtr value = ClParserValueMgrInst->createValue("");
 
-    if (! value.isValid())
+    if (! value)
       return;
 
     ClParserInst->assignValue(variable1, value, &error_code);
@@ -3120,7 +3120,7 @@ ClStdPrintCommand(ClLanguageCommand *command, ClLanguageArgs *args, void *)
                               i, arg.c_str());
       goto done;
     }
-    else if (! value.isValid()) {
+    else if (! value) {
       if (num_args == 1)
         lmgr->syntaxError("undefined 'print' expression '%s'", arg.c_str());
       else
@@ -3735,7 +3735,7 @@ ClStdExecCommand(ClParserValuePtr *values, uint, void *, int *error_code)
   value = ClParserValueMgrInst->createValue(dims, num_dims, line_list);
 
  fail:
-  if (! value.isValid()) {
+  if (! value) {
     dims[0]  = 1;
     num_dims = 1;
 

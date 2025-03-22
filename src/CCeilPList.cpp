@@ -133,7 +133,7 @@ void
 ClParserList::
 addListValues(ClParserListPtr list)
 {
-  addListValues(*list.cast<ClParserList>());
+  addListValues(*dynamic_cast<ClParserList *>(list.get()));
 }
 
 void
@@ -180,7 +180,7 @@ bool
 ClParserList::
 deleteListValues(ClParserListPtr list)
 {
-  return deleteListValues(*list.cast<ClParserList>());
+  return deleteListValues(*dynamic_cast<ClParserList *>(list.get()));
 }
 
 bool
@@ -313,7 +313,7 @@ getMaxValue() const
   auto p2 = values_.end  ();
 
   for ( ; p1 != p2; ++p1)
-    if (! value.isValid() || (*p1)->cmp(value) > 0)
+    if (! value || (*p1)->cmp(value) > 0)
       value = *p1;
 
   return value;
@@ -329,7 +329,7 @@ getMinValue() const
   auto p2 = values_.end  ();
 
   for ( ; p1 != p2; ++p1)
-    if (! value.isValid() || (*p1)->cmp(value) < 0)
+    if (! value || (*p1)->cmp(value) < 0)
       value = *p1;
 
   return value;
@@ -951,7 +951,7 @@ sum() const
   auto p2 = values_.end  ();
 
   for ( ; p1 != p2; ++p1) {
-    if (! value.isValid())
+    if (! value)
       value = *p1;
     else
       value = value->plus(*p1);

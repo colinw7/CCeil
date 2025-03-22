@@ -59,15 +59,15 @@ class ClParserTypeMgr {
 class ClParserType {
  private:
   friend class ClParserTypeMgr;
-  friend class CRefPtr<ClParserType>;
 
   ClParserType(const std::string &name="");
   ClParserType(const std::string &name, const ClParserSubTypeArray &sub_types);
- ~ClParserType();
 
   ClParserType *dup() const;
 
  public:
+ ~ClParserType();
+
   const std::string &getName() const { return name_; }
 
   uint getNumSubTypes() const { return uint(sub_types_.size()); }

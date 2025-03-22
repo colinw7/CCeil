@@ -33,7 +33,6 @@ class ClParserStruct : public ClParserObj {
   }
 
  protected:
-  friend class CRefPtr<ClParserStruct>;
   friend class ClParserValue;
 
   ClParserStruct();
@@ -45,8 +44,6 @@ class ClParserStruct : public ClParserObj {
 
   ClParserStruct(const ClParserStruct &structure);
 
- ~ClParserStruct();
-
   ClParserStruct &operator=(const ClParserStruct &structure);
 
   ClParserStruct *dup() const override;
@@ -54,6 +51,8 @@ class ClParserStruct : public ClParserObj {
   ClParserStructPtr dupStruct() const;
 
  public:
+ ~ClParserStruct();
+
   void copy(const ClParserObj &obj) override;
 
   //--------
@@ -61,7 +60,7 @@ class ClParserStruct : public ClParserObj {
   ClParserTypePtr getType() const { return type_; }
 
   bool getIsFixedType() const {
-    return (type_.isValid() ? type_->getIsFixed() : false);
+    return (type_ ? type_->getIsFixed() : false);
   }
 
   uint getNumValues() const { return uint(values_.size()); }

@@ -444,12 +444,12 @@ ClParserArray(const uint *dims, uint num_dims, const ClParserValuePtr *values) :
 
   for (uint i = 0; i < num_data; ++i) {
     if (values[i]->getType() != CL_PARSER_VALUE_TYPE_STRUCTURE ||
-        (type.isValid() && values[i]->getStructure()->getType() != type)) {
+        (type && values[i]->getStructure()->getType() != type)) {
       ClErrThrow(ClErr::INVALID_TYPE_FOR_OPERATOR);
       return;
     }
 
-    if (! type.isValid())
+    if (! type)
       type = values[i]->getStructure()->getType();
   }
 
@@ -2983,7 +2983,7 @@ internFn(ClParserInternFnPtr internfn, const ClParserValuePtr *values, uint num_
 
       auto array = array1->getSubArray(int(integer1), int(integer2));
 
-      if (! array.isValid())
+      if (! array)
         return ClParserValuePtr();
 
       return ClParserValueMgrInst->createValue(array);

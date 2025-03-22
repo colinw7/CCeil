@@ -3,8 +3,8 @@
 
 #include <vector>
 #include <list>
-#include <CRefPtr.h>
-#include <CRefPtrDbg.h>
+#include <memory>
+#include <cassert>
 
 typedef unsigned char uchar;
 
@@ -175,26 +175,26 @@ union  ClParserArrayData;
 union  ClParserStackNodeData;
 union  ClParserValueData;
 
-typedef CRefPtr<ClParserObj>          ClParserObjPtr;
-typedef CRefPtr<ClParserReal>         ClParserRealPtr;
-typedef CRefPtr<ClParserInteger>      ClParserIntegerPtr;
-typedef CRefPtr<ClParserString>       ClParserStringPtr;
-typedef CRefPtr<ClParserList>         ClParserListPtr;
-typedef CRefPtr<ClParserDict>         ClParserDictPtr;
-typedef CRefPtr<ClParserStruct>       ClParserStructPtr;
-typedef CRefPtr<ClParserType>         ClParserTypePtr;
-typedef CRefPtr<ClParserFunc>         ClParserFuncPtr;
-typedef CRefPtr<ClParserUserFn>       ClParserUserFnPtr;
-typedef CRefPtr<ClParserValue>        ClParserValuePtr;
-typedef CRefPtr<ClParserArray>        ClParserArrayPtr;
-typedef CRefPtr<ClParserIdentifier>   ClParserIdentifierPtr;
-typedef CRefPtr<ClParserInternFn>     ClParserInternFnPtr;
-typedef CRefPtr<ClParserOperator>     ClParserOperatorPtr;
-typedef CRefPtr<ClParserStack>        ClParserStackPtr;
-typedef CRefPtr<ClParserVar>          ClParserVarPtr;
-typedef CRefPtr<ClParserVarRef>       ClParserVarRefPtr;
-typedef CRefPtr<ClParserStructVarRef> ClParserStructVarRefPtr;
-typedef CRefPtr<ClParserScope>        ClParserScopePtr;
+typedef std::shared_ptr<ClParserObj>          ClParserObjPtr;
+typedef std::shared_ptr<ClParserReal>         ClParserRealPtr;
+typedef std::shared_ptr<ClParserInteger>      ClParserIntegerPtr;
+typedef std::shared_ptr<ClParserString>       ClParserStringPtr;
+typedef std::shared_ptr<ClParserList>         ClParserListPtr;
+typedef std::shared_ptr<ClParserDict>         ClParserDictPtr;
+typedef std::shared_ptr<ClParserStruct>       ClParserStructPtr;
+typedef std::shared_ptr<ClParserType>         ClParserTypePtr;
+typedef std::shared_ptr<ClParserFunc>         ClParserFuncPtr;
+typedef std::shared_ptr<ClParserUserFn>       ClParserUserFnPtr;
+typedef std::shared_ptr<ClParserValue>        ClParserValuePtr;
+typedef std::shared_ptr<ClParserArray>        ClParserArrayPtr;
+typedef std::shared_ptr<ClParserIdentifier>   ClParserIdentifierPtr;
+typedef std::shared_ptr<ClParserInternFn>     ClParserInternFnPtr;
+typedef std::shared_ptr<ClParserOperator>     ClParserOperatorPtr;
+typedef std::shared_ptr<ClParserStack>        ClParserStackPtr;
+typedef std::shared_ptr<ClParserVar>          ClParserVarPtr;
+typedef std::shared_ptr<ClParserVarRef>       ClParserVarRefPtr;
+typedef std::shared_ptr<ClParserStructVarRef> ClParserStructVarRefPtr;
+typedef std::shared_ptr<ClParserScope>        ClParserScopePtr;
 
 typedef std::vector<ClParserObj *>    ClParserObjArray;
 typedef std::vector<ClParserValuePtr> ClParserValueArray;

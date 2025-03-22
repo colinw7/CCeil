@@ -7,8 +7,8 @@
 
 class ClParserFuncMgr {
  private:
-  typedef std::map<std::string,ClParserFuncPtr> FuncMap;
-  typedef StringVectorT                         FuncArgList;
+  typedef std::map<std::string, ClParserFuncPtr> FuncMap;
+  typedef StringVectorT                          FuncArgList;
 
  public:
   ClParserFuncMgr();
@@ -50,16 +50,15 @@ class ClParserFuncMgr {
 class ClParserFunc {
  protected:
   friend class ClParserFuncMgr;
-  friend class CRefPtr<ClParserFunc>;
 
   ClParserFunc(const std::string &name);
   ClParserFunc(const std::string &function_string, const std::string &expression_string);
 
- ~ClParserFunc();
-
   ClParserFunc *dup() const;
 
  public:
+ ~ClParserFunc();
+
   const std::string &getName() const { return name_; }
 
   uint getNumArgs() const { return uint(args_.size()); }

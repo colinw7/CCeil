@@ -49,7 +49,7 @@ valueToKey(ClParserValuePtr value)
   if      (value->getType() == CL_PARSER_VALUE_TYPE_INTEGER)
     return integerToKey(value->getInteger()->getValue());
   else if (value->getType() == CL_PARSER_VALUE_TYPE_STRING) {
-    if (value->getString().isValid())
+    if (value->getString())
       return stringToKey(value->getString()->getText());
     else
       return stringToKey("");
@@ -228,7 +228,7 @@ void
 ClParserDict::
 addValues(ClParserDictPtr dict)
 {
-  addValues(*dict.cast<ClParserDict>());
+  addValues(*dynamic_cast<ClParserDict *>(dict.get()));
 }
 
 void
@@ -394,7 +394,7 @@ getMaxValue() const
   auto p2 = key_values_.end  ();
 
   for ( ; p1 != p2; ++p1)
-    if (! value.isValid() || (*p1).value->cmp(value) > 0)
+    if (! value || (*p1).value->cmp(value) > 0)
       value = (*p1).value;
 
   return value;
@@ -410,7 +410,7 @@ getMinValue() const
   auto p2 = key_values_.end  ();
 
   for ( ; p1 != p2; ++p1)
-    if (! value.isValid() || (*p1).value->cmp(value) < 0)
+    if (! value || (*p1).value->cmp(value) < 0)
       value = (*p1).value;
 
   return value;
@@ -1022,7 +1022,7 @@ subscriptValue(const ClParserValuePtr *subscripts, uint num_subscripts) const
 
   ClParserValuePtr sub_value = getKeyValue(key);
 
-  if (! sub_value.isValid()) {
+  if (! sub_value) {
     error_code_ = int(ClErr::SUBSCRIPT_OUT_OF_RANGE);
     return ClParserValuePtr();
   }
@@ -1047,7 +1047,7 @@ getValue(const ClParserKey &key) const
 
   ClParserValuePtr sub_value = getKeyValue(key);
 
-  if (! sub_value.isValid()) {
+  if (! sub_value) {
     error_code_ = int(ClErr::SUBSCRIPT_OUT_OF_RANGE);
     return ClParserValuePtr();
   }

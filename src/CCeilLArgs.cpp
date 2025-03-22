@@ -1273,7 +1273,7 @@ getValueArg(int n, int *error_code)
     return value;
   }
 
-  if (! value.isValid()) {
+  if (! value) {
     const std::string &command_name = ClLanguageMgrInst->getCommandName();
 
     ClLanguageMgrInst->syntaxError("undefined '%s' argument %d - '%s'",
@@ -1828,9 +1828,7 @@ setIntegerArg(int n, long integer, int *error_code)
     return;
 
   value = ClParserValueMgrInst->createValue(integer);
-
-  if (! value.isValid())
-    return;
+  if (! value) return;
 
   int error_code1;
 
@@ -1885,9 +1883,7 @@ setStringArg(int n, const std::string &str, int *error_code)
     return;
 
   value = ClParserValueMgrInst->createValue(str);
-
-  if (! value.isValid())
-    return;
+  if (! value) return;
 
   int error_code1;
 
@@ -1948,9 +1944,7 @@ setCharArrayArg(int n, char *chars, int num_chars, int *error_code)
     return;
 
   value = ClParserValueMgrInst->createValue(chars, uint(num_chars));
-
-  if (! value.isValid())
-    return;
+  if (! value) return;
 
   int error_code1;
 
@@ -2014,9 +2008,7 @@ setRealArrayArg(int n, double *reals, uint *dims, uint num_dims, int *error_code
     return;
 
   value = ClParserValueMgrInst->createValue(dims, num_dims, reals);
-
-  if (! value.isValid())
-    return;
+  if (! value) return;
 
   int error_code1;
 
@@ -2080,9 +2072,7 @@ setRealArrayArg(int n, float *reals, uint *dims, uint num_dims, int *error_code)
     return;
 
   value = ClParserValueMgrInst->createValue(dims, num_dims, reals);
-
-  if (! value.isValid())
-    return;
+  if (! value) return;
 
   int error_code1;
 
@@ -2117,9 +2107,7 @@ setIntegerArrayArg(int n, long *integers, uint *dims, uint num_dims, int *error_
     return;
 
   ClParserValuePtr value = ClParserValueMgrInst->createValue(dims, num_dims, integers);
-
-  if (! value.isValid())
-    return;
+  if (! value) return;
 
   int error_code1;
 
@@ -2183,9 +2171,7 @@ setIntegerArrayArg(int n, int *integers, uint *dims, uint num_dims, int *error_c
     return;
 
   value = ClParserValueMgrInst->createValue(dims, num_dims, integers);
-
-  if (! value.isValid())
-    return;
+  if (! value) return;
 
   int error_code1;
 
@@ -2248,9 +2234,7 @@ setStringArrayArg(int n, char **strings, uint *dims, uint num_dims, int *error_c
     return;
 
   value = ClParserValueMgrInst->createValue(dims, num_dims, const_cast<const char **>(strings));
-
-  if (! value.isValid())
-    return;
+  if (! value) return;
 
   int error_code1;
 
@@ -2318,7 +2302,7 @@ setExpressionArg(int n, const std::string &expression, int *error_code)
     return;
   }
 
-  if (! value.isValid()) {
+  if (! value) {
     const std::string &command_name = ClLanguageMgrInst->getCommandName();
 
     ClLanguageMgrInst->syntaxError("undefined '%s' argument %d - '%s'",
@@ -2468,7 +2452,7 @@ getCommandArgValues(ClLanguageCommand *command, ClParserValuePtr **values, int *
       goto GetCommandValues_1;
     }
 
-    if (! (*values)[i - 1].isValid()) {
+    if (! (*values)[i - 1]) {
       const std::string &command_name = ClLanguageMgrInst->getCommandName();
 
       ClLanguageMgrInst->syntaxError("undefined '%s' argument %d - '%s'",

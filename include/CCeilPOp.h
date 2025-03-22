@@ -91,7 +91,6 @@ struct ClParserOpData {
 class ClParserOperator {
  protected:
   friend class ClParserOperatorMgr;
-  friend class CRefPtr<ClParserOperator>;
 
   explicit ClParserOperator(const ClParserOperatorData &data);
   explicit ClParserOperator(const ClParserOpData &data);

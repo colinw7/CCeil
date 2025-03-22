@@ -54,7 +54,7 @@ createUserFn(const std::string &name, uint type, const IntVectorT &arg_types,
 {
   ClParserUserFn *userfn = new ClParserUserFn(name, type, arg_types, proc, data);
 
-  user_function_map_[name] = userfn;
+  user_function_map_[name] = ClParserUserFnPtr(userfn);
 
   return user_function_map_[name];
 }

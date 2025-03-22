@@ -33,7 +33,7 @@ getScope() const
   auto ps2 = scopes_.end  ();
 
   for ( ; ps1 != ps2; ++ps1) {
-    if (scope.isValid())
+    if (scope)
       scope = scope->getScope(*ps1);
     else
       scope = ClParserInst->getScope(*ps1);

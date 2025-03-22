@@ -31,7 +31,6 @@ class ClParserScopeMgr {
 class ClParserScope {
  protected:
   friend class ClParserScopeMgr;
-  friend class CRefPtr<ClParserScope>;
 
  protected:
   ClParserScope(ClParser *parser, const std::string &name);
@@ -40,13 +39,13 @@ class ClParserScope {
 
   ClParserScope(const ClParserScope &scope);
 
- ~ClParserScope();
-
   ClParserScope &operator=(const ClParserScope &scope);
 
   ClParserScope *dup() const;
 
  public:
+ ~ClParserScope();
+
   const ClParserScope *getParent() const { return parent_; }
 
   const std::string &getName() const { return name_; }

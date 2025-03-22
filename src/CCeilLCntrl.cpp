@@ -224,7 +224,7 @@ init(int *argc, char **argv)
 
     if      (! expr.exec(value))
       lmgr->expressionError(ClErr::INVALID_EXPRESSION, "'-exp' expression '%s'", exp.c_str());
-    else if (! value.isValid())
+    else if (! value)
       lmgr->syntaxError("undefined '-exp' expression '%s'", exp.c_str());
     else if (isExit) {
       value->print();
@@ -1345,7 +1345,7 @@ processCommand(ClLanguageCommand *command)
           goto processCommand_1;
         }
 
-        if (! value.isValid()) {
+        if (! value) {
           lmgr->syntaxError("undefined '$' expression '%s'", exp.c_str());
           goto processCommand_1;
         }
@@ -1529,7 +1529,7 @@ runProcedure(ClLanguageProc *procedure, ClLanguageArgs *args)
         goto runProcedure_1;
       }
 
-      if (! values[i].isValid()) {
+      if (! values[i]) {
         lmgr->syntaxError("procedure '%s' argument %d - '%s' : undefined expression",
                           procedure->getName().c_str(), i + 1, arg.c_str());
         goto runProcedure_1;
@@ -1546,7 +1546,7 @@ runProcedure(ClLanguageProc *procedure, ClLanguageArgs *args)
      Command Line Values */
 
   for (uint i = 0; i < num_args; i++) {
-    if (values[i].isValid()) {
+    if (values[i]) {
       const ClLanguageProcArg &parg = procedure->getArg(i);
 
       ClParserInst->createVar(parg.getName(), values[i]);
@@ -1567,7 +1567,7 @@ runProcedure(ClLanguageProc *procedure, ClLanguageArgs *args)
     if (parg.isReturned()) {
       values[i] = ClParserInst->getVariableValue(parg.getName());
 
-      if (! values[i].isValid()) {
+      if (! values[i]) {
         lmgr->syntaxError("invalid procedure '%s' return argument %d - '%s'",
                           procedure->getName().c_str(), i + 1, parg.getName().c_str());
         goto runProcedure_2;
@@ -1698,7 +1698,7 @@ runFunction(ClParserValuePtr *values, uint num_values, void *data, int *error_co
   /* Get Return Value */
 
   if (! ClParserInst->isVariable("_return")) {
-    if (getLastValue().isValid())
+    if (getLastValue())
       ClParserInst->createVar("_return", getLastValue());
     else
       ClParserInst->createVar("_return", ClParserValueMgrInst->createValue(0L));
@@ -1706,7 +1706,7 @@ runFunction(ClParserValuePtr *values, uint num_values, void *data, int *error_co
 
   value = ClParserInst->getVariableValue("_return");
 
-  if (! value.isValid()) {
+  if (! value) {
     lmgr->syntaxError("no '_return' value specified for function '%s'",
                       function->getName().c_str());
     *error_code = -2;
@@ -1722,7 +1722,7 @@ runFunction(ClParserValuePtr *values, uint num_values, void *data, int *error_co
 
     ClParserValuePtr value1 = ClParserInst->getVariableValue(function->getArg(i).getName());
 
-    if (! value1.isValid())
+    if (! value1)
       continue;
 
     values[i] = value1;
@@ -1789,7 +1789,7 @@ processExpression(ClLanguageCommand *, ClLanguageArgs *args)
       return;
     }
 
-    if (! value.isValid()) {
+    if (! value) {
       if (num_args == 1)
         lmgr->syntaxError("undefined argument '%s'", arg.c_str());
       else
@@ -2398,7 +2398,7 @@ addCommandDef(ClParserScopePtr scope, ClLanguageCommandDef *command_def)
 
   std::string scopeName;
 
-  if (scope.isValid())
+  if (scope)
     scopeName = scope->getFullName() + "::";
 
   std::string key1 = scopeName + command_def->getName();
@@ -2453,7 +2453,7 @@ getCommandDef(ClParserScopePtr scope, const std::string &name, bool *is_end_name
 
   std::string scopeName;
 
-  if (scope.isValid())
+  if (scope)
     scopeName = scope->getFullName() + "::";
 
   std::string key = scopeName + name;
@@ -2496,7 +2496,7 @@ removeCommandDef(ClParserScopePtr scope, ClLanguageCommandDef *command_def)
 
   std::string scopeName;
 
-  if (scope.isValid())
+  if (scope)
     scopeName = scope->getFullName() + "::";
 
   std::string key1 = scopeName + command_def->getName();

@@ -441,7 +441,7 @@ unstackTypeFunction(int *error_code)
 
       pop(op);
 
-      if (op.isValid()) {
+      if (op) {
         if      (op->isType(CL_PARSER_OP_CLOSE_R_BRACKET))
           in_brackets = false;
         else if (! op->isType(CL_PARSER_OP_COMMA))
@@ -455,7 +455,7 @@ unstackTypeFunction(int *error_code)
 
       pop(op);
 
-      if (op.isValid()) {
+      if (op) {
         if (op->isType(CL_PARSER_OP_CLOSE_R_BRACKET)) {
           in_brackets = false;
 
@@ -591,7 +591,7 @@ unstackArrayValue(int *error_code)
 
     /*----------*/
 
-    if (value.isValid()) {
+    if (value) {
       if (! ClParserValue::checkBinaryTypes(value, value1)) {
         *error_code = int(ClErr::INVALID_TYPE_MIX);
         return;
@@ -602,14 +602,14 @@ unstackArrayValue(int *error_code)
 
     /*----------*/
 
-    if (value1.isValid())
+    if (value1)
       values.push_back(value1);
 
     /*----------*/
 
     pop(op);
 
-    if (op.isValid()) {
+    if (op) {
       if      (op->isType(CL_PARSER_OP_CLOSE_S_BRACKET))
         in_brackets = false;
       else if (! op->isType(CL_PARSER_OP_COMMA))
@@ -700,7 +700,7 @@ unstackListValue(int *error_code)
 
     pop(op);
 
-    if (op.isValid()) {
+    if (op) {
       if      (op->isType(CL_PARSER_OP_CLOSE_BRACE))
         in_brackets = false;
       else if (! op->isType(CL_PARSER_OP_COMMA))
@@ -789,7 +789,7 @@ unstackDictionaryValue(int *error_code)
 
     pop(op);
 
-    if (op.isValid()) {
+    if (op) {
       if      (op->isType(CL_PARSER_OP_CLOSE_DICT))
         in_brackets = false;
       else if (! op->isType(CL_PARSER_OP_COMMA))
@@ -907,7 +907,7 @@ backUnstackExpression(int *error_code)
 
   ClParserOperatorPtr last_operator = getLastOperator();
 
-  while (last_operator.isValid()) {
+  while (last_operator) {
     if      (last_operator->isInline()) {
       unstackInlineOperator(error_code);
 
@@ -1191,7 +1191,7 @@ unstackInternalFunction(int *error_code)
 
       pop(op);
 
-      if (op.isValid()) {
+      if (op) {
         if      (op->isType(CL_PARSER_OP_CLOSE_R_BRACKET))
           in_brackets = false;
         else if (! op->isType(CL_PARSER_OP_COMMA))
@@ -1203,7 +1203,7 @@ unstackInternalFunction(int *error_code)
     else if (value_list.empty()) {
       pop(op);
 
-      if (op.isValid()) {
+      if (op) {
         if (op->isType(CL_PARSER_OP_CLOSE_R_BRACKET)) {
           in_brackets = false;
 
@@ -1257,7 +1257,7 @@ unstackInternalFunction(int *error_code)
 
   ClParserValuePtr value = ClParserProcessInternFn(internfn, value_list, error_code);
 
-  if (*error_code != 0 || ! value.isValid())
+  if (*error_code != 0 || ! value)
     return;
 
   push(value);
@@ -1305,7 +1305,7 @@ unstackUserFunction(int *error_code)
 
       pop(op);
 
-      if (op.isValid()) {
+      if (op) {
         if      (op->isType(CL_PARSER_OP_CLOSE_R_BRACKET))
           in_brackets = false;
         else if (! op->isType(CL_PARSER_OP_COMMA))
@@ -1317,7 +1317,7 @@ unstackUserFunction(int *error_code)
     else if (arg_value_list.empty()) {
       pop(op);
 
-      if (op.isValid()) {
+      if (op) {
         if (op->isType(CL_PARSER_OP_CLOSE_R_BRACKET)) {
           in_brackets = false;
 
@@ -1360,7 +1360,7 @@ unstackUserFunction(int *error_code)
 
   ClParserValuePtr value = ClParserProcessUserFn(userfn, arg_value_list, error_code);
 
-  if (*error_code != 0 || ! value.isValid())
+  if (*error_code != 0 || ! value)
     return;
 
   push(value);
@@ -1390,7 +1390,7 @@ unstackStructure(int *error_code)
 
   ClParserVarPtr variable = ClParserInst->getVariable(name);
 
-  if (! variable.isValid()) {
+  if (! variable) {
     ClParserStructPtr structure = ClParserStruct::createStruct();
 
     ClParserValuePtr value = ClParserValueMgrInst->createValue(structure);
@@ -1398,7 +1398,7 @@ unstackStructure(int *error_code)
     variable = ClParserInst->createVar(name, value);
   }
 
-  if (! variable->getValue().isValid() ||
+  if (! variable->getValue() ||
       ! (variable->getValue()->isStructure() || variable->getValue()->isStructureArray())) {
     *error_code = int(ClErr::INVALID_STRUCT_REF);
     return;
@@ -1457,7 +1457,7 @@ unstackStructure(int *error_code)
 
     const std::string &iname = identifier->getName();
 
-    if (var_ref.isValid()) {
+    if (var_ref) {
       ClParserValuePtr svalue;
 
       if (! var_ref->getValue(svalue)) {
@@ -1547,7 +1547,7 @@ unstackStructure(int *error_code)
 
   const std::string &name1 = identifier->getName();
 
-  if (var_ref.isValid()) {
+  if (var_ref) {
     ClParserValuePtr svalue;
 
     if (! var_ref->getValue(svalue)) {
@@ -1635,7 +1635,7 @@ unstackVariable(int *error_code)
 
   ClParserVarPtr variable;
 
-  if (scope.isValid())
+  if (scope)
     variable = scope->getVariable(name);
   else
     variable = ClParserInst->getVariable(name);
@@ -1647,7 +1647,7 @@ unstackVariable(int *error_code)
   if (stack_node && stack_node->isOperator(CL_PARSER_OP_OPEN_S_BRACKET)) {
     ClParserValuePtr subscript_value;
 
-    if (! variable.isValid() || ! variable->getValue().isValid()) {
+    if (! variable || ! variable->getValue()) {
       *error_code = int(ClErr::UNDEFINED_VARIABLE);
       return;
     }
@@ -1667,8 +1667,8 @@ unstackVariable(int *error_code)
     var_ref->addSubscript(subscript_value);
   }
   else {
-    if (! variable.isValid()) {
-      if (scope.isValid())
+    if (! variable) {
+      if (scope)
         variable = scope->getVariable(name, true);
       else
         variable = ClParserInst->getVariable(name, true);
@@ -1716,12 +1716,12 @@ unstackFunction(int *error_code)
 
   ClParserFuncPtr function;
 
-  if (scope.isValid())
+  if (scope)
     function = scope->getFunction(name);
   else
     function = ClParserInst->getFunction(name);
 
-  if (! function.isValid()) {
+  if (! function) {
     *error_code = int(ClErr::UNDEFINED_FUNCTION);
     return;
   }
@@ -1780,7 +1780,7 @@ unstackFunction(int *error_code)
 
   endTempStack();
 
-  if (! value.isValid()) {
+  if (! value) {
     *error_code = int(ClErr::UNDEFINED_FUNCTION);
     return;
   }
@@ -2411,7 +2411,7 @@ pop(ClParserValuePtr &value)
 
     popStackNode();
 
-    if (! value.isValid())
+    if (! value)
       return false;
   }
   else if (stack_node->isStructVarRef()) {
@@ -2422,7 +2422,7 @@ pop(ClParserValuePtr &value)
 
     popStackNode();
 
-    if (! value.isValid())
+    if (! value)
       return false;
   }
   else
@@ -2504,7 +2504,7 @@ ClParserStackPtr
 ClParserStackMgr::
 startStack()
 {
-  if (current_stack_.isValid())
+  if (current_stack_)
     stack_stack_.push_back(current_stack_);
 
   ClParserStack *stack = new ClParserStack;

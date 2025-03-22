@@ -1440,8 +1440,8 @@ bool
 ClParserValue::
 subscriptValue(ClParserValuePtr subscript, ClParserValuePtr &value) const
 {
-  if (! subscript.isValid()) {
-    value = dup();
+  if (! subscript) {
+    value = ClParserValuePtr(dup());
     return true;
   }
 
@@ -1492,7 +1492,7 @@ subscriptValue(ClParserValuePtr subscript, ClParserValuePtr &value) const
 
     ClParserValuePtr value1 = (*data_.array)->getSubscriptValue(subscripts);
 
-    if (! value1.isValid())
+    if (! value1)
       return false;
 
     value = value1;
@@ -1509,7 +1509,7 @@ subscriptValue(ClParserValuePtr subscript, ClParserValuePtr &value) const
 
     ClParserValuePtr value2 = (*data_.list)->subscriptValue(subscripts);
 
-    if (! value2.isValid())
+    if (! value2)
       return false;
 
     value = value2;
@@ -1519,10 +1519,10 @@ subscriptValue(ClParserValuePtr subscript, ClParserValuePtr &value) const
   else if (type_ == CL_PARSER_VALUE_TYPE_DICTIONARY) {
     ClParserValuePtr value2 = (*data_.dict)->subscriptValue(&subscript, 1);
 
-    if (! value2.isValid())
+    if (! value2)
       return false;
 
-    value = value2->dup();
+    value = ClParserValuePtr(value2->dup());
 
     return true;
   }
@@ -1652,7 +1652,7 @@ checkBinaryTypes(ClParserValuePtr &value1, ClParserValuePtr &value2)
     }
     else if (value1->getArray()->getType() == CL_PARSER_VALUE_TYPE_STRING) {
       if (value2->isType(CL_PARSER_VALUE_TYPE_STRING)) {
-        if (value2->getString().isValid()) {
+        if (value2->getString()) {
           array = ClParserArray::createArray
                     (value1->getArray()->getDims(), value2->getString()->getText());
 
@@ -1722,7 +1722,7 @@ checkBinaryTypes(ClParserValuePtr &value1, ClParserValuePtr &value2)
     }
     else if (value2->getArray()->getType() == CL_PARSER_VALUE_TYPE_STRING) {
       if (value1->isType(CL_PARSER_VALUE_TYPE_STRING)) {
-        if (value1->getString().isValid()) {
+        if (value1->getString()) {
           array = ClParserArray::createArray(value2->getArray()->getDims(),
                                              value1->getString()->getText());
 
@@ -2377,7 +2377,7 @@ ClParserObj *
 ClParserValue::
 getObj() const
 {
-  return static_cast<ClParserObj *>(data_.real->cast<ClParserReal>());
+  return static_cast<ClParserObj *>(dynamic_cast<ClParserReal *>(data_.real->get()));
 }
 
 ClParserRealPtr

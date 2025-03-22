@@ -88,16 +88,15 @@ class ClParserUserFn {
 
  protected:
   friend class ClParserUserFnMgr;
-  friend class CRefPtr<ClParserUserFn>;
 
   ClParserUserFn(const std::string &name, uint type, const IntVectorT &arg_types,
                  ClParserUserFnProc proc, void *data);
 
- ~ClParserUserFn();
-
   ClParserUserFn *dup() const;
 
  public:
+ ~ClParserUserFn();
+
   uint getInd() const { return ind_; }
 
   bool isVarArgs() const { return (type_ & CL_PARSER_USERFN_TYPE_VARARGS); }

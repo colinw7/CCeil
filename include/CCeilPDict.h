@@ -153,15 +153,12 @@ class ClParserDict : public ClParserObj {
   }
 
  protected:
-  friend class CRefPtr<ClParserDict>;
   friend class ClParserValue;
 
   ClParserDict();
   ClParserDict(const ClParserValuePtr *values, uint num_values);
   explicit ClParserDict(const ClParserValueArray &values);
   ClParserDict(const ClParserDict &dict);
-
- ~ClParserDict();
 
   ClParserDict &operator=(const ClParserDict &dict);
 
@@ -170,6 +167,8 @@ class ClParserDict : public ClParserObj {
   ClParserDictPtr dupDict() const;
 
  public:
+ ~ClParserDict();
+
   void copy(const ClParserObj &obj) override;
 
   //--------
