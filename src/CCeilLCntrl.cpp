@@ -55,7 +55,7 @@ initVars()
   continueFlag_ = false;
   returnFlag_   = false;
 
-  help_proc_ = nullptr;
+  helpProc_ = nullptr;
 
   command_name_     = "";
   command_line_num_ = 0;
@@ -144,7 +144,7 @@ initVars()
  *
  *------------------------------------------------------------------*/
 
-void
+bool
 ClLanguageMgr::
 init(int *argc, char **argv)
 {
@@ -161,12 +161,23 @@ init(int *argc, char **argv)
  -exit:f    (exit after evaluating expression) \
 ";
 
-  ClLanguageMgr *lmgr = ClLanguageMgrInst;
-
   CArgs cargs(opts);
 
   if (argc && argv)
     cargs.parse(argc, argv);
+
+  if (cargs.isHelp())
+    return false;
+
+  if (cargs.hasError()) {
+    std::cerr << "\n\nUsage:\n ";
+    cargs.usage(argv[0]);
+    return false;
+  }
+
+  //---
+
+  auto *lmgr = ClLanguageMgrInst;
 
   if (cargs.getBooleanArg("-nocase"))
     ClParserInst->setCaseSensitive(false);
@@ -287,6 +298,8 @@ init(int *argc, char **argv)
 
   if (isExp && isExit)
     setExitFlag(true);
+
+  return true;
 }
 
 /*------------------------------------------------------------------*
@@ -337,8 +350,8 @@ reinit()
  *   term();
  *
  * NOTES:
- *   This routine should be called when the application
- *   has finished using the CL routines.
+ *   This routine should be called when the application has finished using
+ *   the CL routines.
  *
  *------------------------------------------------------------------*/
 
@@ -444,9 +457,8 @@ promptLoop()
  *   startup();
  *
  * NOTES:
- *   Normally called automatically by promptLoop()
- *   but needs to be called manually if an application
- *   supplied prompt loop is used.
+ *   Normally called automatically by promptLoop() but needs to be called
+ *   manually if an application supplied prompt loop is used.
  *
  *------------------------------------------------------------------*/
 
@@ -2003,7 +2015,7 @@ checkAbort()
  *                 : the label was found.
  *
  * RETURNS:
- *     None
+ *   None
  *
  * NOTES:
  *   This routine should always find the label. If it does
@@ -2109,15 +2121,13 @@ setOutputFp(FILE *output_fp)
  *   ClParser::OutputProc old_proc = setOutputProc(ClLanguageOutputProc proc);
  *
  * INPUT:
- *   proc     : The procedure to which all CL output
- *            : will be sent.
+ *   proc : The procedure to which all CL output will be sent.
  *
  * OUTPUT:
  *   None
  *
  * RETURNS:
- *   old_proc : The procedure previously
- *            : being used for CL output.
+ *   old_proc : The procedure previously being used for CL output.
  *
  * NOTES:
  *   This routine should be called after init()
@@ -2154,11 +2164,10 @@ getOutputProc() const
  *   ClLanguageHelpProc old_proc = setHelpProc(ClLanguageHelpProc proc);
  *
  * INPUT:
- *   proc     : The help procedure to call
- *            : when help is requested.
+ *   proc : The help procedure to call when help is requested.
  *
  * OUTPUT:
- *     None
+ *   None
  *
  * RETURNS:
  *   old_proc : The help procedure previously being used.
@@ -2649,12 +2658,11 @@ clearBlockCommandStack(bool report_error)
  *   None
  *
  * NOTES:
- *   This is done for procedures and functions where the
- *   command list needs to be retained so it can be run
- *   again.
+ *   This is done for procedures and functions where the command list needs
+ *   to be retained so it can be run again.
  *
- *   The label commands have to be added before each run of
- *   the command list using addCommandLabels.
+ *   The label commands have to be added before each run of the command list
+ *   using addCommandLabels.
  *
  *------------------------------------------------------------------*/
 

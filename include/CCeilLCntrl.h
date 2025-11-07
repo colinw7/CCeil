@@ -121,7 +121,7 @@ class ClLanguageMgr {
 
   void initVars();
 
-  void init(int *argc, char **argv);
+  bool init(int *argc, char **argv);
 
   void reinit();
 
@@ -176,8 +176,8 @@ class ClLanguageMgr {
   void setReturnFlag(bool returnFlag) { returnFlag_ = returnFlag; }
   bool getReturnFlag() const { return returnFlag_; }
 
-  void setHelpProc(ClLanguageHelpProc help_proc) { help_proc_ = help_proc; }
-  ClLanguageHelpProc getHelpProc() const { return help_proc_; }
+  void setHelpProc(ClLanguageHelpProc helpProc) { helpProc_ = helpProc; }
+  ClLanguageHelpProc getHelpProc() const { return helpProc_; }
 
   void setCommandName(const std::string &name) { command_name_ = name; }
   const std::string &getCommandName() const { return command_name_; }
@@ -317,7 +317,7 @@ class ClLanguageMgr {
   bool                    breakFlag_         { false };
   bool                    continueFlag_      { false };
   bool                    returnFlag_        { false };
-  ClLanguageHelpProc      help_proc_         { nullptr };
+  ClLanguageHelpProc      helpProc_          { nullptr };
   std::string             command_name_;
   int                     command_line_num_  { 0 };
   int                     depth_             { 0 };

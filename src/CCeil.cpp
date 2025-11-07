@@ -22,7 +22,8 @@ int
 main(int argc, char **argv)
 {
   // Initialise Language and Parser
-  ClLanguageMgrInst->init(&argc, argv);
+  if (! ClLanguageMgrInst->init(&argc, argv))
+    return 0;
 
   // Turn Real Parsing on if Environment Variable set
   if (CEnvInst.exists("CL_PARSE_REAL"))
