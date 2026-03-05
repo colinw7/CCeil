@@ -7,7 +7,7 @@
 class ClParserParser {
  public:
   explicit ClParserParser(const std::string &str) :
-   parent_(NULL), parse_(str), assign_(false), error_code_(0) {
+   parse_(str) {
   }
 
   explicit ClParserParser(ClParserParser *parent) :

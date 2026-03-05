@@ -84,7 +84,7 @@ class ClParser {
   }
 
   FILE *setOutputFile(FILE *fp) {
-    if (fp != NULL)
+    if (fp)
       std::swap(output_fp_, fp);
     else
       fp = output_fp_;
@@ -97,7 +97,7 @@ class ClParser {
   }
 
   OutputProc setOutputProc(OutputProc proc, void *data) {
-    if (proc != NULL) {
+    if (proc) {
       std::swap(output_proc_, proc);
 
       output_data_ = data;

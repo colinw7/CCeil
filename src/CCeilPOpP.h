@@ -592,5 +592,5 @@ parser_operators[] = {
   &cl_lshift_equals_op,
   &cl_rshift_equals_op,
 
-  NULL,
+  nullptr
 };

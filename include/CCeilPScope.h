@@ -8,7 +8,7 @@ class ClParserScopeMgr {
   typedef std::map<std::string,ClParserScopePtr> ScopeMap;
 
  public:
-  ClParserScopeMgr(ClParserScope *parent=NULL) :
+  ClParserScopeMgr(ClParserScope *parent=nullptr) :
    parent_(parent) {
   }
 
@@ -51,7 +51,7 @@ class ClParserScope {
   const std::string &getName() const { return name_; }
 
   std::string getFullName() const {
-    if (parent_ != NULL)
+    if (parent_)
       return parent_->getFullName() + "::" + getName();
     else
       return getName();

@@ -80,7 +80,7 @@ class ClParserType {
 
   void setIsFixed(bool is_fixed) { is_fixed_ = is_fixed; }
 
-  void addSubType(const std::string &name, uint *dims = NULL, uint num_dims = 0);
+  void addSubType(const std::string &name, uint *dims = nullptr, uint num_dims = 0);
   void addSubType(const std::string &name, const UIntVectorT &dims);
 
   bool isGlobal() const { return (! name_.empty() && name_[0] == '_'); }
