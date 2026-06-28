@@ -46,7 +46,7 @@ ClParserVarPtr
 ClParserVarMgr::
 createVarI(const std::string &name, ClParserValuePtr value)
 {
-  ClParserVar *variable = new ClParserVar(name, value);
+  auto *variable = new ClParserVar(name, value);
 
   return addVariable(variable);
 }
@@ -55,7 +55,7 @@ ClParserVarRefPtr
 ClParserVarMgr::
 createVarRef(ClParserVarPtr variable, const ClParserValueArray &subscripts)
 {
-  ClParserVarRef *var_ref = new ClParserVarRef(variable, subscripts);
+  auto *var_ref = new ClParserVarRef(variable, subscripts);
 
   return ClParserVarRefPtr(var_ref);
 }
@@ -65,7 +65,7 @@ ClParserVarMgr::
 createStructVarRef(ClParserVarPtr variable, const std::string &name,
                    const ClParserValueArray &subscripts)
 {
-  ClParserStructVarRef *svar_ref = new ClParserStructVarRef(variable, name, subscripts);
+  auto *svar_ref = new ClParserStructVarRef(variable, name, subscripts);
 
   return ClParserStructVarRefPtr(svar_ref);
 }

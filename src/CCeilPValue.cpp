@@ -39,7 +39,7 @@ ClParserValuePtr
 ClParserValueMgr::
 createValue(double real)
 {
-  ClParserValue *value = new ClParserValue(real);
+  auto *value = new ClParserValue(real);
 
   return ClParserValuePtr(value);
 }
@@ -48,7 +48,7 @@ ClParserValuePtr
 ClParserValueMgr::
 createValue(long integer)
 {
-  ClParserValue *value = new ClParserValue(integer);
+  auto *value = new ClParserValue(integer);
 
   return ClParserValuePtr(value);
 }
@@ -57,7 +57,7 @@ ClParserValuePtr
 ClParserValueMgr::
 createValue(const std::string &str)
 {
-  ClParserValue *value = new ClParserValue(str);
+  auto *value = new ClParserValue(str);
 
   return ClParserValuePtr(value);
 }
@@ -66,7 +66,7 @@ ClParserValuePtr
 ClParserValueMgr::
 createValue(const char *str, uint len)
 {
-  ClParserValue *value = new ClParserValue(str, int(len));
+  auto *value = new ClParserValue(str, int(len));
 
   return ClParserValuePtr(value);
 }
@@ -75,7 +75,7 @@ ClParserValuePtr
 ClParserValueMgr::
 createValue(ClParserArrayPtr array)
 {
-  ClParserValue *value = new ClParserValue(array);
+  auto *value = new ClParserValue(array);
 
   return ClParserValuePtr(value);
 }
@@ -84,7 +84,7 @@ ClParserValuePtr
 ClParserValueMgr::
 createValue(ClParserListPtr list)
 {
-  ClParserValue *value = new ClParserValue(list);
+  auto *value = new ClParserValue(list);
 
   return ClParserValuePtr(value);
 }
@@ -93,7 +93,7 @@ ClParserValuePtr
 ClParserValueMgr::
 createValue(ClParserDictPtr dict)
 {
-  ClParserValue *value = new ClParserValue(dict);
+  auto *value = new ClParserValue(dict);
 
   return ClParserValuePtr(value);
 }
@@ -102,7 +102,7 @@ ClParserValuePtr
 ClParserValueMgr::
 createValue(ClParserStructPtr structure)
 {
-  ClParserValue *value = new ClParserValue(structure);
+  auto *value = new ClParserValue(structure);
 
   return ClParserValuePtr(value);
 }
@@ -111,7 +111,7 @@ ClParserValuePtr
 ClParserValueMgr::
 createValue(const ClParserObj &obj)
 {
-  ClParserValue *value = new ClParserValue(obj);
+  auto *value = new ClParserValue(obj);
 
   return ClParserValuePtr(value);
 }
@@ -120,7 +120,7 @@ ClParserValuePtr
 ClParserValueMgr::
 createValue(ClParserValueType type)
 {
-  ClParserValue *value = new ClParserValue(type);
+  auto *value = new ClParserValue(type);
 
   return ClParserValuePtr(value);
 }
@@ -129,7 +129,7 @@ ClParserValuePtr
 ClParserValueMgr::
 createValue(ClParserValueType type, ClParserValuePtr *values, int num_values)
 {
-  ClParserValue *value = new ClParserValue(type, values, num_values);
+  auto *value = new ClParserValue(type, values, num_values);
 
   return ClParserValuePtr(value);
 }
@@ -138,7 +138,7 @@ ClParserValuePtr
 ClParserValueMgr::
 createValue(ClParserValueType type, const ClParserValueArray &values)
 {
-  ClParserValue *value = new ClParserValue(type, values);
+  auto *value = new ClParserValue(type, values);
 
   return ClParserValuePtr(value);
 }
@@ -147,7 +147,7 @@ ClParserValuePtr
 ClParserValueMgr::
 createValue(ClParserValuePtr *values, int num_values)
 {
-  ClParserValue *value = new ClParserValue(values, num_values);
+  auto *value = new ClParserValue(values, num_values);
 
   return ClParserValuePtr(value);
 }
@@ -156,7 +156,7 @@ ClParserValuePtr
 ClParserValueMgr::
 createValue(const ClParserValueArray &values)
 {
-  ClParserValue *value = new ClParserValue(values);
+  auto *value = new ClParserValue(values);
 
   return ClParserValuePtr(value);
 }
@@ -165,7 +165,7 @@ ClParserValuePtr
 ClParserValueMgr::
 createValue(ClParserTypePtr type)
 {
-  ClParserValue *value = new ClParserValue(type);
+  auto *value = new ClParserValue(type);
 
   return ClParserValuePtr(value);
 }
@@ -174,7 +174,7 @@ ClParserValuePtr
 ClParserValueMgr::
 createValue(ClParserTypePtr type, ClParserValuePtr *values, int num_values)
 {
-  ClParserValue *value = new ClParserValue(type, values, num_values);
+  auto *value = new ClParserValue(type, values, num_values);
 
   return ClParserValuePtr(value);
 }
@@ -183,7 +183,7 @@ ClParserValuePtr
 ClParserValueMgr::
 createValue(ClParserTypePtr type, const ClParserValueArray &values)
 {
-  ClParserValue *value = new ClParserValue(type, values);
+  auto *value = new ClParserValue(type, values);
 
   return ClParserValuePtr(value);
 }
@@ -192,7 +192,7 @@ ClParserValuePtr
 ClParserValueMgr::
 createValue(uint *dims, uint num_dims, double *reals)
 {
-  ClParserValue *value = new ClParserValue(dims, num_dims, reals);
+  auto *value = new ClParserValue(dims, num_dims, reals);
 
   return ClParserValuePtr(value);
 }
@@ -201,7 +201,7 @@ ClParserValuePtr
 ClParserValueMgr::
 createValue(uint *dims, uint num_dims, float *reals)
 {
-  ClParserValue *value = new ClParserValue(dims, num_dims, reals);
+  auto *value = new ClParserValue(dims, num_dims, reals);
 
   return ClParserValuePtr(value);
 }
@@ -210,7 +210,7 @@ ClParserValuePtr
 ClParserValueMgr::
 createValue(uint *dims, uint num_dims, long *integers)
 {
-  ClParserValue *value = new ClParserValue(dims, num_dims, integers);
+  auto *value = new ClParserValue(dims, num_dims, integers);
 
   return ClParserValuePtr(value);
 }
@@ -219,7 +219,7 @@ ClParserValuePtr
 ClParserValueMgr::
 createValue(uint *dims, uint num_dims, int *integers)
 {
-  ClParserValue *value = new ClParserValue(dims, num_dims, integers);
+  auto *value = new ClParserValue(dims, num_dims, integers);
 
   return ClParserValuePtr(value);
 }
@@ -228,7 +228,7 @@ ClParserValuePtr
 ClParserValueMgr::
 createValue(uint *dims, uint num_dims, const char **strs)
 {
-  ClParserValue *value = new ClParserValue(dims, num_dims, strs);
+  auto *value = new ClParserValue(dims, num_dims, strs);
 
   return ClParserValuePtr(value);
 }
@@ -237,7 +237,7 @@ ClParserValuePtr
 ClParserValueMgr::
 createValue(uint *dims, uint num_dims, const StringVectorT &strs)
 {
-  ClParserValue *value = new ClParserValue(dims, num_dims, strs);
+  auto *value = new ClParserValue(dims, num_dims, strs);
 
   return ClParserValuePtr(value);
 }
@@ -246,7 +246,7 @@ ClParserValuePtr
 ClParserValueMgr::
 createValue(uint *dims, uint num_dims, const LongVectorT &integers)
 {
-  ClParserValue *value = new ClParserValue(dims, num_dims, integers);
+  auto *value = new ClParserValue(dims, num_dims, integers);
 
   return ClParserValuePtr(value);
 }
@@ -255,7 +255,7 @@ ClParserValuePtr
 ClParserValueMgr::
 createValue(uint *dims, uint num_dims, double real)
 {
-  ClParserValue *value = new ClParserValue(dims, num_dims, real);
+  auto *value = new ClParserValue(dims, num_dims, real);
 
   return ClParserValuePtr(value);
 }
@@ -264,7 +264,7 @@ ClParserValuePtr
 ClParserValueMgr::
 createValue(const UIntVectorT &dims, double real)
 {
-  ClParserValue *value = new ClParserValue(dims, real);
+  auto *value = new ClParserValue(dims, real);
 
   return ClParserValuePtr(value);
 }
@@ -273,7 +273,7 @@ ClParserValuePtr
 ClParserValueMgr::
 createValue(uint *dims, uint num_dims, long integer)
 {
-  ClParserValue *value = new ClParserValue(dims, num_dims, integer);
+  auto *value = new ClParserValue(dims, num_dims, integer);
 
   return ClParserValuePtr(value);
 }
@@ -282,7 +282,7 @@ ClParserValuePtr
 ClParserValueMgr::
 createValue(const UIntVectorT &dims, long integer)
 {
-  ClParserValue *value = new ClParserValue(dims, integer);
+  auto *value = new ClParserValue(dims, integer);
 
   return ClParserValuePtr(value);
 }
@@ -291,7 +291,7 @@ ClParserValuePtr
 ClParserValueMgr::
 createValue(uint *dims, uint num_dims, const char *str)
 {
-  ClParserValue *value = new ClParserValue(dims, num_dims, str);
+  auto *value = new ClParserValue(dims, num_dims, str);
 
   return ClParserValuePtr(value);
 }
@@ -300,7 +300,7 @@ ClParserValuePtr
 ClParserValueMgr::
 createValue(const UIntVectorT &dims, const char *str)
 {
-  ClParserValue *value = new ClParserValue(dims, str);
+  auto *value = new ClParserValue(dims, str);
 
   return ClParserValuePtr(value);
 }
@@ -309,7 +309,7 @@ ClParserValuePtr
 ClParserValueMgr::
 createValue(ClParserTypePtr type, uint *dims, uint num_dims)
 {
-  ClParserValue *value = new ClParserValue(type, dims, num_dims);
+  auto *value = new ClParserValue(type, dims, num_dims);
 
   return ClParserValuePtr(value);
 }
@@ -318,7 +318,7 @@ ClParserValuePtr
 ClParserValueMgr::
 createValue(ClParserTypePtr type, const UIntVectorT &dims)
 {
-  ClParserValue *value = new ClParserValue(type, dims);
+  auto *value = new ClParserValue(type, dims);
 
   return ClParserValuePtr(value);
 }

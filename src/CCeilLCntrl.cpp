@@ -373,7 +373,7 @@ term()
 
   ClModuleMgrInst->deleteModules();
 
-  /***********/
+  //---
 
   /* Terminate Parser Routines */
 
@@ -525,7 +525,7 @@ runFile(const std::string &file_name)
 
   /* Save Details of any Current File */
 
-  ClLanguageRunFileData *run_file = new ClLanguageRunFileData;
+  auto *run_file = new ClLanguageRunFileData;
 
   run_file->saveInputFile = getInputFile();
 
@@ -830,7 +830,7 @@ processLine(const std::string &line)
 
   CStrParse parse(line);
 
-  /********/
+  //---
 
   /* Check for Blank Line or Comment */
 
@@ -844,7 +844,7 @@ processLine(const std::string &line)
   if (parse.isChar('#') || parse.isString("//"))
     return nullptr;
 
-  /********/
+  //---
 
   /* Check for System Command ( ';' supported if bracketed) */
 
@@ -894,7 +894,7 @@ processLine(const std::string &line)
     goto processLine_1;
   }
 
-  /********/
+  //---
 
   /* Check for Execute String Command ( ';' supported if bracketed) */
 
@@ -946,7 +946,7 @@ processLine(const std::string &line)
     goto processLine_1;
   }
 
-  /********/
+  //---
 
   /* Extract possible Command Name */
 
@@ -980,7 +980,7 @@ processLine(const std::string &line)
   if (parse.isString("//"))
     parse.skipToEnd();
 
-  /********/
+  //---
 
   /* Check Command Definitions for Match */
 
@@ -1022,7 +1022,7 @@ processLine(const std::string &line)
     goto processLine_1;
   }
 
-  /********/
+  //---
 
   /* If no Match then Check Procedures for Match */
 
@@ -1087,7 +1087,7 @@ processLine(const std::string &line)
     goto processLine_1;
   }
 
-  /********/
+  //---
 
   /* Check for Label */
 
@@ -1122,12 +1122,12 @@ processLine(const std::string &line)
     goto processLine_1;
   }
 
-  /********/
+  //---
 
  processLine_2:
   /* If no Match then it must be an Expression */
 
-  /********/
+  //---
 
   /* Split Line if there is a ';' */
 
@@ -1153,7 +1153,7 @@ processLine(const std::string &line)
   else if (parse.eof() || parse.isString("//"))
     line1 = line.substr(0, i);
 
-  /********/
+  //---
 
   /* Add the Expression Command */
 
@@ -1161,7 +1161,7 @@ processLine(const std::string &line)
 
   goto processLine_1;
 
-  /********/
+  //---
 
  processLine_1:
   /* If we get a RetAll Command then dump all Current Block Commands */
@@ -1263,7 +1263,7 @@ processCommand(ClLanguageCommand *command)
       ClLanguageBlockDataMgrInst->startBlock(procedure->getCommandList(),
                                              CL_BLOCK_TYPE_PROCEDURE_BLOCK);
 
-      ClLanguageArgs *args = new ClLanguageArgs;
+      auto *args = new ClLanguageArgs;
 
       args->startArgs(command);
 
@@ -1309,7 +1309,7 @@ processCommand(ClLanguageCommand *command)
       ClLanguageBlockDataMgrInst->startBlock(procedure->getCommandList(),
                                              CL_BLOCK_TYPE_PROCEDURE_BLOCK);
 
-      ClLanguageArgs *args = new ClLanguageArgs;
+      auto *args = new ClLanguageArgs;
 
       args->startArgs(command);
 
@@ -1324,7 +1324,7 @@ processCommand(ClLanguageCommand *command)
     else if (command->isLabel())
       ;
     else if (command->isExpression()) {
-      ClLanguageArgs *args = new ClLanguageArgs;
+      auto *args = new ClLanguageArgs;
 
       args->startArgs(command);
 
@@ -2367,7 +2367,7 @@ uint
 ClLanguageMgr::
 defineCommand(const std::string &name, ClLanguageCmdProc function, void *data)
 {
-  ClLanguageCommandDef *command_def = new ClLanguageCommandDef(name, function, data);
+  auto *command_def = new ClLanguageCommandDef(name, function, data);
 
   addCommandDef(command_def);
 
@@ -2379,7 +2379,7 @@ ClLanguageMgr::
 defineCommand(ClParserScopePtr scope, const std::string &name,
               ClLanguageCmdProc function, void *data)
 {
-  ClLanguageCommandDef *command_def = new ClLanguageCommandDef(scope, name, function, data);
+  auto *command_def = new ClLanguageCommandDef(scope, name, function, data);
 
   addCommandDef(scope, command_def);
 
@@ -3010,7 +3010,7 @@ void
 ClLanguageCommandDef::
 runFunction(ClLanguageCommand *command)
 {
-  ClLanguageArgs *args = new ClLanguageArgs;
+  auto *args = new ClLanguageArgs;
 
   if (! (type_ & CL_BLOCK_TYPE_NO_ARGS_BLOCK))
     args->startArgs(command);

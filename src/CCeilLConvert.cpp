@@ -588,7 +588,7 @@ void
 ClLanguageConverterMgr::
 addConverter(const std::string &from_type, const std::string &to_type, ClLanguageConvertProc proc)
 {
-  ClLanguageConverter *converter = new ClLanguageConverter;
+  auto *converter = new ClLanguageConverter;
 
   converter->from_type = from_type;
   converter->to_type   = to_type;

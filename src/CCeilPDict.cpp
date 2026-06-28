@@ -96,7 +96,7 @@ ClParserDictPtr
 ClParserDict::
 createDict()
 {
-  ClParserDict *dict = new ClParserDict;
+  auto *dict = new ClParserDict;
 
   return ClParserDictPtr(dict);
 }
@@ -105,7 +105,7 @@ ClParserDictPtr
 ClParserDict::
 createDict(const ClParserValuePtr *values, uint num_values)
 {
-  ClParserDict *dict = new ClParserDict(values, num_values);
+  auto *dict = new ClParserDict(values, num_values);
 
   return ClParserDictPtr(dict);
 }
@@ -114,7 +114,7 @@ ClParserDictPtr
 ClParserDict::
 createDict(const ClParserValueArray &values)
 {
-  ClParserDict *dict = new ClParserDict(values);
+  auto *dict = new ClParserDict(values);
 
   return ClParserDictPtr(dict);
 }
@@ -123,7 +123,7 @@ ClParserDictPtr
 ClParserDict::
 createDict(const ClParserDict &dict)
 {
-  ClParserDict *pdict = new ClParserDict(dict);
+  auto *pdict = new ClParserDict(dict);
 
   return ClParserDictPtr(pdict);
 }

@@ -26,7 +26,7 @@ class ClParserIdentifierMgr {
 
 class ClParserIdentifier {
  public:
-  typedef StringVectorT ScopeList;
+  using ScopeList = StringVectorT;
 
  protected:
   friend class ClParserIdentifierMgr;
@@ -100,7 +100,7 @@ class ClParserIdentifier {
   void debugPrint() const;
 
  private:
-  ClParserIdentifierType type_;
+  ClParserIdentifierType type_ { ClParserIdentifierType::NONE };
   std::string            name_;
   ScopeList              scopes_;
 };

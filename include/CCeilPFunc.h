@@ -7,8 +7,8 @@
 
 class ClParserFuncMgr {
  private:
-  typedef std::map<std::string, ClParserFuncPtr> FuncMap;
-  typedef StringVectorT                          FuncArgList;
+  using FuncMap     = std::map<std::string, ClParserFuncPtr>;
+  using FuncArgList = StringVectorT;
 
  public:
   ClParserFuncMgr();

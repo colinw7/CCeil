@@ -6,7 +6,7 @@ ClParserListPtr
 ClParserList::
 createList()
 {
-  ClParserList *list = new ClParserList;
+  auto *list = new ClParserList;
 
   return ClParserListPtr(list);
 }
@@ -15,7 +15,7 @@ ClParserListPtr
 ClParserList::
 createList(const ClParserValuePtr *values, uint num_values)
 {
-  ClParserList *list = new ClParserList(values, num_values);
+  auto *list = new ClParserList(values, num_values);
 
   return ClParserListPtr(list);
 }
@@ -24,7 +24,7 @@ ClParserListPtr
 ClParserList::
 createList(const ClParserValueArray &values)
 {
-  ClParserList *list = new ClParserList(values);
+  auto *list = new ClParserList(values);
 
   return ClParserListPtr(list);
 }
@@ -33,7 +33,7 @@ ClParserListPtr
 ClParserList::
 createList(const ClParserList &list)
 {
-  ClParserList *plist = new ClParserList(list);
+  auto *plist = new ClParserList(list);
 
   return ClParserListPtr(plist);
 }

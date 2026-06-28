@@ -13,7 +13,7 @@ struct ClParserKeyValueBase {
 };
 
 struct ClParserIntegerKeyValue : public ClParserKeyValueBase {
-  long integer;
+  long integer { 0 };
 
   explicit ClParserIntegerKeyValue(long integer1) : integer(integer1) { }
 
@@ -96,8 +96,8 @@ class ClParserKey {
   ClParserValuePtr getAsValue() const;
 
  private:
-  ClParserValueType     type_;
-  ClParserKeyValueBase *value_;
+  ClParserValueType     type_  { CL_PARSER_VALUE_TYPE_NONE };
+  ClParserKeyValueBase* value_ { nullptr };
 };
 
 //---
@@ -114,12 +114,8 @@ struct ClParserKeyValue {
 #define ClParserDictMgrInst ClParserDictMgr::getInstance()
 
 class ClParserDictMgr {
-  typedef std::map<long,ClParserKey>        IntegerKeyMap;
-  typedef std::map<std::string,ClParserKey> StringKeyMap;
-
- private:
-  IntegerKeyMap integer_key_map_;
-  StringKeyMap  string_key_map_;
+  using IntegerKeyMap = std::map<long, ClParserKey>;
+  using StringKeyMap  = std::map<std::string, ClParserKey>;
 
  public:
   static ClParserDictMgr *getInstance();
@@ -134,6 +130,10 @@ class ClParserDictMgr {
   const ClParserKey &valueToKey(ClParserValuePtr value);
   const ClParserKey &integerToKey(long integer);
   const ClParserKey &stringToKey(const std::string &str);
+
+ private:
+  IntegerKeyMap integer_key_map_;
+  StringKeyMap  string_key_map_;
 };
 
 class ClParserDict : public ClParserObj {
@@ -302,7 +302,7 @@ class ClParserDict : public ClParserObj {
   void addValues(const ClParserDict &list);
 
  private:
-  typedef std::list<ClParserKeyValue> KeyValueList;
+  using KeyValueList = std::list<ClParserKeyValue>;
 
   static int error_code_;
 

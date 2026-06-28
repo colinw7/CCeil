@@ -52,7 +52,7 @@ ClParserUserFnMgr::
 createUserFn(const std::string &name, uint type, const IntVectorT &arg_types,
              ClParserUserFnProc proc, void *data)
 {
-  ClParserUserFn *userfn = new ClParserUserFn(name, type, arg_types, proc, data);
+  auto *userfn = new ClParserUserFn(name, type, arg_types, proc, data);
 
   user_function_map_[name] = ClParserUserFnPtr(userfn);
 
@@ -277,7 +277,7 @@ exec(ClParserValueArray &values, int *error_code)
 {
   uint num_values = uint(values.size());
 
-  ClParserValuePtr *values1 = new ClParserValuePtr [num_values + 1];
+  auto *values1 = new ClParserValuePtr [num_values + 1];
 
   for (uint i = 0; i < num_values; ++i)
     values1[i] = values[i];

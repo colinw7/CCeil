@@ -3,7 +3,7 @@
 class ClLanguageArgParser {
  public:
   ClLanguageArgParser(const std::string &str) :
-   str_(str), pos_(0), len_(uint(str_.size())) {
+   str_(str), len_(uint(str_.size())) {
     inBrackets_.resize(4);
   }
 

@@ -2232,7 +2232,7 @@ void
 ClParserStackMgr::
 push(ClParserIdentifierPtr identifier)
 {
-  ClParserStackNode *stack_node = new ClParserStackNode(identifier);
+  auto *stack_node = new ClParserStackNode(identifier);
 
   pushStackNode(stack_node);
 }
@@ -2241,7 +2241,7 @@ void
 ClParserStackMgr::
 push(ClParserInternFnPtr internfn)
 {
-  ClParserStackNode *stack_node = new ClParserStackNode(internfn);
+  auto *stack_node = new ClParserStackNode(internfn);
 
   pushStackNode(stack_node);
 }
@@ -2259,7 +2259,7 @@ void
 ClParserStackMgr::
 push(ClParserOperatorPtr op)
 {
-  ClParserStackNode *stack_node = new ClParserStackNode(op);
+  auto *stack_node = new ClParserStackNode(op);
 
   pushStackNode(stack_node);
 }
@@ -2268,7 +2268,7 @@ void
 ClParserStackMgr::
 push(ClParserTypePtr type)
 {
-  ClParserStackNode *stack_node = new ClParserStackNode(type);
+  auto *stack_node = new ClParserStackNode(type);
 
   pushStackNode(stack_node);
 }
@@ -2277,7 +2277,7 @@ void
 ClParserStackMgr::
 push(ClParserUserFnPtr userfn)
 {
-  ClParserStackNode *stack_node = new ClParserStackNode(userfn);
+  auto *stack_node = new ClParserStackNode(userfn);
 
   pushStackNode(stack_node);
 }
@@ -2286,7 +2286,7 @@ void
 ClParserStackMgr::
 push(ClParserValuePtr value)
 {
-  ClParserStackNode *stack_node = new ClParserStackNode(value);
+  auto *stack_node = new ClParserStackNode(value);
 
   pushStackNode(stack_node);
 }
@@ -2295,7 +2295,7 @@ void
 ClParserStackMgr::
 push(ClParserVarRefPtr var_ref)
 {
-  ClParserStackNode *stack_node = new ClParserStackNode(var_ref);
+  auto *stack_node = new ClParserStackNode(var_ref);
 
   pushStackNode(stack_node);
 }
@@ -2304,7 +2304,7 @@ void
 ClParserStackMgr::
 push(ClParserStructVarRefPtr svar_ref)
 {
-  ClParserStackNode *stack_node = new ClParserStackNode(svar_ref);
+  auto *stack_node = new ClParserStackNode(svar_ref);
 
   pushStackNode(stack_node);
 }
@@ -2507,7 +2507,7 @@ startStack()
   if (current_stack_)
     stack_stack_.push_back(current_stack_);
 
-  ClParserStack *stack = new ClParserStack;
+  auto *stack = new ClParserStack;
 
   current_stack_ = ClParserStackPtr(stack);
 

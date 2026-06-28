@@ -16,7 +16,7 @@ ClParserIdentifierPtr
 ClParserIdentifierMgr::
 createIdentifier(const std::string &name)
 {
-  ClParserIdentifier *identifier = new ClParserIdentifier(name);
+  auto *identifier = new ClParserIdentifier(name);
 
   return ClParserIdentifierPtr(identifier);
 }

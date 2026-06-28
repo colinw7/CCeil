@@ -6,7 +6,7 @@
 
 class ClParserArray : public ClParserObj {
  public:
-  typedef CMultiArrayT<ClParserValuePtr> ValueArray;
+  using ValueArray = CMultiArrayT<ClParserValuePtr>;
 
   static int getErrorCode() { return error_code_; }
 
@@ -293,7 +293,7 @@ class ClParserArray : public ClParserObj {
  private:
   static int error_code_;
 
-  ClParserValueType type_;
+  ClParserValueType type_ { CL_PARSER_VALUE_TYPE_NONE };
   ValueArray        values_;
 };
 

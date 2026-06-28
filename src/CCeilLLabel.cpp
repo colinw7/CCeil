@@ -4,7 +4,7 @@ ClLanguageLabelData *
 ClLanguageLabelDataMgr::
 createLabelData(const std::string &name)
 {
-  ClLanguageLabelData *label_data = new ClLanguageLabelData(name);
+  auto *label_data = new ClLanguageLabelData(name);
 
   label_stack_.push_back(label_data);
 

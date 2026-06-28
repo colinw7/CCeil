@@ -6,7 +6,7 @@ ClParserArrayPtr
 ClParserArray::
 createArray()
 {
-  ClParserArray *array = new ClParserArray;
+  auto *array = new ClParserArray;
 
   return ClParserArrayPtr(array);
 }
@@ -15,7 +15,7 @@ ClParserArrayPtr
 ClParserArray::
 createArray(ClParserValueType type, const uint *dims, uint num_dims)
 {
-  ClParserArray *array = new ClParserArray(type, dims, num_dims);
+  auto *array = new ClParserArray(type, dims, num_dims);
 
   return ClParserArrayPtr(array);
 }
@@ -24,7 +24,7 @@ ClParserArrayPtr
 ClParserArray::
 createArray(ClParserValueType type, const ValueArray &values)
 {
-  ClParserArray *array = new ClParserArray(type, values);
+  auto *array = new ClParserArray(type, values);
 
   return ClParserArrayPtr(array);
 }
@@ -33,7 +33,7 @@ ClParserArrayPtr
 ClParserArray::
 createArray(const uint *dims, uint num_dims, const double *reals)
 {
-  ClParserArray *array = new ClParserArray(dims, num_dims, reals);
+  auto *array = new ClParserArray(dims, num_dims, reals);
 
   return ClParserArrayPtr(array);
 }
@@ -42,7 +42,7 @@ ClParserArrayPtr
 ClParserArray::
 createArray(const uint *dims, uint num_dims, const float *reals)
 {
-  ClParserArray *array = new ClParserArray(dims, num_dims, reals);
+  auto *array = new ClParserArray(dims, num_dims, reals);
 
   return ClParserArrayPtr(array);
 }
@@ -51,7 +51,7 @@ ClParserArrayPtr
 ClParserArray::
 createArray(const uint *dims, uint num_dims, const long *integers)
 {
-  ClParserArray *array = new ClParserArray(dims, num_dims, integers);
+  auto *array = new ClParserArray(dims, num_dims, integers);
 
   return ClParserArrayPtr(array);
 }
@@ -60,7 +60,7 @@ ClParserArrayPtr
 ClParserArray::
 createArray(const uint *dims, uint num_dims, const int *integers)
 {
-  ClParserArray *array = new ClParserArray(dims, num_dims, integers);
+  auto *array = new ClParserArray(dims, num_dims, integers);
 
   return ClParserArrayPtr(array);
 }
@@ -69,7 +69,7 @@ ClParserArrayPtr
 ClParserArray::
 createArray(const uint *dims, uint num_dims, const char **strs)
 {
-  ClParserArray *array = new ClParserArray(dims, num_dims, strs);
+  auto *array = new ClParserArray(dims, num_dims, strs);
 
   return ClParserArrayPtr(array);
 }
@@ -78,7 +78,7 @@ ClParserArrayPtr
 ClParserArray::
 createArray(const uint *dims, uint num_dims, const StringVectorT &strs)
 {
-  ClParserArray *array = new ClParserArray(dims, num_dims, strs);
+  auto *array = new ClParserArray(dims, num_dims, strs);
 
   return ClParserArrayPtr(array);
 }
@@ -87,7 +87,7 @@ ClParserArrayPtr
 ClParserArray::
 createArray(const uint *dims, uint num_dims, const LongVectorT &integers)
 {
-  ClParserArray *array = new ClParserArray(dims, num_dims, integers);
+  auto *array = new ClParserArray(dims, num_dims, integers);
 
   return ClParserArrayPtr(array);
 }
@@ -96,7 +96,7 @@ ClParserArrayPtr
 ClParserArray::
 createArray(const uint *dims, uint num_dims, double real)
 {
-  ClParserArray *array = new ClParserArray(dims, num_dims, real);
+  auto *array = new ClParserArray(dims, num_dims, real);
 
   return ClParserArrayPtr(array);
 }
@@ -105,7 +105,7 @@ ClParserArrayPtr
 ClParserArray::
 createArray(const UIntVectorT &dims, double real)
 {
-  ClParserArray *array = new ClParserArray(dims, real);
+  auto *array = new ClParserArray(dims, real);
 
   return ClParserArrayPtr(array);
 }
@@ -114,7 +114,7 @@ ClParserArrayPtr
 ClParserArray::
 createArray(const uint *dims, uint num_dims, long integer)
 {
-  ClParserArray *array = new ClParserArray(dims, num_dims, integer);
+  auto *array = new ClParserArray(dims, num_dims, integer);
 
   return ClParserArrayPtr(array);
 }
@@ -123,7 +123,7 @@ ClParserArrayPtr
 ClParserArray::
 createArray(const UIntVectorT &dims, long integer)
 {
-  ClParserArray *array = new ClParserArray(dims, integer);
+  auto *array = new ClParserArray(dims, integer);
 
   return ClParserArrayPtr(array);
 }
@@ -132,7 +132,7 @@ ClParserArrayPtr
 ClParserArray::
 createArray(const uint *dims, uint num_dims, const char *str)
 {
-  ClParserArray *array = new ClParserArray(dims, num_dims, str);
+  auto *array = new ClParserArray(dims, num_dims, str);
 
   return ClParserArrayPtr(array);
 }
@@ -141,7 +141,7 @@ ClParserArrayPtr
 ClParserArray::
 createArray(const UIntVectorT &dims, const char *str)
 {
-  ClParserArray *array = new ClParserArray(dims, str);
+  auto *array = new ClParserArray(dims, str);
 
   return ClParserArrayPtr(array);
 }
@@ -150,7 +150,7 @@ ClParserArrayPtr
 ClParserArray::
 createArray(const UIntVectorT &dims, const std::string &str)
 {
-  ClParserArray *array = new ClParserArray(dims, str);
+  auto *array = new ClParserArray(dims, str);
 
   return ClParserArrayPtr(array);
 }
@@ -159,7 +159,7 @@ ClParserArrayPtr
 ClParserArray::
 createArray(ClParserTypePtr type, const uint *dims, uint num_dims)
 {
-  ClParserArray *array = new ClParserArray(type, dims, num_dims);
+  auto *array = new ClParserArray(type, dims, num_dims);
 
   return ClParserArrayPtr(array);
 }
@@ -168,7 +168,7 @@ ClParserArrayPtr
 ClParserArray::
 createArray(ClParserTypePtr type, const UIntVectorT &dims)
 {
-  ClParserArray *array = new ClParserArray(type, dims);
+  auto *array = new ClParserArray(type, dims);
 
   return ClParserArrayPtr(array);
 }
@@ -177,7 +177,7 @@ ClParserArrayPtr
 ClParserArray::
 createArray(const uint *dims, uint num_dims, const ClParserValuePtr *values)
 {
-  ClParserArray *array = new ClParserArray(dims, num_dims, values);
+  auto *array = new ClParserArray(dims, num_dims, values);
 
   return ClParserArrayPtr(array);
 }
@@ -186,7 +186,7 @@ ClParserArrayPtr
 ClParserArray::
 createArray(const ClParserValuePtr *values, uint num_values)
 {
-  ClParserArray *array = new ClParserArray(values, num_values);
+  auto *array = new ClParserArray(values, num_values);
 
   return ClParserArrayPtr(array);
 }
@@ -195,7 +195,7 @@ ClParserArrayPtr
 ClParserArray::
 createArray(const ClParserValueArray &values)
 {
-  ClParserArray *array = new ClParserArray(values);
+  auto *array = new ClParserArray(values);
 
   return ClParserArrayPtr(array);
 }
@@ -204,7 +204,7 @@ ClParserArrayPtr
 ClParserArray::
 createArray(const ClParserValuePtr *values, const uint *dims, uint num_dims)
 {
-  ClParserArray *array = new ClParserArray(values, dims, num_dims);
+  auto *array = new ClParserArray(values, dims, num_dims);
 
   return ClParserArrayPtr(array);
 }
@@ -213,7 +213,7 @@ ClParserArrayPtr
 ClParserArray::
 createArray(const ClParserValueArray &values, const UIntVectorT &dims)
 {
-  ClParserArray *array = new ClParserArray(values, dims);
+  auto *array = new ClParserArray(values, dims);
 
   return ClParserArrayPtr(array);
 }
@@ -222,7 +222,7 @@ ClParserArrayPtr
 ClParserArray::
 createArray(const ClParserArray &array)
 {
-  ClParserArray *parray = new ClParserArray(array);
+  auto *parray = new ClParserArray(array);
 
   return ClParserArrayPtr(parray);
 }
@@ -231,7 +231,7 @@ createArray(const ClParserArray &array)
 
 ClParserArray::
 ClParserArray() :
- ClParserObj(CL_PARSER_VALUE_TYPE_ARRAY), type_(CL_PARSER_VALUE_TYPE_NONE)
+ ClParserObj(CL_PARSER_VALUE_TYPE_ARRAY)
 {
 }
 

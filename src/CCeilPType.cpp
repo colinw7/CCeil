@@ -31,7 +31,7 @@ ClParserTypePtr
 ClParserTypeMgr::
 createType()
 {
-  ClParserType *type = new ClParserType;
+  auto *type = new ClParserType;
 
   return addType(type);
 }
@@ -40,7 +40,7 @@ ClParserTypePtr
 ClParserTypeMgr::
 createType(const std::string &name)
 {
-  ClParserType *type = new ClParserType(name);
+  auto *type = new ClParserType(name);
 
   return addType(type);
 }
@@ -55,7 +55,7 @@ createType(const std::string &name, const std::string &arg_string)
       ! ClParserInst->isValidNewName(ClParserNameType::STRUCT, name))
     ClErrThrow(ClErr::INVALID_STRUCT_NAME);
 
-  ClParserType *type = new ClParserType(name);
+  auto *type = new ClParserType(name);
 
   type->setIsFixed(true);
 
@@ -335,7 +335,7 @@ addSubType(const std::string &name, uint *dims, uint num_dims)
 {
   ClParserTypePtr type = ClParserInst->getType(name_);
 
-  ClParserSubType *sub_type = new ClParserSubType(name, type, dims, num_dims);
+  auto *sub_type = new ClParserSubType(name, type, dims, num_dims);
 
   sub_types_.push_back(sub_type);
 }
@@ -346,7 +346,7 @@ addSubType(const std::string &name, const UIntVectorT &dims)
 {
   ClParserTypePtr type = ClParserInst->getType(name_);
 
-  ClParserSubType *sub_type = new ClParserSubType(name, type, dims);
+  auto *sub_type = new ClParserSubType(name, type, dims);
 
   sub_types_.push_back(sub_type);
 }

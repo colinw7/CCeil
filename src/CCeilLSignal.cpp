@@ -147,7 +147,7 @@ raiseSignal(const std::string &name, const std::string &data)
   else if (type == SIGSYNTAX) {
     char *message;
 
-    ClLanguageArgs *args = new ClLanguageArgs;
+    auto *args = new ClLanguageArgs;
 
     args->startArgs(nullptr);
 
@@ -163,7 +163,7 @@ raiseSignal(const std::string &name, const std::string &data)
   else if (type == SIGEXPR) {
     char *message;
 
-    ClLanguageArgs *args = new ClLanguageArgs;
+    auto *args = new ClLanguageArgs;
 
     args->startArgs(nullptr);
 

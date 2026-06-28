@@ -37,7 +37,7 @@ startBlock(const ClLanguageCommandList &command_list, ClBlockType type)
   /* Save any active block command's environment */
 
   if (current_block_data_.getCommands()) {
-    ClLanguageBlockData *block_data = new ClLanguageBlockData(current_block_data_);
+    auto *block_data = new ClLanguageBlockData(current_block_data_);
 
     block_data_stack_.push_back(block_data);
   }

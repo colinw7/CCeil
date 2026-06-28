@@ -392,22 +392,23 @@ class ClParser {
   std::string string_format_    { "%s" };
   bool        math_fail_        { false };
   double      tolerance_        { 1E-6 };
-  bool        parse_as_reals_   { false };
-  bool        dollar_prefix_    { false };
+
+  bool parse_as_reals_ { false };
+  bool dollar_prefix_  { false };
 
 #ifdef CL_PARSER_DEBUG
   CRoutineTraceMgr trace_mgr_;
 #else
-  bool             debug_       { false};
+  bool debug_ { false };
 #endif
 
-  int         init_depth_;
-  FILE       *output_fp_;
-  OutputProc  output_proc_;
-  void       *output_data_         { nullptr };
+  int         init_depth_  { 0 };
+  FILE       *output_fp_   { nullptr };
+  OutputProc  output_proc_ { nullptr };
+  void       *output_data_ { nullptr };
 
-  StrCmpProc  strcmp_;
-  StrNCmpProc strncmp_;
+  StrCmpProc  strcmp_  { nullptr };
+  StrNCmpProc strncmp_ { nullptr };
 
   ClParserVarMgr*     varMgr_      { nullptr };
   ClParserFuncMgr     funcMgr_;

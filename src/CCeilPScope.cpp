@@ -46,7 +46,7 @@ ClParserScopePtr
 ClParserScopeMgr::
 createScope(ClParserScope *parent, const std::string &name)
 {
-  ClParserScope *scope = new ClParserScope(parent, name);
+  auto *scope = new ClParserScope(parent, name);
 
   return ClParserScopePtr(scope);
 }

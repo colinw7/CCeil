@@ -24,7 +24,7 @@ createFunc(const std::string &name, int *error_code)
     return false;
   }
 
-  ClParserFunc *func = new ClParserFunc(name);
+  auto *func = new ClParserFunc(name);
 
   addFunction(func);
 
@@ -83,7 +83,7 @@ createFunc(const std::string &function_string, const std::string &expression_str
 
   //------
 
-  ClParserFunc *func = new ClParserFunc(function_name);
+  auto *func = new ClParserFunc(function_name);
 
   addFunction(func);
 
